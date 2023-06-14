@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>HorangHill</title>
+  <link rel="icon" type="image/x-icon" href="HorangHill.png">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <script src="fontawesome.js" defer></script>
+  <script src="index.js" defer></script>
+  <script src="addShapes.js" defer></script>
+  <script src="sceneexplorer.js" defer></script>
+  <script src="winmgmt.js" defer></script>
+  <link rel="icon" type="image/x-icon" href="../css/HorangHill.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="windows.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+  <script type="text/javascript" src="js/three/GLTFExporter.js" defer></script>
+  <script type="text/javascript" src="js/three/ImprovedNoise.js" defer></script>
+  <script type="text/javascript" src="js/three/GLTFLoader.js" defer></script>
+  <script type="text/javascript" src="js/three/three.min.js"></script>
+  <script type="text/javascript" src="js/three/OrbitControls.js"></script>
+  <script type="text/javascript" src="js/three/stats.min.js"></script>
+  <script type="text/javascript" src="js/three/TransformControls.js"></script>
+  <script type="text/javascript" src="js/three/FileSaver.min.js"></script>
+</head>
+
+<body>
+  <div id="sidebar">
+    <h1>HorangHill</h1>
+    LigmaForge Editor Version 1.0
+    <BR>
+    Copyright 2023 HorangStudios
+  </div>
+
+  <div id="main">
+    <div class="ribbon">
+      <div class="titlebar">
+        <ul class="ul">
+
+          <li class="dropdown li">
+            <a href="javascript:void(0)" class="dropbtn">File</a>
+            <div class="dropdown-content">
+              <a onclick="exportScene()"><i class="fa fa-save"></i> Save Project</a>
+              <input type="file" accept=".hhls" id="file-input" onchange="importScene()" style="display: none;" />
+              <a onclick="document.getElementById('file-input').click();"><i class="fa fa-folder-open"></i>
+                Open Project</a>
+            </div>
+          </li>
+
+          <li class="dropdown li">
+            <a href="javascript:void(0)" class="dropbtn">Edit</a>
+            <div class="dropdown-content">
+              <a aria-disabled><i class="fa fa-undo"></i> Undo</a>
+              <a aria-disabled><i class="fa fa-redo"></i> Redo</a>
+            </div>
+          </li>
+
+          <li class="dropdown li">
+            <a href="javascript:void(0)" class="dropbtn">Insert</a>
+            <div class="dropdown-content">
+              <a onclick="spawnCube(0,0,0,1,1,1,0xff0000)"><i class="fa fa-cubes"></i> Cube</a>
+              <a onclick="addCylinder(0,0,0,5,5,10,32,0xff0000)"><i class="fa fa-cubes"></i> Cylinder</a>
+              <a onclick="addSphere(15,32,16,0,0,0,0xff0000)"><i class="fa fa-cubes"></i> Sphere</a>
+              <a onclick="addLight(0,0,0,10,10,0xffffff)"><i class="fa fa-cubes"></i> Light</a>
+            </div>
+          </li>
+
+          <li class="dropdown li">
+            <a href="javascript:void(0)" class="dropbtn">About</a>
+            <div class="dropdown-content">
+              <a href="#"><i class="fa fa-square-h"></i> HorangHill LigmaForge Engine. Version 1.0</a>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <div style="display: inline-block;" class="transformControls">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('translate');">
+          <img src="../resources/icons/arrow_nsew.png">
+        </button>
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('rotate');">
+          <img src="../resources/icons/Silk_arrow_rotate_anticlockwise.png">
+        </button>
+      </div>
+
+      <div style="display: inline-block;">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="spawnCube(0,0,0,1,1,1,0xff0000)">
+          <img src="../resources/icons/brick_add.png">
+        </button>
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addCylinder(0,0,0,5,5,10,32,0xff0000)">
+          <img src="../resources/icons/database_add.png">
+        </button>
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addSphere(15,32,16,0,0,0,0xff0000)">
+          <img src="../resources/icons/Contrast_high.png">
+        </button>
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addLight(0,0,0,10,10,0xffffff)">
+          <img src="../resources/icons/lightbulb_add.png">
+        </button>
+      </div>
+
+      <div style="display: inline-block;">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="CreateEditorCodeWindow()">
+          <img src="../resources/icons/script_add.png">
+        </button>
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="playScene()">
+          <img src="../resources/icons/control_play_blue.png">
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

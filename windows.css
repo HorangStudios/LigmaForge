@@ -1,0 +1,234 @@
+.window {
+    height: fit-content !important;
+    width: fit-content !important;
+    display: none;
+    animation: fadein;
+    animation-duration: 0.1s;
+    position: absolute !important;
+}
+
+.header {
+    width: 100% !important;
+    height: fit-content;
+    background-color: #1d1d1ddd;
+    cursor: move;
+    border-radius: 5px 5px 0px 0px;
+    overflow: auto;
+    backdrop-filter: blur(10px);
+    border: #9d9d9d20 solid;
+    border-width: 2px 0px 0px 0px;
+}
+
+.content {
+    width: fit-content;
+    margin: 0;
+    padding: 0;
+    height: fit-content;
+    border-radius: 0px 0px 5px 5px;
+}
+
+.content textarea {
+    resize: both;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: none;
+    min-width: 140.8px;
+    color: black;
+    padding: 5px;
+    font-size: 12px;
+}
+
+.headertext {
+    color: white;
+    background: none;
+    height: 23.5px;
+    border: black solid 0px;
+    border-radius: 5px;
+    font-size: 17.5px;
+    margin: 3px;
+    margin-right: 0px;
+    transition: all 0.1s ease;
+}
+
+.headertext:hover {
+    color: white;
+    background: #4d4d4d90;
+    height: 23.5px;
+    border: black solid 0px;
+    border-radius: 5px;
+    font-size: 17.5px;
+    margin: 3px;
+    margin-right: 0px;
+    transition: all 0.1s ease;
+}
+
+.closebutton {
+    float: right;
+    color: white;
+    background: darkred;
+    height: 23.5px;
+    width: 23.5px;
+    border-radius: 5px;
+    font-size: 18px;
+    margin: 3px;
+    transition: all 0.1s ease;
+    border: 1px groove darkred;
+    border-width: 1px 0px 0px 0px;
+}
+
+.closebutton:hover {
+    background-color: red;
+    transition: all 0.1s ease;
+}
+
+.closebutton:active {
+    background-color: darkred;
+    transition: all 0.1s ease;
+}
+
+.menubutton {
+    background-color: #2d2d2d00;
+    border: black solid 0px;
+    color: black;
+    float: left;
+    height: 32px;
+    width: 32px !important;
+    border-radius: 3px;
+    padding: 4px !important;
+    margin: 3px;
+    transition: all 0.1s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    outline: none;
+}
+
+nav {
+    display: inline-block;
+}
+
+.menubutton2 {
+    background: none;
+    border: black solid 0px;
+    font-family: Inter;
+    color: white;
+    float: left;
+    text-align: left;
+    font-size: 20px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.minimize {
+    float: right;
+    color: white;
+    background: NONE;
+    height: 23.5px;
+    width: 23.5px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin: 3px;
+    transition: all 0.1s ease;
+    border: none;
+}
+
+.minimize:hover {
+    background-color: red;
+    border-width: 1px 0px 0px 0px;
+    transition: all 0.1s ease;
+}
+
+.minimize:active {
+    background-color: darkred;
+    transition: all 0.1s ease;
+}
+
+.menubuttonminimized {
+    color: white;
+    float: left;
+    padding: 4px !important;
+    font-size: 20px;
+    height: 32px;
+    width: 32px;
+    margin: 3px;
+    transition: all 0.1s ease;
+    border-radius: 3px;
+    background: none;
+    border: solid #4d4d4d;
+    border-width: 0px 0px 3px 0px;
+}
+
+.menubuttonminimizing {
+    background-color: #9d9d9d20;
+    border: 1px solid #9d9d9d20;
+    border-width: 2px 0px 0px 0px;
+}
+
+.menubutton:hover {
+    background-color: #4d4d4d40;
+    transition: all 0.1s ease;
+}
+
+.menubutton:active {
+    background-color: #6d6d6d66;
+    cursor: progress;
+    transition: all 0.1s ease;
+}
+
+#menutogglebutton {
+    font-size: 22px;
+    color: white;
+}
+
+.menubuttonminimized:hover {
+    background-color: #8d8d8d80;
+    transition: all 0.1s ease;
+}
+
+.menubuttonminimized:active {
+    background-color: #6d6d6d66;
+    transition: all 0.1s ease;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideright {
+    0% {
+        transform: translateX(50%);
+    }
+
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes slideup {
+    0% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: translateY(0%);
+    }
+}
+
+#menutogglebuttonimg {
+    height: 22.5px !important;
+    width: 22.5px !important;
+    margin: 0 !important;
+}
+
+.focused {
+    z-index: 5 !important;
+}

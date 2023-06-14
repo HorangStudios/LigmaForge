@@ -1,0 +1,173 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+@font-face {
+  font-family: horangfont;
+  src: url("Righteous-Regular.ttf");
+}
+
+* {
+  transition: all 0.25s ease;
+  font-family: horangfont;
+}
+
+header {
+  background:rgba(0, 0, 0, .20) url('horanghillstartingplace.png');
+  background-position: center;
+  color: whitesmoke;
+  padding: 20px;
+  height: fit-content;
+  background-blend-mode: darken;
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1; 
+}
+header h1 {
+  padding: 0px 20px;
+}
+
+html {
+  background-image: url('../html/horanghillbg.png');
+  background-size: 7.5%;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: whitesmoke;
+  min-height: calc(100vh - 130px);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+label,
+textarea,
+button,
+input {
+  font-size: 16px;
+  margin: 10px;
+  box-sizing: border-box;
+  background: whitesmoke;
+}
+
+textarea,
+input {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+button {
+  background: rgba(0, 0, 0, .20) url('horanghillstartingplace.png');
+  background-blend-mode: darken;
+  background-position: center;
+  color: whitesmoke;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+  aspect-ratio: 1 / 1;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.card:hover {
+  background-color: #d1d1d1;
+  border: 1px solid gray;
+  box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+}
+
+.quickcard {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+  height: fit-content;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.quickcard:hover {
+  background-color: #d1d1d1;
+  border: 1px solid gray;
+  box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+}
+
+.navlink {
+  padding: 10px 20px;
+}
+
+.cardholder {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+
+#title {
+  display: block;
+  font-size: 2em;
+  margin-inline-start: 0px;
+  font-weight: bold;
+  border: none;
+  padding: 0;
+}
+
+#desc {
+  display: block;
+  font-size: 1.17em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  border: none;
+  padding: 0;
+  height: fit-content;
+}
+
+#adcontainer {
+  text-align: center;
+}
+
+body, html {
+  background: whitesmoke;
+}
+
+.author, #dev {
+  color: #444444;
+}
+
+.notifBanner {
+  padding: 10px;
+  background-color: orangered;
+  color: white;
+  text-align: center;
+}

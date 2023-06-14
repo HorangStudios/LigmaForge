@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            user-select: none;
+            font-family: horangfont;
+            transition: all 0.5s ease !important;
+        }
+
+        @font-face {
+            font-family: horangfont;
+            src: url("../../css/Righteous-Regular.ttf");
+        }
+
+        #menutoggle {
+            position: absolute;
+            z-index: 2;
+            bottom: 0;
+            height: 50px;
+            width: 50px;
+            margin: 10px;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        #menutoggle img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #1d1d1d;
+            overflow: hidden;
+            transition: 0.5s;
+        }
+
+        .sidenav a {
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 17.5px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        .sidenav .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        #main {
+            transition: margin-left .5s;
+            padding: 20px;
+        }
+
+        .bottomsidebar {
+            background: #2d2d2d;
+            height: 70px;
+            padding-left: 55px;
+            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+        }
+
+        .topsidebar {
+            height: calc(100% - 70px);
+        }
+    </style>
+
+    <title id="pagetitle">HorangHill Player</title>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/three@0.119.1/build/three.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.1/build/cannon.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/three@0.119.1/examples/js/controls/OrbitControls.js"></script>
+    <script type="text/javascript" src="editor/ImprovedNoise.js"></script>
+    <script type="text/javascript" src="editor/editorSpawnSDK.js" defer></script>
+    <script type="text/javascript" src="editor/editor.js" defer></script>
+    <script type="text/javascript" src="editor/fontawesome.js" defer></script>
+    <script src="firebaseMapLoader.js" defer></script>
+</head>
+
+<body style="height: 100%; width: 100%;" id="section">
+    <button id="menutoggle" onclick="toggleSideBar()">
+        <img src="../../css/HorangHill.png">
+    </button>
+
+    <div id="Sidenav" class="sidenav" style="width: 0px;">
+        <div class="topsidebar" id="topsidebar">
+            <a onclick="window.location.replace('../index.html')"><i class="fa-solid fa-angle-left"></i> Quit</a>
+        </div>
+        <div class="bottomsidebar">
+            <a id="gamename">Game</a>
+        </div>
+    </div>
+</body>

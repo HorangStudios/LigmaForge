@@ -1,0 +1,264 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	transition: ease all .25s;
+	user-select: none;
+	color: white;
+	scroll-behavior: smooth;
+}
+
+body,
+html {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	height: 60%;
+	background-color: #000000;
+}
+
+@font-face {
+	font-family: horangfont;
+	src: url("Righteous-Regular.ttf");
+}
+
+header {
+	Background-image: url("horanghillstartingplace.png");
+	height: 100vh;
+	background-size: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	animation: skeleton-loading 1s linear infinite alternate;
+	text-align: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	font-weight: bold;
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+header a {
+	text-decoration: none;
+}
+
+header button {
+	background: none;
+	border: none;
+	font-weight: bold;
+	font-size: 17.5px;
+	padding: 12.5px;
+}
+
+header button:hover {
+	background: #2d2d2d;
+	border-radius: 3px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+section {
+	padding-top: 30px;
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-bottom: 30px;
+}
+
+footer {
+	background-color: lightgray;
+	padding: 30px;
+}
+
+h1 {
+	text-align: center;
+}
+
+p {
+	text-align: center;
+}
+
+nav {
+	background-color: #000000dd;
+	backdrop-filter: blur(10px);
+	position: fixed;
+	width: 100%;
+	z-index: 2;
+}
+
+li {
+	float: right;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 5px;
+	height: 55px;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+li a {
+	display: block;
+	text-align: center;
+	padding: 12.5px;
+	text-decoration: none;
+	border-radius: 3px;
+	font-weight: bold;
+}
+
+li a:hover {
+	background-color: #2d2d2d;
+}
+
+
+.logo1 {
+	height: 46px;
+	width: 46px;
+}
+
+.searchbox {
+	position: relative;
+	bottom: 3%;
+	border-radius: 3px;
+}
+
+.search {
+	padding: 12.5px;
+	float: right;
+	border-radius: 3px;
+	display: none;
+}
+
+#game {
+	width: 250px !important;
+	height: 250px !important;
+	background-color: #1d1d1d;
+	border-radius: 5px;
+	text-align: center;
+	float: left;
+	margin: 15px;
+	background-size: cover;
+	text-shadow: 2px 2px 10px #000000;
+	transition: all 0.5s ease;
+	animation: skeleton-loading 1s linear infinite alternate;
+	border: #5d5d5d solid 1px;
+}
+
+#game:hover {
+	box-shadow: 0 8px 16px 0 #5d5d5d, 0 6px 20px 0 #5d5d5d;
+	transition: all 0.5s ease;
+	cursor: pointer;
+}
+
+input,
+textarea,
+#form button,
+.form button {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	box-sizing: border-box;
+	border-radius: 3px;
+	border: black solid 1px;
+	font-size: 16px;
+	padding: 5px;
+	text-align: center;
+	width: 300px;
+	margin-bottom: 5px;
+}
+
+@keyframes skeleton-loading {
+	0% {
+		background-color: hsl(200, 20%, 80%);
+	}
+
+	100% {
+		background-color: hsl(200, 20%, 95%);
+	}
+}
+
+#gamecard1 {
+	background-color: #000000dd;
+	backdrop-filter: blur(10px);
+	height: 32.2%;
+	overflow: hidden;
+	box-sizing: border-box;
+	padding: 10px;
+	text-align: left;
+	border-radius: 4px;
+}
+
+#gamecard2:hover {
+	opacity: 1;
+}
+
+#gamecard2 {
+	height: 68%;
+	padding: 5px;
+	box-sizing: border-box;
+	opacity: 0;
+}
+
+.logo1 {
+	border-radius: 5px;
+}
+
+#form input,
+.form input,
+#form textarea,
+.form textarea,
+#form button,
+.form button {
+	border: none;
+	background: #333333;
+	text-align: left;
+	width: 40vw;
+	padding: 10px;
+}
+
+#form,
+.form {
+	background-color: #000000dd;
+	backdrop-filter: blur(10px);
+	padding: 20px;
+	height: 100%;
+}
+
+#title {
+	display: block;
+	font-size: 2em;
+	margin-inline-start: 0px;
+	font-weight: bold;
+	border: none;
+	padding: 0;
+	background: none !important;
+}
+
+#desc {
+	display: block;
+	font-size: 1.17em;
+	margin-inline-start: 0px;
+	margin-inline-end: 0px;
+	font-weight: bold;
+	border: none;
+	padding: 0;
+	height: fit-content;
+	background: none !important;
+}
+
+#dev {
+	font-size: 1.17em;
+	padding: 10px;
+	text-align: left;
+}
+
+.quickcard {
+	background-color: #333333;
+	backdrop-filter: blur(10px);
+	padding: 10px;
+	margin: 5px;
+	text-align: left;
+	border-radius: 5px;
+}
+
+hr {
+	border: #333333 solid 1px;
+}
