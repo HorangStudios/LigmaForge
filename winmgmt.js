@@ -73,3 +73,6 @@ function focusWindow(windowElem) {
 async function CreateEditorCodeWindow() {
     eval(await spawnCodeEditor('', 'Run Editor Script'));
 }
+
+//spawn baseplate
+spawnCube(0, -1, 0, 32, 1, 32, 0x008000)

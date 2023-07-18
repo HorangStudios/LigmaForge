@@ -6,6 +6,7 @@ color: red;
 text-shadow: 3px 3px 0 rgb(217,31,38) , 6px 6px 0 rgb(226,91,14) , 9px 9px 0 rgb(245,221,8) , 12px 12px 0 rgb(5,148,68) , 15px 15px 0 rgb(2,135,206) , 18px 18px 0 rgb(4,77,145) , 21px 21px 0 rgb(42,21,113)
 `);
 console.log(`HorangHill (LigmaForge) Client Version ${ver}`)
+document.getElementById('clientversion').innerText = `HorangHill (LigmaForge) Client Version ${ver}`
 
 //editor debug
 function debug(text) {
@@ -14,12 +15,13 @@ function debug(text) {
 
 // Create a scene
 var scene = new THREE.Scene();
-
-//run scripts
-var runscript = 0;
+const color = 0xadd8e6;  // white
+const near = 10;
+const far = 100;
+scene.fog = new THREE.Fog(color, near, far);
 
 //create a camera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
 camera.position.set(5, 5, 5);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -83,13 +85,14 @@ const texture = loader.load([
 ]);
 scene.background = texture;
 
-// Add OrbitControls
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
-
 // Function to import a GLTF file to the scene
 function loadMap(sceneSchematics) {
+    var loadedItems = 0
+
     sceneSchematics.forEach(element => {
         let sceneNode;
+
+        loadedItems += 1;
 
         switch (element.type) {
             case "cube":
@@ -126,7 +129,7 @@ function loadMap(sceneSchematics) {
             // Add cases for other object types if needed
 
             case "cylinder":
-                var cylinderGeometry = new THREE.CylinderGeometry(element.radiusTop, element.radiusBottom, element.height, element.radialSegments);
+                var cylinderGeometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
                 var cylinderMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
@@ -137,7 +140,7 @@ function loadMap(sceneSchematics) {
                 scene.add(sceneNode);
 
                 // Create the corresponding Cannon.js body
-                var cylinderShape = new CANNON.Cylinder(element.radiusTop, element.radiusBottom, element.height, element.radialSegments);
+                var cylinderShape = new CANNON.Cylinder(element.radius, element.radius, element.height, element.radialSegments);
                 var cylinderBody = new CANNON.Body({ mass: element.mass });
                 cylinderBody.addShape(cylinderShape);
                 cylinderBody.position.set(element.x, element.y, element.z);
@@ -172,6 +175,11 @@ function loadMap(sceneSchematics) {
             default:
                 console.warn('Unknown Scene Node! ' + element.type);
         }
+
+        if (loadedItems == sceneSchematics.length) {
+            document.getElementById('gameload').style.display = "none";
+            spawnPlayer()
+        }
     });
 }
 
@@ -186,7 +194,7 @@ function animate() {
 
 function render() {
 
-    world.step(1 / 60);
+    world.step(1 / 120);
 
     // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
     world.bodies.forEach(function (body, index) {
@@ -211,8 +219,6 @@ function render() {
             }
         }
     });
-
-    controls.update()
 
     renderer.render(scene, camera);
 }
@@ -262,4 +268,15 @@ function onDocumentMouseDown(event) {
             }
         }
     }
+}
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
 }

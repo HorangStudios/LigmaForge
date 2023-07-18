@@ -84,6 +84,20 @@
         .topsidebar {
             height: calc(100% - 70px);
         }
+
+        .loadingScreen {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            background: #1d1d1dab;
+            color: white;
+            text-align: center;
+            justify-content: center;
+            place-items: center;
+            display: flex;
+        }
     </style>
 
     <title id="pagetitle">HorangHill Player</title>
@@ -95,6 +109,7 @@
     <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.1/build/cannon.min.js"></script>
     <script type="text/javascript"
         src="https://cdn.jsdelivr.net/npm/three@0.119.1/examples/js/controls/OrbitControls.js"></script>
+    <script src="editor/playerObject.js" defer></script>
     <script type="text/javascript" src="editor/ImprovedNoise.js"></script>
     <script type="text/javascript" src="editor/editorSpawnSDK.js" defer></script>
     <script type="text/javascript" src="editor/editor.js" defer></script>
@@ -103,6 +118,13 @@
 </head>
 
 <body style="height: 100%; width: 100%;" id="section">
+    <div class="loadingScreen" id="gameload">
+        <div>
+            <h1>Loading Game...</h1>
+            <span id="clientversion"></span>
+        </div>
+    </div>
+
     <button id="menutoggle" onclick="toggleSideBar()">
         <img src="../css/HorangHill.png">
     </button>

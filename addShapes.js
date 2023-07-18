@@ -36,7 +36,7 @@ function spawnCube(x, y, z, sizeX, sizeY, sizeZ, color) {
         "updateScript": "",
         "clickScript": "",
         
-        "mass": 1
+        "mass": 0
     }
 
     // Add the cube to the scene
@@ -82,57 +82,11 @@ function addSphere(sphereradius, spherewidth, sphereheight, x, y, z, color) {
         "updateScript": "",
         "clickScript": "",
         
-        "mass": 1
+        "mass": 0
     }
 
     // Add the sphere to the scene
     scene.add(sphere);
-    sceneSchematics.push(schematicItem)
-    listSchematic()
-}
-
-function addCone(x, y, z, radius, height, radialSegments, color) {
-    // Create a new geometry for the cone
-    var geometry = new THREE.ConeGeometry(radius, height, radialSegments);
-
-    // Create a new material for the cone
-    var material = new THREE.MeshPhongMaterial({ color: color });
-
-    // Create a new mesh from the geometry and material
-    var cone = new THREE.Mesh(geometry, material);
-    cone.castShadow = true;
-    cone.receiveShadow = true;
-    cone.position.set(x, y, z);
-
-    let schematicItem = {
-        "name": "cone",
-        "type": "cone",
-
-        "x": x,
-        "y": y,
-        "z": z,
-
-        "rotx": 0,
-        "roty": 0,
-        "rotz": 0,
-
-        "radius": radius,
-        "height": height,
-        "radialSegments": radialSegments,
-
-        "color": color,
-        "mat": "MeshPhongMaterial",
-        "tex": false,
-
-        "initScript": "",
-        "updateScript": "",
-        "clickScript": "",
-        
-        "mass": 1
-    }
-
-    // Add the cone to the scene
-    scene.add(cone);
     sceneSchematics.push(schematicItem)
     listSchematic()
 }
@@ -162,8 +116,7 @@ function addCylinder(x, y, z, radiusTop, radiusBottom, height, radialSegments, c
         "roty": 0,
         "rotz": 0,
         
-        "radiusTop": radiusTop,
-        "radiusBottom": radiusBottom,
+        "radius": radiusTop,
         "height": height,
         "radialSegments": radialSegments,
 
@@ -175,7 +128,7 @@ function addCylinder(x, y, z, radiusTop, radiusBottom, height, radialSegments, c
         "updateScript": "",
         "clickScript": "",
         
-        "mass": 1
+        "mass": 0
     }
 
     // Add the cone to the scene
@@ -213,4 +166,59 @@ function addLight(x, y, z, intensity, distance, color) {
     scene.add(light);
     sceneSchematics.push(schematicItem)
     listSchematic()
+}
+
+function generateterrain(voxsize, tersize, color) {
+    // Create a new ImprovedNoise object
+    var noise = new THREE.ImprovedNoise();
+
+    // Create a voxel size and terrain size
+    var voxelSize = voxsize;
+    var terrainSize = tersize;
+
+    // Create a new geometry and material for the voxel terrain
+    var geometry = new THREE.BoxGeometry(1, 1, 1);
+    var material = new THREE.MeshPhongMaterial({ color: color });
+
+    var generated = 0;
+
+    // Loop through each position in the terrain and create a voxel mesh
+    for (var x = 0; x < terrainSize; x++) {
+        for (var y = 0; y < terrainSize; y++) {
+            // Generate a random height value using ImprovedNoise
+            var height = noise.noise(x / 10, y / 10, 0) * 10;
+
+            let schematicItem = {
+                "name": "cube",
+                "type":"cube",
+
+                "x": (x * voxelSize) - (terrainSize / 2),
+                "y": height,
+                "z": (y * voxelSize) - (terrainSize / 2),
+
+                "rotx": 0,
+                "roty": 0,
+                "rotz": 0,
+                
+                "sizeX": voxelSize,
+                "sizeY": voxelSize,
+                "sizeZ": voxelSize,
+
+                "color": color,
+                "mat": "MeshPhongMaterial",
+                "tex": false,
+
+                "initScript": "",
+                "updateScript": "",
+                "clickScript": "",
+                
+                "mass": 0
+            }
+
+            sceneSchematics.push(schematicItem)
+            generated += 1;
+        }
+
+        if (generated == (terrainSize * terrainSize)) listSchematic();
+    }
 }

@@ -39,7 +39,7 @@ function listSchematic() {
                 scene.add(scenenode);
                 break;
             case "cylinder":
-                var geometry = new THREE.CylinderGeometry(element.radiusTop, element.radiusBottom, element.height, element.radialSegments);
+                var geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
                 var material = new THREE.MeshPhongMaterial({ color: element.color });
 
                 scenenode = new THREE.Mesh(geometry, material);

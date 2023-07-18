@@ -1,11 +1,15 @@
 // Create a scene
 var scene = new THREE.Scene();
+const color = 0xadd8e6;  // white
+const near = 10;
+const far = 100;
+scene.fog = new THREE.Fog(color, near, far);
 
 //declare objects
 var sceneSchematics = [];
 
 //create a camera
-var camera = new THREE.PerspectiveCamera(75, 640 / 400, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(75, 640 / 400, 0.1, 100);
 camera.position.set(5, 5, 5);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -16,8 +20,6 @@ renderer.setClearColor(0xadd8e6); // Set the background color to #add8e6
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.domElement.id = 'canvas';
-renderer.gammaInput = true;
-renderer.gammaOutput = true;
 document.getElementById('main').appendChild(renderer.domElement);
 
 // LIGHTS
@@ -123,7 +125,7 @@ function importScene() {
 }
 
 function playScene() {
-    const receiverWindow = window.open('player/engine.html', 'popup', 'popup=true');
+    const receiverWindow = window.open('player/engine.html', 'popup', 'popup=true,width=640,height=400');
 
     receiverWindow.addEventListener('load', function () {
         receiverWindow.loadMap(sceneSchematics)
