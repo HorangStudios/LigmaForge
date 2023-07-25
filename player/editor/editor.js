@@ -245,7 +245,7 @@ function render() {
 animate()
 
 function updatePhysics() {
-    world.step(1 / 120);
+    world.step(1 / 60);
 
     // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
     world.bodies.forEach(function (body, index) {
@@ -273,7 +273,6 @@ function toggleSideBar() {
 document.getElementById('canvas').addEventListener('click', onDocumentMouseDown, false);
 
 function onDocumentMouseDown(event) {
-
     // Get the mouse position relative to the canvas
     var mouse = new THREE.Vector2();
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
@@ -306,10 +305,8 @@ function onDocumentMouseDown(event) {
 window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
     renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
