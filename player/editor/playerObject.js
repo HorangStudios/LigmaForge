@@ -73,7 +73,8 @@ function spawnPlayer() {
 	  var cameraPosition = new THREE.Vector3();
 
     function playerLoop() {
-      camera.position.set(sceneNode.position.x, sceneNode.position.y + 3, sceneNode.position.z + 3);
+      const newCamPosition = new THREE.Vector3( sceneNode.position.x, sceneNode.position.y + 3, sceneNode.position.z + 3 );
+      camera.position.lerp(newCamPosition, 0.05);
       camera.lookAt( sceneNode.position );
       cubeBody.quaternion.x = 0
       cubeBody.quaternion.y = 0
@@ -92,11 +93,9 @@ function spawnPlayer() {
         cubeBody.position.x += 0.1
       }
       if (keyState.space) {
-        cubeBody.position.y += 0.1
+        cubeBody.velocity.y = 2.5;
       }
-
-      requestAnimationFrame(playerLoop)
     }
 
-    playerLoop()
+    audioTimerLoop(playerLoop, 0)
 }

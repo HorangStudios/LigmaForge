@@ -223,6 +223,12 @@ function animate() {
 }
 
 function render() {
+    renderer.render(scene, camera);
+}
+
+animate()
+
+function updatePhysics() {
     scene.traverse(function (object) {
         if (object instanceof THREE.Mesh && object.userData.scriptFunction) {
             try {
@@ -239,12 +245,6 @@ function render() {
         }
     });
 
-    renderer.render(scene, camera);
-}
-
-animate()
-
-function updatePhysics() {
     world.step(1 / 60);
 
     // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
