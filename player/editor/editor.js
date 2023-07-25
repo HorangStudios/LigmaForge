@@ -183,6 +183,38 @@ function loadMap(sceneSchematics) {
     });
 }
 
+//insane borrowed code from stackoverflow
+function audioTimerLoop(callback, frequency) {
+    var freq = frequency / 1000;
+    var aCtx = new AudioContext();
+
+    var silence = aCtx.createGain();
+    silence.gain.value = 0;
+    silence.connect(aCtx.destination);
+
+    onOSCend();
+
+    var stopped = false;
+    function onOSCend() {
+        var osc = aCtx.createOscillator();
+        osc.onended = onOSCend;
+        osc.connect(silence);
+        osc.start(0);
+        osc.stop(aCtx.currentTime + freq);
+        callback(aCtx.currentTime);
+        if (stopped) {
+        osc.onended = function() {
+            aCtx.close();
+            return;
+        };
+        }
+    };
+
+    return function() {
+        stopped = true;
+    };
+}
+
 // Render the scene
 function animate() {
 
@@ -192,8 +224,7 @@ function animate() {
 
 }
 
-function render() {
-
+function updatePhysics() {
     world.step(1 / 120);
 
     // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
@@ -203,6 +234,11 @@ function render() {
             body.threeMesh.quaternion.copy(body.quaternion);
         }
     });
+}
+
+audioTimerLoop(updatePhysics, 0)
+
+function render() {
 
     scene.traverse(function (object) {
         if (object instanceof THREE.Mesh && object.userData.scriptFunction) {
