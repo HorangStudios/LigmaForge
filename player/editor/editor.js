@@ -217,29 +217,12 @@ function audioTimerLoop(callback, frequency) {
 
 // Render the scene
 function animate() {
-
     requestAnimationFrame(animate);
 
     render();
-
 }
-
-function updatePhysics() {
-    world.step(1 / 120);
-
-    // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
-    world.bodies.forEach(function (body, index) {
-        if (body.threeMesh) {
-            body.threeMesh.position.copy(body.position);
-            body.threeMesh.quaternion.copy(body.quaternion);
-        }
-    });
-}
-
-audioTimerLoop(updatePhysics, 0)
 
 function render() {
-
     scene.traverse(function (object) {
         if (object instanceof THREE.Mesh && object.userData.scriptFunction) {
             try {
@@ -260,6 +243,20 @@ function render() {
 }
 
 animate()
+
+function updatePhysics() {
+    world.step(1 / 120);
+
+    // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
+    world.bodies.forEach(function (body, index) {
+        if (body.threeMesh) {
+            body.threeMesh.position.copy(body.position);
+            body.threeMesh.quaternion.copy(body.quaternion);
+        }
+    });
+}
+
+audioTimerLoop(updatePhysics, 0)
 
 function toggleSideBar() {
     var x = document.getElementById("Sidenav");
