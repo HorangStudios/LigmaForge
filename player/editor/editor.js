@@ -1,4 +1,4 @@
-let ver = "0.2.3";
+let ver = "0.2.4";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
