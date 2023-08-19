@@ -114,7 +114,11 @@ function listSchematic() {
                 label.className = "nodeSceneLabel";
 
                 input.onchange = function () {
-                    element[key] = input.value;
+                    if (typeof value == 'number') {
+                        element[key] = parseInt(input.value);
+                    } else {
+                        element[key] = input.value;
+                    }
                     listSchematic();
                 };
 
