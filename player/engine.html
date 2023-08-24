@@ -11,6 +11,7 @@
             user-select: none;
             font-family: horangfont;
             transition: all 0.5s ease !important;
+            background: #000000;
         }
 
         @font-face {
@@ -55,6 +56,11 @@
             color: #818181;
             display: block;
             transition: 0.3s;
+            padding-top: 0;
+        }
+
+        .sidenav a:first-child {
+            padding-top: 10px;
         }
 
         .sidenav a:hover {
@@ -98,6 +104,34 @@
             place-items: center;
             display: flex;
         }
+
+        #devtools {
+            position: absolute;
+            z-index: 2;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+            right: 0;
+            transition: 0.5s;
+        }
+
+        #terminal {
+            backdrop-filter: blur(10px);
+            background: #1d1d1dab;
+            padding: 20px;
+            height: 100%;
+            color: white;
+            overflow: auto;
+        }
+
+        #skiploading {
+            position: absolute;
+            border: 0;
+            background: 0;
+            color: white;
+            bottom: 0;
+            margin-bottom: 25px;
+        }
     </style>
 
     <title id="pagetitle">HorangHill Player</title>
@@ -119,10 +153,10 @@
 
 <body style="height: 100%; width: 100%;" id="section">
     <div class="loadingScreen" id="gameload">
+        <button id="skiploading" onclick='document.getElementById("gameload").style.display = "none"; spawnPlayer();'>Skip loading</button>
         <div id="loadingMessageScreenForLigmaForge">
             <h1>Loading Game...</h1>
-            <span id="clientversion"></span><br><br>
-            <button onclick='document.getElementById("gameload").style.display = "none"; spawnPlayer();'>Skip loading</button>
+            <span id="clientversion"></span>
         </div>
     </div>
 
@@ -133,9 +167,16 @@
     <div id="Sidenav" class="sidenav" style="width: 0px;">
         <div class="topsidebar" id="topsidebar">
             <a onclick="window.location.replace('../index.html')"><i class="fa-solid fa-angle-left"></i> Quit</a>
+            <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer console</a>
         </div>
         <div class="bottomsidebar">
             <a id="gamename">Game</a>
+        </div>
+    </div>
+
+    <div id="devtools" style="width: 0px;">
+        <div id="terminal">
+            
         </div>
     </div>
 </body>

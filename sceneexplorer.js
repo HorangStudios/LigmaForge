@@ -18,7 +18,7 @@ function listSchematic() {
         switch (element.type) {
             case "cube":
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
-                var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var cubeMaterial = new THREE.MeshToonMaterial({ color: element.color });
 
                 scenenode = new THREE.Mesh(cubeGeometry, cubeMaterial);
                 scenenode.castShadow = true;
@@ -29,7 +29,7 @@ function listSchematic() {
                 break;
             case "sphere":
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var sphereMaterial = new THREE.MeshToonMaterial({ color: element.color });
 
                 scenenode = new THREE.Mesh(sphereGeometry, sphereMaterial);
                 scenenode.castShadow = true;
@@ -40,7 +40,7 @@ function listSchematic() {
                 break;
             case "cylinder":
                 var geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                var material = new THREE.MeshPhongMaterial({ color: element.color });
+                var material = new THREE.MeshToonMaterial({ color: element.color });
 
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.castShadow = true;

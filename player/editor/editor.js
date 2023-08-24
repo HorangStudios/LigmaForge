@@ -1,16 +1,30 @@
-let ver = "0.2.4";
+let ver = "0.2.5 Pre-release";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
 color: red; 
 text-shadow: 3px 3px 0 rgb(217,31,38) , 6px 6px 0 rgb(226,91,14) , 9px 9px 0 rgb(245,221,8) , 12px 12px 0 rgb(5,148,68) , 15px 15px 0 rgb(2,135,206) , 18px 18px 0 rgb(4,77,145) , 21px 21px 0 rgb(42,21,113)
 `);
-console.log(`HorangHill (LigmaForge) Client Version ${ver}`)
-document.getElementById('clientversion').innerText = `HorangHill (LigmaForge) Client Version ${ver}`
+console.log(`HorangHill Client Version ${ver} (LigmaForge)`)
+document.getElementById('clientversion').innerText = `HorangHill Client Version ${ver}`
 
 //editor debug
 function debug(text) {
-    console.log('Message from game: ' + text)
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    const formattedToday = '[' + dd + '/' + mm + '/' + yyyy + '] ';
+
+    let p = document.createElement('p');
+    p.innerText = formattedToday + text;
+
+    document.getElementById('terminal').prepend(p)
+    console.log(formattedToday + text);
 }
 
 // Create a scene
@@ -88,16 +102,21 @@ scene.background = texture;
 // Function to import a GLTF file to the scene
 function loadMap(sceneSchematics) {
     var loadedItems = 0
-
     sceneSchematics.forEach(element => {
         let sceneNode;
 
         loadedItems += 1;
 
+        if (loadedItems == sceneSchematics.length) {
+            document.getElementById('gameload').style.display = "none";
+            spawnPlayer()
+            debug('Spawning Player...')
+        }
+
         switch (element.type) {
             case "cube":
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
-                var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var cubeMaterial = new THREE.MeshToonMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(cubeGeometry, cubeMaterial);
                 sceneNode.castShadow = true;
@@ -130,7 +149,7 @@ function loadMap(sceneSchematics) {
 
             case "cylinder":
                 var cylinderGeometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                var cylinderMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var cylinderMaterial = new THREE.MeshToonMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
                 sceneNode.castShadow = true;
@@ -152,7 +171,7 @@ function loadMap(sceneSchematics) {
 
             case "sphere":
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var sphereMaterial = new THREE.MeshToonMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(sphereGeometry, sphereMaterial);
                 sceneNode.castShadow = true;
@@ -174,11 +193,6 @@ function loadMap(sceneSchematics) {
 
             default:
                 console.warn('Unknown Scene Node! ' + element.type);
-        }
-
-        if (loadedItems == sceneSchematics.length) {
-            document.getElementById('gameload').style.display = "none";
-            spawnPlayer()
         }
     });
 }
@@ -261,12 +275,23 @@ audioTimerLoop(updatePhysics, 0)
 function toggleSideBar() {
     var x = document.getElementById("Sidenav");
     var y = document.getElementById("canvas");
+    var z = document.getElementById("devtools");
     if (x.style.width == "0px") {
         x.style.width = "250px";
         y.style.filter = "blur(10px)";
     } else {
         x.style.width = "0px";
+        z.style.width = "0px";
         y.style.filter = "blur(0px)";
+    }
+}
+
+function showConsole() {
+    var x = document.getElementById("devtools");
+    if (x.style.width == "0px") {
+        x.style.width = "calc(100vw - 250px)";
+    } else {
+        x.style.width = "0px";
     }
 }
 
