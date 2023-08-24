@@ -54,6 +54,7 @@ renderer.setClearColor(0xadd8e6); // Set the background color to #add8e6
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.domElement.id = 'canvas';
+renderer.domElement.style.transition = '0.5s ease';
 document.body.appendChild(renderer.domElement);
 
 // LIGHTS
@@ -278,7 +279,7 @@ function toggleSideBar() {
     var z = document.getElementById("devtools");
     if (x.style.width == "0px") {
         x.style.width = "250px";
-        y.style.filter = "blur(10px)";
+        y.style.filter = "blur(20px)";
     } else {
         x.style.width = "0px";
         z.style.width = "0px";
