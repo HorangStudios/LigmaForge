@@ -1,4 +1,4 @@
-let ver = "0.2.5 Pre-release";
+let ver = "0.2.6";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -198,38 +198,6 @@ function loadMap(sceneSchematics) {
     });
 }
 
-//insane borrowed code from stackoverflow
-function audioTimerLoop(callback, frequency) {
-    var freq = frequency / 1000;
-    var aCtx = new AudioContext();
-
-    var silence = aCtx.createGain();
-    silence.gain.value = 0;
-    silence.connect(aCtx.destination);
-
-    onOSCend();
-
-    var stopped = false;
-    function onOSCend() {
-        var osc = aCtx.createOscillator();
-        osc.onended = onOSCend;
-        osc.connect(silence);
-        osc.start(0);
-        osc.stop(aCtx.currentTime + freq);
-        callback(aCtx.currentTime);
-        if (stopped) {
-        osc.onended = function() {
-            aCtx.close();
-            return;
-        };
-        }
-    };
-
-    return function() {
-        stopped = true;
-    };
-}
-
 // Render the scene
 function animate() {
     requestAnimationFrame(animate);
@@ -260,7 +228,7 @@ function updatePhysics() {
         }
     });
 
-    world.step(1 / 60);
+    world.step(1 / 120);
 
     // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
     world.bodies.forEach(function (body, index) {
@@ -271,7 +239,7 @@ function updatePhysics() {
     });
 }
 
-audioTimerLoop(updatePhysics, 0)
+setInterval(updatePhysics, 0)
 
 function toggleSideBar() {
     var x = document.getElementById("Sidenav");

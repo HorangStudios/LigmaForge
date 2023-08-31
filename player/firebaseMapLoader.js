@@ -24,4 +24,8 @@ if (isFirebaseEnv == 'true') {
     document.getElementById('pagetitle').innerText = item.title
     loadMap(item.hhls)
   });
+
+  document.getElementById('quitbtn').onclick = function () {
+    window.location.href = 'https://horanghill.web.app/'
+  }
 }

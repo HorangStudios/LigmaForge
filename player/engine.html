@@ -12,6 +12,8 @@
             font-family: horangfont;
             transition: all 0.5s ease !important;
             background: #000000;
+            height: 100vh;
+            width: 100vw;
         }
 
         @font-face {
@@ -151,7 +153,7 @@
     <script src="firebaseMapLoader.js" defer></script>
 </head>
 
-<body style="height: 100%; width: 100%;" id="section">
+<body id="section">
     <div class="loadingScreen" id="gameload">
         <button id="skiploading" onclick='document.getElementById("gameload").style.display = "none"; spawnPlayer();'>Skip loading</button>
         <div id="loadingMessageScreenForLigmaForge">
@@ -166,7 +168,7 @@
 
     <div id="Sidenav" class="sidenav" style="width: 0px;">
         <div class="topsidebar" id="topsidebar">
-            <a onclick="window.location.replace('../index.html')"><i class="fa-solid fa-angle-left"></i> Quit</a>
+            <a onclick="window.location.replace('../index.html')" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
             <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer console</a>
         </div>
         <div class="bottomsidebar">

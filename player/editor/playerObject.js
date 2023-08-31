@@ -93,9 +93,12 @@ function spawnPlayer() {
         cubeBody.position.x += 0.1
       }
       if (keyState.space) {
-        cubeBody.velocity.y = 2.5;
+        if (Math.abs(cubeBody.velocity.y) < 0.1) {
+          cubeBody.velocity.y = 7.5;
+        }
       }
     }
+    
+    setInterval(playerLoop, 10)
 
-    audioTimerLoop(playerLoop, 0)
 }
