@@ -151,6 +151,11 @@
     <script type="text/javascript" src="editor/editor.js" defer></script>
     <script type="text/javascript" src="editor/fontawesome.js" defer></script>
     <script src="firebaseMapLoader.js" defer></script>
+    <script>
+        function closeWindow() {
+            window.close();
+        }
+    </script>
 </head>
 
 <body id="section">
@@ -168,7 +173,7 @@
 
     <div id="Sidenav" class="sidenav" style="width: 0px;">
         <div class="topsidebar" id="topsidebar">
-            <a onclick="window.location.replace('../index.html')" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
+            <a onclick="closeWindow()" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
             <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer console</a>
         </div>
         <div class="bottomsidebar">
