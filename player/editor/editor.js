@@ -117,7 +117,7 @@ function loadMap(sceneSchematics) {
         switch (element.type) {
             case "cube":
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
-                var cubeMaterial = new THREE.MeshToonMaterial({ color: element.color });
+                var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(cubeGeometry, cubeMaterial);
                 sceneNode.castShadow = true;
@@ -150,7 +150,7 @@ function loadMap(sceneSchematics) {
 
             case "cylinder":
                 var cylinderGeometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                var cylinderMaterial = new THREE.MeshToonMaterial({ color: element.color });
+                var cylinderMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
                 sceneNode.castShadow = true;
@@ -172,7 +172,7 @@ function loadMap(sceneSchematics) {
 
             case "sphere":
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                var sphereMaterial = new THREE.MeshToonMaterial({ color: element.color });
+                var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
                 sceneNode = new THREE.Mesh(sphereGeometry, sphereMaterial);
                 sceneNode.castShadow = true;

@@ -4,7 +4,7 @@ function spawnCube(x, y, z, sizeX, sizeY, sizeZ, color) {
     var cubeGeometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
 
     // Create the cube's material
-    var cubeMaterial = new THREE.MeshToonMaterial({ color: color });
+    var cubeMaterial = new THREE.MeshPhongMaterial({ color: color });
 
     // Create the cube
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -29,7 +29,7 @@ function spawnCube(x, y, z, sizeX, sizeY, sizeZ, color) {
         "sizeZ": sizeZ,
 
         "color": color,
-        "mat": "MeshToonMaterial",
+        "mat": "MeshPhongMaterial",
         "tex": false,
 
         "initScript": "",
@@ -50,7 +50,7 @@ function addSphere(sphereradius, spherewidth, sphereheight, x, y, z, color) {
     var sphereGeometry = new THREE.SphereGeometry(sphereradius, spherewidth, sphereheight);
 
     // Create a new mesh material with a red color
-    var sphereMaterial = new THREE.MeshToonMaterial({ color: color });
+    var sphereMaterial = new THREE.MeshPhongMaterial({ color: color });
 
     // Create a new mesh using the sphere geometry and material
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -75,7 +75,7 @@ function addSphere(sphereradius, spherewidth, sphereheight, x, y, z, color) {
         "sphereheight": sphereheight,
 
         "color": color,
-        "mat": "MeshToonMaterial",
+        "mat": "MeshPhongMaterial",
         "tex": false,
 
         "initScript": "",
@@ -96,7 +96,7 @@ function addCylinder(x, y, z, radiusTop, radiusBottom, height, radialSegments, c
     var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
 
     // Create a new material for the cone
-    var material = new THREE.MeshToonMaterial({ color: color });
+    var material = new THREE.MeshPhongMaterial({ color: color });
 
     // Create a new mesh from the geometry and material
     var cylinder = new THREE.Mesh(geometry, material);
@@ -121,7 +121,7 @@ function addCylinder(x, y, z, radiusTop, radiusBottom, height, radialSegments, c
         "radialSegments": radialSegments,
 
         "color": color,
-        "mat": "MeshToonMaterial",
+        "mat": "MeshPhongMaterial",
         "tex": false,
 
         "initScript": "",
@@ -178,7 +178,7 @@ function generateterrain(voxsize, tersize, color) {
 
     // Create a new geometry and material for the voxel terrain
     var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshToonMaterial({ color: color });
+    var material = new THREE.MeshPhongMaterial({ color: color });
 
     var generated = 0;
 
@@ -205,7 +205,7 @@ function generateterrain(voxsize, tersize, color) {
                 "sizeZ": voxelSize,
 
                 "color": color,
-                "mat": "MeshToonMaterial",
+                "mat": "MeshPhongMaterial",
                 "tex": false,
 
                 "initScript": "",
