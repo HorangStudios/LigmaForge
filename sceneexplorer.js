@@ -79,13 +79,16 @@ function listSchematic() {
             });
 
             let backButton = document.createElement('button');
-            let hr = document.createElement('hr');
             backButton.innerHTML = `<i class="fa-solid fa-circle-left"></i> Back`
             backButton.className = "sceneNodeIcon";
 
             let delButton = document.createElement('button');
             delButton.innerHTML = `<i class="fa-solid fa-trash"></i> Delete`
             delButton.className = "sceneNodeIcon";
+
+            let cloneButton = document.createElement('button');
+            cloneButton.innerHTML = `<i class="fa-regular fa-clone"></i> Clone`
+            cloneButton.className = "sceneNodeIcon";
 
             backButton.onclick = function () {
                 listSchematic()
@@ -96,9 +99,16 @@ function listSchematic() {
                 listSchematic()
             }
 
-            shapesList.appendChild(delButton);
+            cloneButton.onclick = function () {
+                sceneSchematics.push(element)
+                listSchematic()
+            }
+
+            shapesList.appendChild(document.createElement('hr'));
             shapesList.appendChild(backButton);
-            shapesList.appendChild(hr);
+            shapesList.appendChild(delButton);
+            shapesList.appendChild(cloneButton);
+            shapesList.appendChild(document.createElement('hr'));
 
             Object.entries(element).forEach(([key, value]) => {
                 let input = document.createElement('input');

@@ -1,4 +1,4 @@
-let ver = "0.2.6";
+let ver = "0.2.7";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -102,13 +102,10 @@ scene.background = texture;
 
 // Function to import a GLTF file to the scene
 function loadMap(sceneSchematics) {
-    var loadedItems = 0
-    sceneSchematics.forEach(element => {
+    sceneSchematics.forEach((element, i) => {
         let sceneNode;
 
-        loadedItems += 1;
-
-        if (loadedItems == sceneSchematics.length) {
+        if (i == sceneSchematics.length - 1) {
             document.getElementById('gameload').style.display = "none";
             spawnPlayer()
             debug('Spawning Player...')
