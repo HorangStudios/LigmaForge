@@ -1,4 +1,4 @@
-let ver = "0.2.7";
+let ver = "0.2.8";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -141,6 +141,14 @@ function loadMap(sceneSchematics) {
                 const initscriptFunction = new Function("mesh", element.initScript);
                 sceneNode.userData.initscriptFunction = initscriptFunction;
 
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex, () => {
+                        // Once the texture is loaded, replace the sphere's material map with the new texture
+                        sceneNode.material.map = texture;
+                        sceneNode.material.needsUpdate = true;
+                    });
+                }
+
                 break;
 
             // Add cases for other object types if needed
@@ -165,6 +173,15 @@ function loadMap(sceneSchematics) {
 
                 // Associate the Three.js mesh with the Cannon.js body
                 cylinderBody.threeMesh = sceneNode;
+
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex, () => {
+                        // Once the texture is loaded, replace the sphere's material map with the new texture
+                        sceneNode.material.map = texture;
+                        sceneNode.material.needsUpdate = true;
+                    });
+                }
+
                 break;
 
             case "sphere":
@@ -187,6 +204,15 @@ function loadMap(sceneSchematics) {
 
                 // Associate the Three.js mesh with the Cannon.js body
                 sphereBody.threeMesh = sceneNode;
+
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex, () => {
+                        // Once the texture is loaded, replace the sphere's material map with the new texture
+                        sceneNode.material.map = texture;
+                        sceneNode.material.needsUpdate = true;
+                    });
+                }
+
                 break;
 
             default:

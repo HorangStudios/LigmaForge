@@ -1,3 +1,19 @@
+const convertBase64 = (event) => {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+
+        fileReader.onerror = (error) => {
+            reject(error);
+        };
+
+        fileReader.readAsDataURL(event.target.files[0]);
+    });
+};
+
 function listSchematic() {
     const shapesList = document.getElementById('sidebar');
     shapesList.innerHTML = '';
@@ -26,6 +42,15 @@ function listSchematic() {
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scene.add(scenenode);
+
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex, () => {
+                        // Once the texture is loaded, replace the sphere's material map with the new texture
+                        scenenode.material.map = texture;
+                        scenenode.material.needsUpdate = true;
+                    });
+                }
+
                 break;
             case "sphere":
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
@@ -37,6 +62,15 @@ function listSchematic() {
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scene.add(scenenode);
+
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex, () => {
+                        // Once the texture is loaded, replace the sphere's material map with the new texture
+                        scenenode.material.map = texture;
+                        scenenode.material.needsUpdate = true;
+                    });
+                }
+
                 break;
             case "cylinder":
                 var geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
@@ -48,6 +82,15 @@ function listSchematic() {
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scene.add(scenenode);
+
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex, () => {
+                        // Once the texture is loaded, replace the sphere's material map with the new texture
+                        scenenode.material.map = texture;
+                        scenenode.material.needsUpdate = true;
+                    });
+                }
+
                 break;
             case "light":
                 scenenode = new THREE.PointLight(element.color, element.intensity, element.distance);
@@ -123,24 +166,40 @@ function listSchematic() {
 
                 label.className = "nodeSceneLabel";
 
-                input.onchange = function () {
+                input.onchange = async function (event) {
                     if (key == "color") {
                         element[key] = input.value;
                     } else if (typeof value == 'number') {
                         element[key] = parseInt(input.value);
+                    } else if (input.type == 'file') {
+                        const base64 = await convertBase64(event);
+                        element[key] = base64;
                     } else {
                         element[key] = input.value;
                     }
                     listSchematic();
                 };
 
-                if (key !== "type" && key !== "mat" && key !== "tex" && key !== "initScript" && key !== "updateScript" && key !== "clickScript") {
+                if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript") {
                     shapesList.appendChild(label);
                     shapesList.appendChild(input);
                 }
 
                 if (key == "color") {
                     input.type = "color"
+                }
+
+                if (key == "tex") {
+                    input.type = "file"
+
+                    let clearBtn = document.createElement('a')
+                    clearBtn.innerText = '(Clear)'
+                    label.appendChild(clearBtn)
+
+                    clearBtn.onclick = function () {
+                        element[key] = false
+                        listSchematic();
+                    }
                 }
 
                 if (key == "initScript") {
