@@ -31,6 +31,7 @@ function spawnCube(x, y, z, sizeX, sizeY, sizeZ, color) {
         "color": color,
         "mat": "MeshPhongMaterial",
         "tex": false,
+        "opacity": 1,
 
         "initScript": "",
         "updateScript": "",
@@ -77,6 +78,7 @@ function addSphere(sphereradius, spherewidth, sphereheight, x, y, z, color) {
         "color": color,
         "mat": "MeshPhongMaterial",
         "tex": false,
+        "opacity": 1,
 
         "initScript": "",
         "updateScript": "",
@@ -123,6 +125,7 @@ function addCylinder(x, y, z, radiusTop, radiusBottom, height, radialSegments, c
         "color": color,
         "mat": "MeshPhongMaterial",
         "tex": false,
+        "opacity": 1,
 
         "initScript": "",
         "updateScript": "",
@@ -207,6 +210,7 @@ function generateterrain(voxsize, tersize, color) {
                 "color": color,
                 "mat": "MeshPhongMaterial",
                 "tex": false,
+                "opacity": 1,
 
                 "initScript": "",
                 "updateScript": "",

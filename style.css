@@ -261,3 +261,7 @@ h6 {
 ::-webkit-scrollbar-track:active {
     background: #2d2d2d;
 }
+input[type="color"] {
+    padding: 0 !important;
+    margin: 0;
+}

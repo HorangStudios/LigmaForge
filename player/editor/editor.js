@@ -1,4 +1,4 @@
-let ver = "0.2.8";
+let ver = "0.2.9";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -116,6 +116,9 @@ function loadMap(sceneSchematics) {
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
                 var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
+                cubeMaterial.opacity = element.opacity || 1
+                cubeMaterial.transparent = true
+
                 sceneNode = new THREE.Mesh(cubeGeometry, cubeMaterial);
                 sceneNode.castShadow = true;
                 sceneNode.receiveShadow = true;
@@ -157,6 +160,9 @@ function loadMap(sceneSchematics) {
                 var cylinderGeometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
                 var cylinderMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
+                cylinderMaterial.opacity = element.opacity || 1
+                cylinderMaterial.transparent = true
+
                 sceneNode = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
                 sceneNode.castShadow = true;
                 sceneNode.receiveShadow = true;
@@ -188,6 +194,9 @@ function loadMap(sceneSchematics) {
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
                 var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
+                sphereMaterial.opacity = element.opacity || 1
+                sphereMaterial.transparent = true
+
                 sceneNode = new THREE.Mesh(sphereGeometry, sphereMaterial);
                 sceneNode.castShadow = true;
                 sceneNode.receiveShadow = true;
@@ -213,6 +222,15 @@ function loadMap(sceneSchematics) {
                     });
                 }
 
+                break;
+
+            case "light":
+                scenenode = new THREE.PointLight(element.color, element.intensity, element.distance);
+
+                scenenode.position.set(element.x, element.y, element.z);
+                scenenode.castShadow = true;
+                scene.add(scenenode);
+                
                 break;
 
             default:
@@ -319,11 +337,11 @@ function onDocumentMouseDown(event) {
     }
 }
 
-window.addEventListener( 'resize', onWindowResize, false );
+window.addEventListener('resize', onWindowResize, false);
 
-function onWindowResize(){
+function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }

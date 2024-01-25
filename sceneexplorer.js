@@ -36,6 +36,9 @@ function listSchematic() {
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
                 var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
+                cubeMaterial.opacity = element.opacity || 1
+                cubeMaterial.transparent = true
+
                 scenenode = new THREE.Mesh(cubeGeometry, cubeMaterial);
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
@@ -56,6 +59,9 @@ function listSchematic() {
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
                 var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
 
+                sphereMaterial.opacity = element.opacity || 1
+                sphereMaterial.transparent = true
+
                 scenenode = new THREE.Mesh(sphereGeometry, sphereMaterial);
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
@@ -75,6 +81,9 @@ function listSchematic() {
             case "cylinder":
                 var geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
                 var material = new THREE.MeshPhongMaterial({ color: element.color });
+
+                material.opacity = element.opacity || 1
+                material.transparent = true
 
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.castShadow = true;
@@ -138,12 +147,13 @@ function listSchematic() {
             }
 
             delButton.onclick = function () {
-                delete sceneSchematics[i];
+                sceneSchematics.splice(i, 1);
                 listSchematic()
             }
 
             cloneButton.onclick = function () {
-                sceneSchematics.push(element)
+                var copy = JSON.parse(JSON.stringify(element));
+                sceneSchematics.push(copy)
                 listSchematic()
             }
 
@@ -164,11 +174,19 @@ function listSchematic() {
                     input.type = "number"
                 }
 
+                if (key == "color") {
+                    input.setAttribute("value", value)
+                }
+
                 label.className = "nodeSceneLabel";
 
                 input.onchange = async function (event) {
                     if (key == "color") {
                         element[key] = input.value;
+                        listSchematic();
+                        return
+                    } if (key == "opacity") {
+                        element[key] = parseFloat(input.value);
                     } else if (typeof value == 'number') {
                         element[key] = parseInt(input.value);
                     } else if (input.type == 'file') {

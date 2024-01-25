@@ -75,4 +75,4 @@ async function CreateEditorCodeWindow() {
 }
 
 //spawn baseplate
-spawnCube(0, -1, 0, 32, 1, 32, 0x008000)
+spawnCube(0, -1, 0, 32, 1, 32, '#008000')

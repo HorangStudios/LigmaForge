@@ -9,7 +9,7 @@ scene.fog = new THREE.Fog(color, near, far);
 var sceneSchematics = [];
 
 //create a camera
-var camera = new THREE.PerspectiveCamera(75, 640 / 400, 0.1, 100);
+var camera = new THREE.PerspectiveCamera(75, 640 / 400, 0.1, 1000000);
 camera.position.set(5, 5, 5);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 

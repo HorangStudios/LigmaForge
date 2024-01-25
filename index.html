@@ -62,11 +62,11 @@
           <li class="dropdown li">
             <a href="javascript:void(0)" class="dropbtn">Insert</a>
             <div class="dropdown-content">
-              <a onclick="spawnCube(0,0,0,1,1,1,0xff0000)"><i class="fa fa-cubes"></i> Cube</a>
-              <a onclick="addCylinder(0,0,0,5,5,10,32,0xff0000)"><i class="fa fa-cubes"></i> Cylinder</a>
-              <a onclick="addSphere(15,32,16,0,0,0,0xff0000)"><i class="fa fa-cubes"></i> Sphere</a>
-              <a onclick="addLight(0,0,0,10,10,0xffffff)"><i class="fa fa-cubes"></i> Light</a>
-              <a onclick="generateterrain(2, prompt('Enter terrain size... (Under development)'), 0x008000)"><i class="fa fa-cubes"></i> Terrain</a>
+              <a onclick="spawnCube(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Cube</a>
+              <a onclick="addCylinder(0,0,0,5,5,10,32,'#ff0000')"><i class="fa fa-cubes"></i> Cylinder</a>
+              <a onclick="addSphere(15,32,16,0,0,0,'#ff0000')"><i class="fa fa-cubes"></i> Sphere</a>
+              <a onclick="addLight(0,0,0,10,10,'#ffffff')"><i class="fa fa-cubes"></i> Light</a>
+              <a onclick="generateterrain(2, prompt('Enter terrain size... (Under development)'), '#008000')"><i class="fa fa-cubes"></i> Terrain</a>
             </div>
           </li>
 
@@ -90,16 +90,16 @@
       </div>
 
       <div style="display: inline-block;">
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="spawnCube(0,0,0,1,1,1,0xff0000)">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="spawnCube(0,0,0,1,1,1,'#ff0000')">
           <img src="resources/icons/brick_add.png">
         </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addCylinder(0,0,0,5,5,10,32,0xff0000)">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addCylinder(0,0,0,5,5,10,32,'#ff0000')">
           <img src="resources/icons/database_add.png">
         </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addSphere(15,32,16,0,0,0,0xff0000)">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addSphere(15,32,16,0,0,0,'#ff0000')">
           <img src="resources/icons/Contrast_high.png">
         </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addLight(0,0,0,10,10,0xffffff)">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addLight(0,0,0,10,10,'#ffffff')">
           <img src="resources/icons/lightbulb_add.png">
         </button>
       </div>
