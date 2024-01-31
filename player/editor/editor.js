@@ -1,4 +1,4 @@
-let ver = "0.2.9";
+let ver = "0.3.0";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -108,6 +108,11 @@ function loadMap(sceneSchematics) {
         if (i == sceneSchematics.length - 1) {
             document.getElementById('gameload').style.display = "none";
             spawnPlayer()
+            
+            if (isFirebaseEnv) {
+                otherPlayers()
+            }
+
             debug('Spawning Player...')
         }
 
@@ -230,7 +235,7 @@ function loadMap(sceneSchematics) {
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.castShadow = true;
                 scene.add(scenenode);
-                
+
                 break;
 
             default:

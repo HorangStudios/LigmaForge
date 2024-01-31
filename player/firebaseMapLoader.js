@@ -15,8 +15,8 @@ if (isFirebaseEnv == 'true') {
   firebase.initializeApp(firebaseConfig);
 
   var database = firebase.database();
-  const id = new URLSearchParams(window.location.search).get('id');
-  const ref = firebase.database().ref(`games/${id}`);
+  var id = new URLSearchParams(window.location.search).get('id');
+  var ref = firebase.database().ref(`games/${id}`);
 
   ref.once('value', snapshot => {
     const item = snapshot.val();
