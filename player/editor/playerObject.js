@@ -34,6 +34,7 @@ function spawnPlayer() {
   sceneNode.receiveShadow = true;
   sceneNode.position.set(0, 1, 0);
   scene.add(sceneNode);
+  playerObject.node = sceneNode
 
   // Create the corresponding Cannon.js body
   var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1 / 2, 1 / 2));
@@ -41,6 +42,7 @@ function spawnPlayer() {
   cubeBody.addShape(cubeShape);
   cubeBody.position.set(0, 0, 0);
   world.addBody(cubeBody);
+  playerObject.body = cubeBody
 
   // Associate the Three.js mesh with the Cannon.js body
   cubeBody.threeMesh = sceneNode;
