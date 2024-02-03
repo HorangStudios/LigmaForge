@@ -106,7 +106,7 @@ function spawnPlayer() {
     cubeBody.quaternion.z = 0
 
     //bro why wont this work ?
-    if (cubeBody.position.y < -19) {
+    if (cubeBody.position.y < -30) {
       cubeBody.position.set(0, 0, 0);
     }
 
