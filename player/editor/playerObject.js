@@ -28,6 +28,10 @@ const playerUniqueID = makeid(256)
 function spawnPlayer() {
   var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
   var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x800000 });
+  var Health = 100;
+  var buttonh = document.createElement('a')
+  buttonh.innerText = "Health: " + Health;
+  document.getElementById('topsidebar').appendChild(buttonh)
 
   sceneNode = new THREE.Mesh(cubeGeometry, cubeMaterial);
   sceneNode.castShadow = true;
@@ -107,6 +111,9 @@ function spawnPlayer() {
 
     //bro why wont this work ?
     if (cubeBody.position.y < -30) {
+      Health = 0;
+    }
+    if (Health < 0.1) {
       cubeBody.position.set(0, 0, 0);
     }
 
