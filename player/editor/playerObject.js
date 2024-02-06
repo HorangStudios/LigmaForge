@@ -115,7 +115,9 @@ function spawnPlayer() {
     }
     if (Health < 0.1) {
       cubeBody.position.set(0, 0, 0);
+      Health = 100;
     }
+    buttonh.innerText = "Health: " + Health;
 
     if (keyState.w) {
       cubeBody.position.z -= 0.1
