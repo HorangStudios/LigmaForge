@@ -32,6 +32,11 @@ function spawnPlayer() {
   var buttonh = document.createElement('a')
   buttonh.innerText = "Health: " + Health;
   document.getElementById('topsidebar').appendChild(buttonh)
+  document.addEventListener('keydown', function(event) {
+    if(event.keyCode == 27) {
+        toggleSideBar()
+    }
+  });
 
   sceneNode = new THREE.Mesh(cubeGeometry, cubeMaterial);
   sceneNode.castShadow = true;
