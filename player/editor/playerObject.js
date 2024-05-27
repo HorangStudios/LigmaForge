@@ -26,15 +26,16 @@ var playerObject
 const playerUniqueID = makeid(256)
 
 function spawnPlayer() {
+  var playerRotation = 0;
   var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
   var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x800000 });
   var Health = 100;
   var buttonh = document.createElement('a')
   buttonh.innerText = "Health: " + Health;
   document.getElementById('topsidebar').appendChild(buttonh)
-  document.addEventListener('keydown', function(event) {
-    if(event.keyCode == 27) {
-        toggleSideBar()
+  document.addEventListener('keydown', function (event) {
+    if (event.keyCode == 27) {
+      toggleSideBar()
     }
   });
 
@@ -105,16 +106,43 @@ function spawnPlayer() {
 
   var targetPosition = new THREE.Vector3();
   var cameraPosition = new THREE.Vector3();
+  var cameraAngle = 0;
 
   function playerLoop() {
-    const newCamPosition = new THREE.Vector3(sceneNode.position.x, sceneNode.position.y + 3, sceneNode.position.z + 3);
-    camera.position.lerp(newCamPosition, 0.05);
+    if (playerRotation > 1) {
+      playerRotation = 1
+    } else if (playerRotation < -1) {
+      playerRotation = -1
+    }
+
+    function calcRot() {
+      var angleRadians = 2 * Math.atan2(playerRotation, cubeBody.quaternion.w);
+      var angleDegrees = angleRadians * (180 / Math.PI);
+
+      const angleInRadians = angleDegrees * (Math.PI / 180);
+
+      const deltaX = 1 * Math.cos(angleInRadians);
+      const deltaZ = 1 * Math.sin(angleInRadians);
+
+      const newX = deltaX;
+      const newZ = deltaZ;
+
+      return { newZ, newX };
+    }
+
+    var angleRadians = 2 * Math.atan2(playerRotation, cubeBody.quaternion.w);
+    var angleDegrees = angleRadians * (180 / Math.PI);
+    const angleInRadians = angleDegrees * (Math.PI / 180);
+
+    cameraAngle = THREE.MathUtils.lerp(cameraAngle, angleInRadians, 1);
+    camera.position.setFromSphericalCoords(5, 1, cameraAngle);
+    camera.position.add(sceneNode.position);
     camera.lookAt(sceneNode.position);
+
     cubeBody.quaternion.x = 0
-    cubeBody.quaternion.y = 0
+    cubeBody.quaternion.y = playerRotation
     cubeBody.quaternion.z = 0
 
-    //bro why wont this work ?
     if (cubeBody.position.y < -30) {
       Health = 0;
     }
@@ -125,16 +153,18 @@ function spawnPlayer() {
     buttonh.innerText = "Health: " + Health;
 
     if (keyState.w) {
-      cubeBody.position.z -= 0.1
+      cubeBody.position.z -= calcRot().newX / 10
+      cubeBody.position.x -= calcRot().newZ / 10
     }
     if (keyState.s) {
-      cubeBody.position.z += 0.1
+      cubeBody.position.z += calcRot().newX / 10
+      cubeBody.position.x += calcRot().newZ / 10
     }
     if (keyState.a) {
-      cubeBody.position.x -= 0.1
+      playerRotation += 0.01
     }
     if (keyState.d) {
-      cubeBody.position.x += 0.1
+      playerRotation -= 0.01
     }
     if (keyState.space) {
       if (Math.abs(cubeBody.velocity.y) < 0.1) {
@@ -143,6 +173,7 @@ function spawnPlayer() {
     }
 
     if (isFirebaseEnv) {
+      firebase.database().ref(`games/${id}/server/${playerUniqueID}/rot`).set(playerRotation)
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/pos`).set(cubeBody.position)
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/age`).set(Date.now())
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/id`).set(playerUniqueID)
@@ -153,6 +184,7 @@ function spawnPlayer() {
 
   if (isFirebaseEnv) {
     var player = {
+      rot: playerRotation,
       id: playerUniqueID,
       age: Date.now(),
       pos: cubeBody.position
@@ -182,6 +214,7 @@ function otherPlayers() {
           allPlayersElem[element.id].position.x = element.pos.x
           allPlayersElem[element.id].position.y = element.pos.y
           allPlayersElem[element.id].position.z = element.pos.z
+          allPlayersElem[element.id].rotation.y = element.rot
         }
       }
 
