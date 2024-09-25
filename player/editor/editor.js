@@ -1,4 +1,4 @@
-let ver = "0.3.1";
+let ver = "0.3.2B";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -7,6 +7,10 @@ text-shadow: 3px 3px 0 rgb(217,31,38) , 6px 6px 0 rgb(226,91,14) , 9px 9px 0 rgb
 `);
 console.log(`HorangHill Client Version ${ver} (LigmaForge)`)
 document.getElementById('clientversion').innerText = `HorangHill Client Version ${ver}`
+
+function closeWindow() {
+    window.close();
+}
 
 //editor debug
 function debug(text) {
@@ -32,10 +36,10 @@ var scene = new THREE.Scene();
 const color = 0xadd8e6;  // white
 const near = 10;
 const far = 100;
-scene.fog = new THREE.Fog(color, near, far);
+//scene.fog = new THREE.Fog(color, near, far);
 
 //create a camera
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 700);
 camera.position.set(5, 5, 5);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -51,6 +55,7 @@ const clock = new THREE.Clock();
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0xadd8e6); // Set the background color to #add8e6
+renderer.setPixelRatio( window.devicePixelRatio );
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.domElement.id = 'canvas';
@@ -72,10 +77,10 @@ scene.add(dirLight);
 
 dirLight.castShadow = true;
 
-dirLight.shadow.mapSize.width = 2048;
-dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.mapSize.width = 4096;
+dirLight.shadow.mapSize.height = 4096;
 
-const d = 50;
+var d = 50;
 
 dirLight.shadow.camera.left = - d;
 dirLight.shadow.camera.right = d;
@@ -83,7 +88,7 @@ dirLight.shadow.camera.top = d;
 dirLight.shadow.camera.bottom = - d;
 
 dirLight.shadow.camera.far = 3500;
-dirLight.shadow.bias = - 0.0001;
+dirLight.shadow.bias = - 0.00001;
 
 const light = new THREE.AmbientLight(0x404040); // soft white light
 scene.add(light);
@@ -119,7 +124,7 @@ function loadMap(sceneSchematics) {
         switch (element.type) {
             case "cube":
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
-                var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var cubeMaterial = new THREE.MeshLambertMaterial({ color: element.color });
 
                 cubeMaterial.opacity = element.opacity || 1
                 cubeMaterial.transparent = true
@@ -163,7 +168,7 @@ function loadMap(sceneSchematics) {
 
             case "cylinder":
                 var cylinderGeometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                var cylinderMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var cylinderMaterial = new THREE.MeshLambertMaterial({ color: element.color });
 
                 cylinderMaterial.opacity = element.opacity || 1
                 cylinderMaterial.transparent = true
@@ -197,7 +202,7 @@ function loadMap(sceneSchematics) {
 
             case "sphere":
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var sphereMaterial = new THREE.MeshLambertMaterial({ color: element.color });
 
                 sphereMaterial.opacity = element.opacity || 1
                 sphereMaterial.transparent = true
@@ -244,6 +249,14 @@ function loadMap(sceneSchematics) {
     });
 }
 
+// 🔥 shading
+composer = new THREE.EffectComposer(renderer);
+ssaoPass = new THREE.SSAOPass(scene, camera);
+composer.addPass(ssaoPass);
+ssaoPass.kernelRadius = 1
+ssaoPass.minDistance = 0.0001
+ssaoPass.maxDistance = 0.3
+
 // Render the scene
 function animate() {
     requestAnimationFrame(animate);
@@ -252,7 +265,8 @@ function animate() {
 }
 
 function render() {
-    renderer.render(scene, camera);
+    //renderer.render(scene, camera);
+    composer.render(scene, camera);
 }
 
 animate()
@@ -349,4 +363,5 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
 }

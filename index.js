@@ -1,15 +1,17 @@
+//threejs r120
+
 // Create a scene
 var scene = new THREE.Scene();
 const color = 0xadd8e6;  // white
 const near = 10;
 const far = 100;
-scene.fog = new THREE.Fog(color, near, far);
+//scene.fog = new THREE.Fog(color, near, far);
 
 //declare objects
 var sceneSchematics = [];
 
 //create a camera
-var camera = new THREE.PerspectiveCamera(75, 640 / 400, 0.1, 1000000);
+var camera = new THREE.PerspectiveCamera(75, 640 / 400, 0.1, 700);
 camera.position.set(5, 5, 5);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -17,9 +19,10 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(1920, 1080);
 renderer.setClearColor(0xadd8e6); // Set the background color to #add8e6
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.domElement.id = 'canvas';
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.domElement.id = 'canvas';
 document.getElementById('main').appendChild(renderer.domElement);
 
 // LIGHTS
@@ -37,10 +40,10 @@ scene.add(dirLight);
 
 dirLight.castShadow = true;
 
-dirLight.shadow.mapSize.width = 2048;
-dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.mapSize.width = 4096;
+dirLight.shadow.mapSize.height = 4096;
 
-const d = 50;
+var d = 50;
 
 dirLight.shadow.camera.left = - d;
 dirLight.shadow.camera.right = d;
@@ -48,7 +51,7 @@ dirLight.shadow.camera.top = d;
 dirLight.shadow.camera.bottom = - d;
 
 dirLight.shadow.camera.far = 3500;
-dirLight.shadow.bias = - 0.0001;
+dirLight.shadow.bias = - 0.00001;
 
 const light = new THREE.AmbientLight(0x404040); // soft white light
 scene.add(light);
@@ -75,12 +78,21 @@ scene.add(transformControls);
 // Add OrbitControls
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+composer = new THREE.EffectComposer(renderer);
+ssaoPass = new THREE.SSAOPass(scene, camera);
+composer.addPass(ssaoPass);
+ssaoPass.kernelRadius = 1
+ssaoPass.minDistance = 0.0001
+ssaoPass.maxDistance = 0.3
+
 // Render the scene
 function render() {
 
     controls.update()
 
-    renderer.render(scene, camera);
+    //renderer.render(scene, camera);
+    
+    composer.render(scene, camera);
 
 }
 
@@ -93,6 +105,17 @@ function animate() {
 }
 
 animate()
+
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize() {
+    var viewPortWidth = document.getElementById("canvas").getBoundingClientRect().width
+    var viewPortHeight = document.getElementById("canvas").getBoundingClientRect().height
+    camera.aspect = viewPortWidth / viewPortHeight
+    camera.updateProjectionMatrix();
+    renderer.setSize(viewPortWidth, viewPortHeight);
+    composer.setSize(viewPortWidth, viewPortHeight);
+}
 
 // Save And Open
 function exportScene() {
@@ -131,3 +154,5 @@ function playScene() {
         receiverWindow.loadMap(sceneSchematics)
     });
 }
+
+onWindowResize()

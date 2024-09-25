@@ -34,7 +34,7 @@ function listSchematic() {
         switch (element.type) {
             case "cube":
                 var cubeGeometry = new THREE.BoxGeometry(element.sizeX, element.sizeY, element.sizeZ);
-                var cubeMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var cubeMaterial = new THREE.MeshLambertMaterial({ color: element.color });
 
                 cubeMaterial.opacity = element.opacity || 1
                 cubeMaterial.transparent = true
@@ -57,7 +57,7 @@ function listSchematic() {
                 break;
             case "sphere":
                 var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
+                var sphereMaterial = new THREE.MeshLambertMaterial({ color: element.color });
 
                 sphereMaterial.opacity = element.opacity || 1
                 sphereMaterial.transparent = true
@@ -80,7 +80,7 @@ function listSchematic() {
                 break;
             case "cylinder":
                 var geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                var material = new THREE.MeshPhongMaterial({ color: element.color });
+                var material = new THREE.MeshLambertMaterial({ color: element.color });
 
                 material.opacity = element.opacity || 1
                 material.transparent = true

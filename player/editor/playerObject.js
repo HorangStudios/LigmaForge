@@ -172,6 +172,12 @@ function spawnPlayer() {
       }
     }
 
+    if (playerRotation > 1) {
+      playerRotation = 1;
+    } else if (playerRotation < -1) {
+      playerRotation = -1;
+    }    
+
     if (isFirebaseEnv) {
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/rot`).set(playerRotation)
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/pos`).set(cubeBody.position)
