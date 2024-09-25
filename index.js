@@ -7,6 +7,9 @@ const near = 10;
 const far = 100;
 //scene.fog = new THREE.Fog(color, near, far);
 
+const stats = new Stats();
+document.getElementsByClassName("counter")[0].appendChild(stats.dom);
+
 //declare objects
 var sceneSchematics = [];
 
@@ -16,7 +19,7 @@ camera.position.set(5, 5, 5);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 // Create a renderer
-var renderer = new THREE.WebGLRenderer({ antialias: true });
+var renderer = new THREE.WebGLRenderer({ antialias: false });
 renderer.setSize(1920, 1080);
 renderer.setClearColor(0xadd8e6); // Set the background color to #add8e6
 renderer.setPixelRatio( window.devicePixelRatio );
@@ -40,8 +43,8 @@ scene.add(dirLight);
 
 dirLight.castShadow = true;
 
-dirLight.shadow.mapSize.width = 4096;
-dirLight.shadow.mapSize.height = 4096;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
 
 var d = 50;
 
@@ -81,7 +84,7 @@ var controls = new THREE.OrbitControls(camera, renderer.domElement);
 composer = new THREE.EffectComposer(renderer);
 ssaoPass = new THREE.SSAOPass(scene, camera);
 composer.addPass(ssaoPass);
-ssaoPass.kernelRadius = 1
+ssaoPass.kernelRadius = 2
 ssaoPass.minDistance = 0.0001
 ssaoPass.maxDistance = 0.3
 
@@ -100,7 +103,9 @@ function animate() {
 
     requestAnimationFrame(animate);
 
+    stats.begin();
     render();
+    stats.end();
 
 }
 

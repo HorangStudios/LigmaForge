@@ -184,9 +184,11 @@ function spawnPlayer() {
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/age`).set(Date.now())
       firebase.database().ref(`games/${id}/server/${playerUniqueID}/id`).set(playerUniqueID)
     }
+
+    requestAnimationFrame(playerLoop)
   }
 
-  setInterval(playerLoop, 10)
+  playerLoop()
 
   if (isFirebaseEnv) {
     var player = {

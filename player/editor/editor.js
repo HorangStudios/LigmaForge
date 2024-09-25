@@ -1,4 +1,4 @@
-let ver = "0.3.2B";
+let ver = "0.3.2";
 console.log(`%cHorangHill`, `
 font-weight: bold; 
 font-size: 50px;
@@ -52,10 +52,10 @@ world.solver.iterations = 10;
 const clock = new THREE.Clock();
 
 // Create a renderer
-var renderer = new THREE.WebGLRenderer({ antialias: true });
+var renderer = new THREE.WebGLRenderer({ antialias: false });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0xadd8e6); // Set the background color to #add8e6
-renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.domElement.id = 'canvas';
@@ -113,7 +113,7 @@ function loadMap(sceneSchematics) {
         if (i == sceneSchematics.length - 1) {
             document.getElementById('gameload').style.display = "none";
             spawnPlayer()
-            
+
             if (isFirebaseEnv) {
                 otherPlayers()
             }
@@ -253,7 +253,7 @@ function loadMap(sceneSchematics) {
 composer = new THREE.EffectComposer(renderer);
 ssaoPass = new THREE.SSAOPass(scene, camera);
 composer.addPass(ssaoPass);
-ssaoPass.kernelRadius = 1
+ssaoPass.kernelRadius = 2
 ssaoPass.minDistance = 0.0001
 ssaoPass.maxDistance = 0.3
 
@@ -288,7 +288,7 @@ function updatePhysics() {
         }
     });
 
-    world.step(1 / 120);
+    world.step(1 / 30);
 
     // Update the positions and rotations of the Three.js objects based on the Cannon.js bodies
     world.bodies.forEach(function (body, index) {
@@ -297,9 +297,10 @@ function updatePhysics() {
             body.threeMesh.quaternion.copy(body.quaternion);
         }
     });
-}
 
-setInterval(updatePhysics, 0)
+    requestAnimationFrame(updatePhysics)
+}
+updatePhysics()
 
 function toggleSideBar() {
     var x = document.getElementById("Sidenav");
