@@ -129,3 +129,32 @@ body {
     bottom: 0;
     margin-bottom: 25px;
 }
+
+#chats {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    position: absolute;
+    z-index: 1;
+    padding: 20px;
+    height: 20vh;
+    width: 20vw;
+    transition: 0.5s;
+    text-shadow: 0px 0px 5px #000000;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#chats:hover {
+    opacity: 1;
+    background: #1d1d1dab;
+    overflow: auto;
+    text-shadow: none;
+}
+
+#chats p {
+    pointer-events: all;
+    margin: 0;
+    color: white;
+    width: fit-content;
+}

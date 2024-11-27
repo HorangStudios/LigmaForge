@@ -153,7 +153,7 @@ function importScene() {
 }
 
 function playScene() {
-    const receiverWindow = window.open('player/engine.html', 'popup', 'popup=true,width=640,height=400');
+    const receiverWindow = window.open('player/', 'popup', 'popup=true,width=640,height=400');
 
     receiverWindow.addEventListener('load', function () {
         receiverWindow.loadMap(sceneSchematics)

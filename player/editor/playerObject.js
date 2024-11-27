@@ -24,6 +24,7 @@ function getRandomHexColor() {
 
 var playerObject
 const playerUniqueID = makeid(256)
+const firstMessageID = makeid(256)
 
 function spawnPlayer() {
   var playerRotation = 0;
@@ -60,6 +61,7 @@ function spawnPlayer() {
     a: false,
     s: false,
     d: false,
+    m: false,
     space: false
   };
 
@@ -77,6 +79,18 @@ function spawnPlayer() {
         break;
       case 'KeyD':
         keyState.d = true;
+        break;
+      case 'KeyT':
+        const theMessage = prompt()
+        const generatedMessageID = makeid(256)
+        const msg = document.createElement("p")
+        msg.innerText = theMessage
+        document.getElementById("chats").prepend(msg)
+        firebase.database().ref(`games/${id}/server/${playerUniqueID}/messages/${generatedMessageID}`).set({
+          content: theMessage,
+          age: Date.now(),
+          id: generatedMessageID
+        })
         break;
       case 'Space':
         keyState.space = true;
@@ -109,62 +123,31 @@ function spawnPlayer() {
   var cameraAngle = 0;
 
   function playerLoop() {
-    if (playerRotation > 1) {
-      playerRotation = 1
-    } else if (playerRotation < -1) {
-      playerRotation = -1
+    function normalizeRotation(rotation) {
+      while (rotation > Math.PI) rotation -= 2 * Math.PI;
+      while (rotation < -Math.PI) rotation += 2 * Math.PI;
+      return rotation;
     }
 
-    function calcRot() {
-      var angleRadians = 2 * Math.atan2(playerRotation, cubeBody.quaternion.w);
-      var angleDegrees = angleRadians * (180 / Math.PI);
-
-      const angleInRadians = angleDegrees * (Math.PI / 180);
-
-      const deltaX = 1 * Math.cos(angleInRadians);
-      const deltaZ = 1 * Math.sin(angleInRadians);
-
-      const newX = deltaX;
-      const newZ = deltaZ;
-
-      return { newZ, newX };
+    function calcMovement() {
+      const deltaX = Math.sin(playerRotation);
+      const deltaZ = Math.cos(playerRotation);
+      return { deltaX, deltaZ };
     }
-
-    var angleRadians = 2 * Math.atan2(playerRotation, cubeBody.quaternion.w);
-    var angleDegrees = angleRadians * (180 / Math.PI);
-    const angleInRadians = angleDegrees * (Math.PI / 180);
-
-    cameraAngle = THREE.MathUtils.lerp(cameraAngle, angleInRadians, 1);
-    camera.position.setFromSphericalCoords(5, 1, cameraAngle);
-    camera.position.add(sceneNode.position);
-    camera.lookAt(sceneNode.position);
-
-    cubeBody.quaternion.x = 0
-    cubeBody.quaternion.y = playerRotation
-    cubeBody.quaternion.z = 0
-
-    if (cubeBody.position.y < -30) {
-      Health = 0;
-    }
-    if (Health < 0.1) {
-      cubeBody.position.set(0, 0, 0);
-      Health = 100;
-    }
-    buttonh.innerText = "Health: " + Health;
 
     if (keyState.w) {
-      cubeBody.position.z -= calcRot().newX / 10
-      cubeBody.position.x -= calcRot().newZ / 10
+      cubeBody.position.x -= calcMovement().deltaX / 10;
+      cubeBody.position.z -= calcMovement().deltaZ / 10;
     }
     if (keyState.s) {
-      cubeBody.position.z += calcRot().newX / 10
-      cubeBody.position.x += calcRot().newZ / 10
+      cubeBody.position.x += calcMovement().deltaX / 10;
+      cubeBody.position.z += calcMovement().deltaZ / 10;
     }
     if (keyState.a) {
-      playerRotation += 0.01
+      playerRotation += 0.02;
     }
     if (keyState.d) {
-      playerRotation -= 0.01
+      playerRotation -= 0.02;
     }
     if (keyState.space) {
       if (Math.abs(cubeBody.velocity.y) < 0.1) {
@@ -172,20 +155,41 @@ function spawnPlayer() {
       }
     }
 
-    if (playerRotation > 1) {
-      playerRotation = 1;
-    } else if (playerRotation < -1) {
-      playerRotation = -1;
-    }    
-
-    if (isFirebaseEnv) {
-      firebase.database().ref(`games/${id}/server/${playerUniqueID}/rot`).set(playerRotation)
-      firebase.database().ref(`games/${id}/server/${playerUniqueID}/pos`).set(cubeBody.position)
-      firebase.database().ref(`games/${id}/server/${playerUniqueID}/age`).set(Date.now())
-      firebase.database().ref(`games/${id}/server/${playerUniqueID}/id`).set(playerUniqueID)
+    function lerpAngle(a, b, t) {
+      let difference = b - a;
+      difference = ((difference + Math.PI) % (2 * Math.PI)) - Math.PI;
+      return a + difference * t;
     }
 
-    requestAnimationFrame(playerLoop)
+    playerRotation = normalizeRotation(playerRotation);
+    sceneNode.rotation.y = playerRotation
+    
+    cameraAngle = lerpAngle(cameraAngle, playerRotation, 0.1);
+    camera.position.setFromSphericalCoords(5, 1, cameraAngle);
+    camera.position.add(sceneNode.position);
+    camera.lookAt(sceneNode.position);
+
+    if (cubeBody.position.y < -30) {
+      Health = 0;
+    }
+
+    if (Health < 0.1) {
+      cubeBody.position.set(0, 0, 0);
+      Health = 100;
+    }
+
+    buttonh.innerText = "Health: " + Health;
+
+    if (isFirebaseEnv) {
+      const playerRef = firebase.database().ref(`games/${id}/server/${playerUniqueID}`);
+      playerRef.update({
+        rot: playerRotation,
+        pos: cubeBody.position,
+        age: Date.now(),
+      });
+    }
+
+    requestAnimationFrame(playerLoop);
   }
 
   playerLoop()
@@ -195,22 +199,33 @@ function spawnPlayer() {
       rot: playerRotation,
       id: playerUniqueID,
       age: Date.now(),
-      pos: cubeBody.position
+      pos: cubeBody.position,
+      messages: {}
     };
+
+    player.messages[firstMessageID] = {
+      content: "Joined the game",
+      age: Date.now(),
+      id: firstMessageID
+    }
 
     firebase.database().ref(`games/${id}/server/${playerUniqueID}`).set(player)
   }
 }
 
 var allPlayersElem = {}
+var allMessages = []
 function otherPlayers() {
   firebase.database().ref(`games/${id}/server/`).on('value', function (snapshot) {
     var playerslist = snapshot.val()
+    if (!playerslist) return;
+
     Object.values(playerslist).forEach(element => {
       const unixTimeMilliseconds = parseInt(element.age);
       const unixTimeDate = new Date(unixTimeMilliseconds);
       const currentTime = new Date();
       const timeDifference = currentTime.getTime() - unixTimeDate.getTime();
+      const messages = element.messages
 
       if (element.id != playerUniqueID) {
         if (!allPlayersElem[element.id]) {
@@ -219,10 +234,12 @@ function otherPlayers() {
           allPlayersElem[element.id] = new THREE.Mesh(cubeGeometry, cubeMaterial);
           scene.add(allPlayersElem[element.id])
         } else {
-          allPlayersElem[element.id].position.x = element.pos.x
-          allPlayersElem[element.id].position.y = element.pos.y
-          allPlayersElem[element.id].position.z = element.pos.z
-          allPlayersElem[element.id].rotation.y = element.rot
+          try {
+            allPlayersElem[element.id].position.x = element.pos.x
+            allPlayersElem[element.id].position.y = element.pos.y
+            allPlayersElem[element.id].position.z = element.pos.z
+            allPlayersElem[element.id].rotation.y = element.rot
+          } catch (error) { }
         }
       }
 
@@ -232,6 +249,26 @@ function otherPlayers() {
           scene.remove(allPlayersElem[element.id])
         }
       }
+
+      if (!messages) return;
+      Object.values(messages).forEach((items, index) => {
+        const unixTimeMilliseconds = parseInt(items.age);
+        const unixTimeDate = new Date(unixTimeMilliseconds);
+        const currentTime = new Date();
+        const timeDifference = currentTime.getTime() - unixTimeDate.getTime();
+        if (timeDifference >= 10000) {
+          firebase.database().ref(`games/${id}/server/${element.id}/messages/${items.id}`).remove()
+        } else {
+          if (!allMessages.includes(items.id)) {
+            allMessages.push(items.id)
+            if (element.id == playerUniqueID) return;
+            debug(items.content)
+            const msg = document.createElement("p")
+            msg.innerText = items.content
+            document.getElementById("chats").prepend(msg)
+          }
+        }
+      })
     });
   })
 }
