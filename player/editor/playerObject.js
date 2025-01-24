@@ -52,6 +52,7 @@ function spawnPlayer() {
   cubeBody.addShape(cubeShape);
   cubeBody.position.set(0, 0, 0);
   world.addBody(cubeBody)
+  let previousY = cubeBody.position.y; // Store the initial position before the loop starts
 
   // Associate the Three.js mesh with the Cannon.js body
   cubeBody.threeMesh = sceneNode;
@@ -121,7 +122,7 @@ function spawnPlayer() {
   var targetPosition = new THREE.Vector3();
   var cameraPosition = new THREE.Vector3();
   var cameraAngle = 0;
-
+  
   function playerLoop() {
     function normalizeRotation(rotation) {
       while (rotation > Math.PI) rotation -= 2 * Math.PI;
@@ -133,6 +134,20 @@ function spawnPlayer() {
       const deltaX = Math.sin(playerRotation);
       const deltaZ = Math.cos(playerRotation);
       return { deltaX, deltaZ };
+    }
+    
+    function checkPositionChange() {
+     const cubeBodynewValue = cubeBody.position.y; // Get the current value 
+     const change = Math.abs(cubeBodynewValue - previousY); // Calculate the change compared to the previous value
+      const smallChangeThreshold = 0.0000001; // Define the threshold for small change
+
+      if (change <= smallChangeThreshold) {
+       previousY = cubeBodynewValue; // Update the previous value for the next iteration
+       return true
+     } else {
+      previousY = cubeBodynewValue; // Update the previous value for the next iteration
+       return false
+     }
     }
 
     if (keyState.w) {
@@ -150,11 +165,13 @@ function spawnPlayer() {
       playerRotation -= 0.02;
     }
     if (keyState.space) {
-      if (Math.abs(cubeBody.velocity.y) < 0.1) {
+      if (checkPositionChange()) {
         cubeBody.velocity.y = 7.5;
       }
     }
 
+    // console.log(cubeBody.position.y)
+    
     function lerpAngle(a, b, t) {
       let difference = b - a;
       difference = ((difference + Math.PI) % (2 * Math.PI)) - Math.PI;
