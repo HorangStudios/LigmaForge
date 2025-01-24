@@ -139,7 +139,7 @@ function spawnPlayer() {
     function checkPositionChange() {
      const cubeBodynewValue = cubeBody.position.y; // Get the current value 
      const change = Math.abs(cubeBodynewValue - previousY); // Calculate the change compared to the previous value
-      const smallChangeThreshold = 0.0000001; // Define the threshold for small change
+      const smallChangeThreshold = 0.0001; // Define the threshold for small change
 
       if (change <= smallChangeThreshold) {
        previousY = cubeBodynewValue; // Update the previous value for the next iteration
