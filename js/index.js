@@ -90,7 +90,7 @@ function importScene() {
 
 // play
 function playScene() {
-    const receiverWindow = window.open('player/', 'popup', 'popup=true,width=640,height=400');
+    const receiverWindow = window.open('player/index.html', 'popup', 'popup=true,width=640,height=400');
 
     receiverWindow.addEventListener('load', function () {
         receiverWindow.loadScene(sceneSchematics, true, false)
