@@ -1,12 +1,14 @@
 function makeid(length) {
   let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
   let counter = 0;
+
   while (counter < length) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
     counter += 1;
   }
+
   return result;
 }
 
@@ -22,18 +24,32 @@ function getRandomHexColor() {
   return hexColor;
 }
 
+function typeChat(e) {
+  if (event.key === 'Enter') {
+    const generatedMessageID = Date.now() + makeid(16)
+    const theMessage = e.value
+
+    document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + '\nYou: ' + theMessage
+    firebase.database().ref(`games/${id}/server/${playerUniqueID}/messages/${generatedMessageID}`).set({
+      content: theMessage,
+      age: Date.now(),
+      id: generatedMessageID
+    })
+
+    e.value = ''
+  }
+}
+
 var playerObject
 const playerUniqueID = makeid(256)
-const firstMessageID = makeid(256)
+const firstMessageID = Date.now() + makeid(16)
 
 function spawnPlayer() {
   var playerRotation = 0;
   var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
   var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x800000 });
   var Health = 100;
-  var buttonh = document.createElement('a')
-  buttonh.innerText = "Health: " + Health;
-  document.getElementById('topsidebar').appendChild(buttonh)
+
   document.addEventListener('keydown', function (event) {
     if (event.keyCode == 27) {
       toggleSideBar()
@@ -46,27 +62,22 @@ function spawnPlayer() {
   sceneNode.position.set(0, 1, 0);
   scene.add(sceneNode);
 
-  // Create the corresponding Cannon.js body
   var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1 / 2, 1 / 2));
   var cubeBody = new CANNON.Body({ mass: parseInt(1) });
+  var previousY = cubeBody.position.y;
   cubeBody.addShape(cubeShape);
   cubeBody.position.set(0, 0, 0);
-  world.addBody(cubeBody)
-  let previousY = cubeBody.position.y; // Store the initial position before the loop starts
-
-  // Associate the Three.js mesh with the Cannon.js body
   cubeBody.threeMesh = sceneNode;
+  world.addBody(cubeBody)
 
   var keyState = {
     w: false,
     a: false,
     s: false,
     d: false,
-    m: false,
     space: false
   };
 
-  // Event listeners for keydown and keyup events
   document.addEventListener('keydown', function (event) {
     switch (event.code) {
       case 'KeyW':
@@ -80,18 +91,6 @@ function spawnPlayer() {
         break;
       case 'KeyD':
         keyState.d = true;
-        break;
-      case 'KeyT':
-        const theMessage = prompt()
-        const generatedMessageID = makeid(256)
-        const msg = document.createElement("p")
-        msg.innerText = theMessage
-        document.getElementById("chats").prepend(msg)
-        firebase.database().ref(`games/${id}/server/${playerUniqueID}/messages/${generatedMessageID}`).set({
-          content: theMessage,
-          age: Date.now(),
-          id: generatedMessageID
-        })
         break;
       case 'Space':
         keyState.space = true;
@@ -119,10 +118,7 @@ function spawnPlayer() {
     }
   });
 
-  var targetPosition = new THREE.Vector3();
-  var cameraPosition = new THREE.Vector3();
   var cameraAngle = 0;
-  
   function playerLoop() {
     function normalizeRotation(rotation) {
       while (rotation > Math.PI) rotation -= 2 * Math.PI;
@@ -135,19 +131,19 @@ function spawnPlayer() {
       const deltaZ = Math.cos(playerRotation);
       return { deltaX, deltaZ };
     }
-    
+
     function checkPositionChange() {
-     const cubeBodynewValue = cubeBody.position.y; // Get the current value 
-     const change = Math.abs(cubeBodynewValue - previousY); // Calculate the change compared to the previous value
-      const smallChangeThreshold = 0.0001; // Define the threshold for small change
+      const cubeBodynewValue = cubeBody.position.y;
+      const change = Math.abs(cubeBodynewValue - previousY);
+      const smallChangeThreshold = 0.0001;
 
       if (change <= smallChangeThreshold) {
-       previousY = cubeBodynewValue; // Update the previous value for the next iteration
-       return true
-     } else {
-      previousY = cubeBodynewValue; // Update the previous value for the next iteration
-       return false
-     }
+        previousY = cubeBodynewValue;
+        return true
+      } else {
+        previousY = cubeBodynewValue;
+        return false
+      }
     }
 
     if (keyState.w) {
@@ -170,8 +166,6 @@ function spawnPlayer() {
       }
     }
 
-    // console.log(cubeBody.position.y)
-    
     function lerpAngle(a, b, t) {
       let difference = b - a;
       difference = ((difference + Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -180,7 +174,8 @@ function spawnPlayer() {
 
     playerRotation = normalizeRotation(playerRotation);
     sceneNode.rotation.y = playerRotation
-    
+    cubeBody.quaternion.setFromEuler(0, playerRotation, 0);
+
     cameraAngle = lerpAngle(cameraAngle, playerRotation, 0.1);
     camera.position.setFromSphericalCoords(5, 1, cameraAngle);
     camera.position.add(sceneNode.position);
@@ -190,12 +185,14 @@ function spawnPlayer() {
       Health = 0;
     }
 
-    if (Health < 0.1) {
-      cubeBody.position.set(0, 0, 0);
-      Health = 100;
+    if (Health <= 0) {
+      setTimeout(() => {
+        cubeBody.position.set(0, 0, 0);
+        Health = 100;
+      }, 1500);
     }
 
-    buttonh.innerText = "Health: " + Health;
+    document.getElementById("health").value = Health
 
     if (isFirebaseEnv) {
       const playerRef = firebase.database().ref(`games/${id}/server/${playerUniqueID}`);
@@ -280,9 +277,7 @@ function otherPlayers() {
             allMessages.push(items.id)
             if (element.id == playerUniqueID) return;
             debug(items.content)
-            const msg = document.createElement("p")
-            msg.innerText = items.content
-            document.getElementById("chats").prepend(msg)
+            document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + `\n${playerUniqueID.slice(0,5)}: ` + items.content
           }
         }
       })

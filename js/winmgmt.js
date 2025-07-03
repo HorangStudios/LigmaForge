@@ -66,7 +66,6 @@ function spawnCodeEditor(code, name) {
 function focusWindow(windowElem) {
     const windows = document.querySelectorAll('.window');
     windows.forEach((elem) => elem.classList.remove('focused'));
-
     windowElem.classList.add('focused');
 }
 
@@ -75,4 +74,4 @@ async function CreateEditorCodeWindow() {
 }
 
 //spawn baseplate
-spawnCube(0, -1, 0, 32, 1, 32, '#008000')
+addElem.cube(0, -1, 0, 32, 1, 32, '#008000')

@@ -2,50 +2,42 @@
 <html>
 
 <head>
-  <title>HorangHill Editor</title>
-  <link rel="icon" type="image/x-icon" href="HorangHill.png">
-
+  <meta charset='utf-8'>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <script src="fontawesome.js" defer></script>
-  <script src="index.js" defer></script>
-  <script src="addShapes.js" defer></script>
-  <script src="sceneexplorer.js" defer></script>
-  <script src="winmgmt.js" defer></script>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>HorangHill Editor</title>
+
   <link rel="icon" type="image/x-icon" href="css/HorangHill.png">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="windows.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/windows.css">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="js/fontawesome.js" defer></script>
+  <script type="text/javascript" src="js/index.js" defer></script>
+  <script type="text/javascript" src="js/addShapes.js" defer></script>
+  <script type="text/javascript" src="js/sceneLoader.js" defer></script>
+  <script type="text/javascript" src="js/sceneexplorer.js" defer></script>
+  <script type="text/javascript" src="js/winmgmt.js" defer></script>
 
-  <script type="text/javascript" src="js/three/GLTFExporter.js" defer></script>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/jquery-ui.js"></script>
+
   <script type="text/javascript" src="js/three/ImprovedNoise.js" defer></script>
-  <script type="text/javascript" src="js/three/GLTFLoader.js" defer></script>
   <script type="text/javascript" src="js/three/three.min.js"></script>
   <script type="text/javascript" src="js/three/OrbitControls.js"></script>
+  <script type="text/javascript" src="js/three/stats.min.js"></script>
   <script type="text/javascript" src="js/three/EffectComposer.js"></script>
   <script type="text/javascript" src="js/three/RenderPass.js"></script>
   <script type="text/javascript" src="js/three/SimplexNoise.js"></script>
-  <script type="text/javascript" src="js/three/SAOPass.js"></script>
-  <script type="text/javascript" src="js/three/SSAOPass.js"></script>
   <script type="text/javascript" src="js/three/ShaderPass.js"></script>
   <script type="text/javascript" src="js/three/CopyShader.js"></script>
-  <script type="text/javascript" src="js/three/SAOShader.js"></script>
+  <script type="text/javascript" src="js/three/SSAOPass.js"></script>
   <script type="text/javascript" src="js/three/SSAOShader.js"></script>
-  <script type="text/javascript" src="js/three/UnpackDepthRGBAShader.js"></script>
-  <script type="text/javascript" src="js/three/DepthLimitedBlurShader.js"></script>
-  <script type="text/javascript" src="js/three/stats.min.js"></script>
-  <script type="text/javascript" src="js/three/TransformControls.js"></script>
-  <script type="text/javascript" src="js/three/FileSaver.min.js"></script>
+  <script type="text/javascript" src="js/three/transformControls.js"></script>
+  <script type="text/javascript" src="js/three/sky.js"></script>
 </head>
 
 <body>
-  <div id="sidebar">
-    <h1>HorangHill</h1>
-    LigmaForge Editor Version 1.0
-    <BR>
-    Copyright 2023 HorangStudios
-  </div>
+  <div id="sidebar"></div>
 
   <div id="main">
     <div class="ribbon">
@@ -73,11 +65,12 @@
           <li class="dropdown li">
             <a href="javascript:void(0)" class="dropbtn">Insert</a>
             <div class="dropdown-content">
-              <a onclick="spawnCube(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Cube</a>
-              <a onclick="addCylinder(0,0,0,5,5,10,32,'#ff0000')"><i class="fa fa-cubes"></i> Cylinder</a>
-              <a onclick="addSphere(15,32,16,0,0,0,'#ff0000')"><i class="fa fa-cubes"></i> Sphere</a>
-              <a onclick="addLight(0,0,0,10,10,'#ffffff')"><i class="fa fa-cubes"></i> Light</a>
-              <a onclick="generateterrain(2, prompt('Enter terrain size... (Under development)'), '#008000')"><i class="fa fa-cubes"></i> Terrain</a>
+              <a onclick="addElem.cube(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Cube</a>
+              <a onclick="addElem.cylinder(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Cylinder</a>
+              <a onclick="addElem.sphere(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Sphere</a>
+              <a onclick="addElem.light(0,0,0,10,10,'#ffffff')"><i class="fa fa-cubes"></i> Light</a>
+              <a onclick="addElem.terrain(2, prompt('Enter terrain size... (Under development)'), '#008000')"><i
+                  class="fa fa-cubes"></i> Terrain</a>
             </div>
           </li>
 
@@ -97,19 +90,22 @@
         <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('rotate');">
           <img src="resources/icons/Silk_arrow_rotate_anticlockwise.png">
         </button>
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('scale');">
+          <img src="resources/icons/Silk_arrow_out.png">
+        </button>
       </div>
 
       <div style="display: inline-block;">
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="spawnCube(0,0,0,1,1,1,'#ff0000')">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.cube(0,0,0,1,1,1,'#ff0000')">
           <img src="resources/icons/brick_add.png">
         </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addCylinder(0,0,0,5,5,10,32,'#ff0000')">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.cylinder(0,0,0,1,1,1,'#ff0000')">
           <img src="resources/icons/database_add.png">
         </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addSphere(15,32,16,0,0,0,'#ff0000')">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.sphere(0,0,0,1,1,1,'#ff0000')">
           <img src="resources/icons/Contrast_high.png">
         </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addLight(0,0,0,10,10,'#ffffff')">
+        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.light(0,0,0,10,10,'#ffffff')">
           <img src="resources/icons/lightbulb_add.png">
         </button>
       </div>

@@ -9,26 +9,26 @@
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/cannon@0.6.1/build/cannon.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/glin-profanity@1.1.9/lib/cjs/index.min.js"></script>
 
+    <script type="text/javascript" src="../js/three/ImprovedNoise.js" defer></script>
     <script type="text/javascript" src="../js/three/three.min.js"></script>
+    <script type="text/javascript" src="../js/three/OrbitControls.js"></script>
+    <script type="text/javascript" src="../js/three/stats.min.js"></script>
     <script type="text/javascript" src="../js/three/EffectComposer.js"></script>
     <script type="text/javascript" src="../js/three/RenderPass.js"></script>
     <script type="text/javascript" src="../js/three/SimplexNoise.js"></script>
-    <script type="text/javascript" src="../js/three/SSAOPass.js"></script>
     <script type="text/javascript" src="../js/three/ShaderPass.js"></script>
     <script type="text/javascript" src="../js/three/CopyShader.js"></script>
+    <script type="text/javascript" src="../js/three/SSAOPass.js"></script>
     <script type="text/javascript" src="../js/three/SSAOShader.js"></script>
-    <script type="text/javascript" src="../js/three/UnpackDepthRGBAShader.js"></script>
-    <script type="text/javascript" src="../js/three/DepthLimitedBlurShader.js"></script>
-    <script type="text/javascript" src="../js/three/OrbitControls.js"></script>
+    <script type="text/javascript" src="../js/three/sky.js"></script>
+    <script type="text/javascript" src="../js/addShapes.js" defer></script>
+    <script type="text/javascript" src="../js/sceneLoader.js" defer></script>
 
-    <script type="text/javascript" src="editor/playerObject.js" defer></script>
-    <script type="text/javascript" src="editor/ImprovedNoise.js"></script>
-    <script type="text/javascript" src="editor/editorSpawnSDK.js" defer></script>
-    <script type="text/javascript" src="editor/editor.js" defer></script>
-    <script type="text/javascript" src="editor/fontawesome.js" defer></script>
-    <script type="text/javascript" src="firebaseMapLoader.js" defer></script>
+    <script type="text/javascript" src="js/playerObject.js" defer></script>
+    <script type="text/javascript" src="js/index.js" defer></script>
+    <script type="text/javascript" src="js/fontawesome.js" defer></script>
+    <script type="text/javascript" src="js/firebaseMapLoader.js" defer></script>
 </head>
 
 <body id="section">
@@ -41,23 +41,22 @@
         </div>
     </div>
 
-    <button id="menutoggle" onclick="toggleSideBar()">
-        <img src="../css/HorangHill.png">
-    </button>
+    <div id="navigation">
+        <img src="../css/HorangHill.png" onclick="toggleSideBar()">
+        <progress value="100" max="100" id="health"></progress>
+    </div>
 
     <div id="chats">
-        <p>Press T to chat</p>
-        <p>Welcome to HorangHill !</p>
+        <input placeholder="Send a message..." onkeydown="typeChat(this)">
+        <p id="chatcontent">Welcome to HorangHill !</p>
     </div>
 
     <div id="Sidenav" class="sidenav" style="width: 0px;">
         <div class="topsidebar" id="topsidebar">
-            <a onclick="closeWindow()" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
+            <a onclick="window.close();" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
             <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer log</a>
         </div>
-        <div class="bottomsidebar">
-            <a id="gamename">Game</a>
-        </div>
+        <a id="gamename">Game</a>
     </div>
 
     <div id="devtools" style="width: 0px;">

@@ -1,7 +1,6 @@
 const isFirebaseEnv = new URLSearchParams(window.location.search).get('online');
 
 if (isFirebaseEnv == 'true') {
-  // Initialize Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDE-mQcJoquJxLrHAcS1kZbpjUbHYQmzsE",
     authDomain: "horanghill.firebaseapp.com",
@@ -20,9 +19,9 @@ if (isFirebaseEnv == 'true') {
 
   ref.once('value', snapshot => {
     const item = snapshot.val();
-    document.getElementById('gamename').innerHTML = item.title + "<br>" + item.createdBy
+    document.getElementById('gamename').innerHTML = item.title + "<br>By: " + item.createdBy
     document.getElementById('pagetitle').innerText = item.title
-    loadMap(item.hhls)
+    loadScene(item.hhls, true, false)
   });
 
   document.getElementById('quitbtn').onclick = function () {
