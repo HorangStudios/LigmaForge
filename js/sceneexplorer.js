@@ -14,7 +14,7 @@ const convertBase64 = (event) => {
     });
 };
 
-function listSchematic() {
+function listSchematic(toClick = false) {
     const shapesList = document.getElementById('sidebar');
     shapesList.innerHTML = '';
 
@@ -58,7 +58,7 @@ function listSchematic() {
                 transformControls.detach()
                 var copy = JSON.parse(JSON.stringify(element));
                 sceneSchematics.push(copy)
-                listSchematic()
+                listSchematic(i)
             }
 
             shapesList.appendChild(document.createElement('hr'));
@@ -72,7 +72,9 @@ function listSchematic() {
                 let label = document.createElement('label');
 
                 label.innerText = key + ":";
+                label.setAttribute('for', key);
                 input.value = value;
+                input.id = key;
 
                 if (typeof value == 'number') {
                     input.type = "number"
@@ -88,19 +90,21 @@ function listSchematic() {
                     transformControls.detach()
                     if (key == "color") {
                         element[key] = input.value;
-                        listSchematic();
-                        return
-                    } if (key == "opacity") {
+                        listSchematic(i);
+                    } else if (key == "opacity") {
                         element[key] = parseFloat(input.value);
+                        listSchematic(i);
                     } else if (typeof value == 'number') {
                         element[key] = parseInt(input.value);
+                        listSchematic(i);
                     } else if (input.type == 'file') {
                         const base64 = await convertBase64(event);
                         element[key] = base64;
+                        listSchematic(i);
                     } else {
                         element[key] = input.value;
+                        listSchematic(i);
                     }
-                    listSchematic();
                 };
 
                 if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript") {
@@ -122,7 +126,7 @@ function listSchematic() {
                     clearBtn.onclick = function () {
                         transformControls.detach()
                         element[key] = false
-                        listSchematic();
+                        listSchematic(i);
                     }
                 }
 
@@ -168,5 +172,9 @@ function listSchematic() {
         };
 
         shapesList.appendChild(button);
+
+        if (i === toClick) {
+            button.click();
+        }
     });
 }

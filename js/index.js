@@ -25,10 +25,13 @@ document.getElementById('main').appendChild(renderer.domElement);
 
 //transform controls
 var transformControls = new THREE.TransformControls(camera, renderer.domElement);
+scene.add(transformControls);
+transformControls.setTranslationSnap(0.5)
+transformControls.setRotationSnap(0.5)
+transformControls.setScaleSnap(0.5)
 transformControls.addEventListener('dragging-changed', function (event) {
     controls.enabled = !event.value;
 });
-scene.add(transformControls);
 
 //AAA game graphics
 composer = new THREE.EffectComposer(renderer);

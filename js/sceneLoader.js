@@ -101,7 +101,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
                     if (i == select && select !== false) {
                         transformControls.attach(scenenode);
-                        transformControls.addEventListener('change', function () {
+                        transformControls.addEventListener('change', function (event) {
+                            if (!transformControls.dragging) return
+
                             element["x"] = scenenode.position.x;
                             element["y"] = scenenode.position.y;
                             element["z"] = scenenode.position.z;
@@ -113,6 +115,18 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             element["sizeX"] = scenenode.scale.x;
                             element["sizeY"] = scenenode.scale.y;
                             element["sizeZ"] = scenenode.scale.z;
+
+                            document.getElementById("x").value = scenenode.position.x;
+                            document.getElementById("y").value = scenenode.position.y;
+                            document.getElementById("z").value = scenenode.position.z;
+
+                            document.getElementById("rotx").value = scenenode.rotation.x;
+                            document.getElementById("roty").value = scenenode.rotation.y;
+                            document.getElementById("rotz").value = scenenode.rotation.z;
+
+                            document.getElementById("sizeX").value = scenenode.scale.x;
+                            document.getElementById("sizeY").value = scenenode.scale.y;
+                            document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
                     }
 
@@ -192,6 +206,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     if (i == select && select !== false) {
                         transformControls.attach(scenenode);
                         transformControls.addEventListener('change', function () {
+                            if (!transformControls.dragging) return
+
                             element["x"] = scenenode.position.x;
                             element["y"] = scenenode.position.y;
                             element["z"] = scenenode.position.z;
@@ -203,6 +219,18 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             element["sizeX"] = scenenode.scale.x;
                             element["sizeY"] = scenenode.scale.y;
                             element["sizeZ"] = scenenode.scale.z;
+
+                            document.getElementById("x").value = scenenode.position.x;
+                            document.getElementById("y").value = scenenode.position.y;
+                            document.getElementById("z").value = scenenode.position.z;
+
+                            document.getElementById("rotx").value = scenenode.rotation.x;
+                            document.getElementById("roty").value = scenenode.rotation.y;
+                            document.getElementById("rotz").value = scenenode.rotation.z;
+
+                            document.getElementById("sizeX").value = scenenode.scale.x;
+                            document.getElementById("sizeY").value = scenenode.scale.y;
+                            document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
                     }
 
@@ -282,6 +310,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     if (i == select && select !== false) {
                         transformControls.attach(scenenode);
                         transformControls.addEventListener('change', function () {
+                            if (!transformControls.dragging) return
+
                             element["x"] = scenenode.position.x;
                             element["y"] = scenenode.position.y;
                             element["z"] = scenenode.position.z;
@@ -293,6 +323,18 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             element["sizeX"] = scenenode.scale.x * 10;
                             element["sizeY"] = scenenode.scale.y * 10;
                             element["sizeZ"] = scenenode.scale.z * 10;
+
+                            document.getElementById("x").value = scenenode.position.x;
+                            document.getElementById("y").value = scenenode.position.y;
+                            document.getElementById("z").value = scenenode.position.z;
+
+                            document.getElementById("rotx").value = scenenode.rotation.x;
+                            document.getElementById("roty").value = scenenode.rotation.y;
+                            document.getElementById("rotz").value = scenenode.rotation.z;
+
+                            document.getElementById("sizeX").value = scenenode.scale.x;
+                            document.getElementById("sizeY").value = scenenode.scale.y;
+                            document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
                     }
 
@@ -364,6 +406,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 if (i == select && select !== false) {
                     transformControls.attach(scenenode);
                     transformControls.addEventListener('change', function () {
+                        if (!transformControls.dragging) return
+
                         element["x"] = scenenode.position.x;
                         element["y"] = scenenode.position.y;
                         element["z"] = scenenode.position.z;
@@ -375,6 +419,18 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         element["sizeX"] = scenenode.scale.x;
                         element["sizeY"] = scenenode.scale.y;
                         element["sizeZ"] = scenenode.scale.z;
+
+                        document.getElementById("x").value = scenenode.position.x;
+                        document.getElementById("y").value = scenenode.position.y;
+                        document.getElementById("z").value = scenenode.position.z;
+
+                        document.getElementById("rotx").value = scenenode.rotation.x;
+                        document.getElementById("roty").value = scenenode.rotation.y;
+                        document.getElementById("rotz").value = scenenode.rotation.z;
+
+                        document.getElementById("sizeX").value = scenenode.scale.x;
+                        document.getElementById("sizeY").value = scenenode.scale.y;
+                        document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
                 }
 
@@ -419,6 +475,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 if (i == select && select !== false) {
                     transformControls.attach(scenenode);
                     transformControls.addEventListener('change', function () {
+                        if (!transformControls.dragging) return
+
                         element["x"] = scenenode.position.x;
                         element["y"] = scenenode.position.y;
                         element["z"] = scenenode.position.z;
@@ -430,6 +488,18 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         element["sizeX"] = scenenode.scale.x;
                         element["sizeY"] = scenenode.scale.y;
                         element["sizeZ"] = scenenode.scale.z;
+
+                        document.getElementById("x").value = scenenode.position.x;
+                        document.getElementById("y").value = scenenode.position.y;
+                        document.getElementById("z").value = scenenode.position.z;
+
+                        document.getElementById("rotx").value = scenenode.rotation.x;
+                        document.getElementById("roty").value = scenenode.rotation.y;
+                        document.getElementById("rotz").value = scenenode.rotation.z;
+
+                        document.getElementById("sizeX").value = scenenode.scale.x;
+                        document.getElementById("sizeY").value = scenenode.scale.y;
+                        document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
                 }
 
@@ -466,6 +536,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 if (i == select && select !== false) {
                     transformControls.attach(scenenode);
                     transformControls.addEventListener('change', function () {
+                        if (!transformControls.dragging) return
+
                         element["x"] = scenenode.position.x;
                         element["y"] = scenenode.position.y;
                         element["z"] = scenenode.position.z;
@@ -473,6 +545,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         element["rotx"] = scenenode.rotation.x;
                         element["roty"] = scenenode.rotation.y;
                         element["rotz"] = scenenode.rotation.z;
+
+                        document.getElementById("x").value = scenenode.position.x;
+                        document.getElementById("y").value = scenenode.position.y;
+                        document.getElementById("z").value = scenenode.position.z;
+
+                        document.getElementById("rotx").value = scenenode.rotation.x;
+                        document.getElementById("roty").value = scenenode.rotation.y;
+                        document.getElementById("rotz").value = scenenode.rotation.z;
                     });
                 }
 
