@@ -396,10 +396,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.userData.initscriptFunction = initscriptFunction;
 
                 if (element.tex) {
-                    const texture = new THREE.TextureLoader().load(element.tex, () => {
-                        scenenode.material.map = texture;
-                        scenenode.material.needsUpdate = true;
-                    });
+                    const texture = new THREE.TextureLoader().load(element.tex);
+                    scenenode.material.map = texture;
+                    scenenode.material.needsUpdate = true;
                 }
                 break;
 
@@ -452,10 +451,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.userData.initscriptFunction = initscriptFunction;
 
                 if (element.tex) {
-                    const texture = new THREE.TextureLoader().load(element.tex, () => {
-                        scenenode.material.map = texture;
-                        scenenode.material.needsUpdate = true;
-                    });
+                    const texture = new THREE.TextureLoader().load(element.tex);
+                    scenenode.material.map = texture;
+                    scenenode.material.needsUpdate = true;
                 }
                 break;
 
