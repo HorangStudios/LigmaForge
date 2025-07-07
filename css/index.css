@@ -1,0 +1,229 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    outline: none;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.sceneNodeIcon {
+    margin-bottom: 10px;
+}
+
+@keyframes fadedown {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+:root {
+    --ui-base-color: #2d2d2d;
+    --ui-button-color: #1d1d1d;
+    --ui-button-hover-color: #3d3d3d;
+    --ui-button-active-color: #424242;
+    --ui-button-disabled-color: #303030;
+    --ui-base-text-color: #fff;
+}
+
+body,
+html {
+    background-color: var(--ui-base-color);
+    color: var(--ui-base-text-color);
+    overflow: hidden
+}
+
+header {
+    padding: 15px;
+    display: inline-flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+#controls {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    height: 44px;
+}
+
+button {
+    background: var(--ui-button-color);
+    border: none;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    min-width: 25px;
+}
+
+#sideButtons {
+    float: left;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+
+#sideButtons button {
+    padding: 12px;
+    background: none;
+    font-size: 17px;
+}
+
+hr {
+    border-color: var(--ui-button-active-color);
+    border-style: solid;
+}
+
+canvas {
+    float: right;
+    border-top: var(--ui-button-hover-color) solid 1px;
+    border-left: var(--ui-button-hover-color) solid 1px;
+}
+
+.li {
+    float: left;
+}
+
+.li a,
+.dropbtn {
+    color: white;
+    display: inline-block;
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+}
+
+.li a:hover,
+.dropdown:hover .dropbtn,
+button:hover {
+    background-color: var(--ui-button-hover-color) !important;
+}
+
+.li a:hover select {
+    background-color: var(--ui-button-active-color) !important;
+}
+
+.li a i {
+    float: left;
+    margin-right: 10px;
+}
+
+.li.dropdown {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.dropdown-content{
+    display: none;
+    position: absolute;
+    background-color: var(--ui-button-hover-color);
+    min-width: 160px;
+    animation: fadedown 0.1s ease;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 16px 0px;
+    z-index: 1;
+}
+
+.dropdown-content a {
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    padding-top: 12px;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--ui-button-active-color) !important;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+input[type=checkbox] {
+    min-width: 13px;
+    margin: 0;
+    margin-top: 3px;
+    accent-color: var(--ui-button-active-color);
+    cursor: pointer;
+}
+
+select {
+    color: white;
+    background-color: var(--ui-button-hover-color);
+    border: none;
+    font-size: 16px;
+    display: inline-block;
+    margin-top: -1px;
+    margin-left: -4px;
+}
+
+#explorer {
+    background: var(--ui-base-color);
+    border: var(--ui-button-hover-color) solid;
+    position: absolute;
+    box-sizing: border-box;
+    resize: horizontal;
+}
+
+#explorercontent {
+    padding: 15px;
+    height: 100%;
+    overflow: auto;
+}
+
+#explorercontent label {
+    display: inline-block;
+    margin: 5px;
+    margin-left: 0;
+}
+
+#explorercontent input[type=checkbox] {
+    margin: 7px;
+    position: absolute;
+    margin-left: 0;
+}
+
+#explorercontent input[type=number],
+#explorercontent input[type=text],
+#explorercontent input[type=file],
+#explorercontent input[type=color],
+#explorercontent button {
+    width: 100%;
+    padding: 8px;
+    background-color: #202020;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-align: left;
+}
+
+#sidecontainer {
+    height: calc(100vh - 44px);
+    overflow: auto;
+    position: absolute;
+}
+
+.cornerlogo {
+    width: 45.25px;
+    display: flex !important;
+    justify-content: center;
+    place-items: center;
+    padding-top: 10px !important;
+}
+
+#resourceMonitor {
+    float: right !important;
+    position: absolute !important;
+    right: 0;
+    height: 40px;
+}

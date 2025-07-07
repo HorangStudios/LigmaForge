@@ -1,125 +1,209 @@
-<!doctype html>
 <html>
 
 <head>
-  <meta charset='utf-8'>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <title>HorangHill Editor</title>
+	<link rel="icon" type="image/x-icon" href="css/HorangHill.png">
+	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="css/scroll.css">
+	<link rel="stylesheet" href="css/windows.css">
 
-  <link rel="icon" type="image/x-icon" href="css/HorangHill.png">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/windows.css">
+	<title>HorangHill Editor</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script type="text/javascript" src="js/fontawesome.js" defer></script>
-  <script type="text/javascript" src="js/index.js" defer></script>
-  <script type="text/javascript" src="js/addShapes.js" defer></script>
-  <script type="text/javascript" src="js/sceneLoader.js" defer></script>
-  <script type="text/javascript" src="js/sceneexplorer.js" defer></script>
-  <script type="text/javascript" src="js/winmgmt.js" defer></script>
+	<script type="text/javascript" src="js/undo.js" defer></script>
+	<script type="text/javascript" src="js/index.js" defer></script>
+	<script type="text/javascript" src="js/addShapes.js" defer></script>
+	<script type="text/javascript" src="js/sceneLoader.js" defer></script>
+	<script type="text/javascript" src="js/sceneexplorer.js" defer></script>
 
-  <script type="text/javascript" src="js/jquery.min.js"></script>
-  <script type="text/javascript" src="js/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/deps/fontawesome.js" defer></script>
+	<script type="text/javascript" src="js/deps/winmgmt.js" defer></script>
+	<script type="text/javascript" src="js/deps/jquery.min.js"></script>
+	<script type="text/javascript" src="js/deps/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/deps/translation.js"></script>
 
-  <script type="text/javascript" src="js/three/ImprovedNoise.js" defer></script>
-  <script type="text/javascript" src="js/three/three.min.js"></script>
-  <script type="text/javascript" src="js/three/OrbitControls.js"></script>
-  <script type="text/javascript" src="js/three/stats.min.js"></script>
-  <script type="text/javascript" src="js/three/EffectComposer.js"></script>
-  <script type="text/javascript" src="js/three/RenderPass.js"></script>
-  <script type="text/javascript" src="js/three/SimplexNoise.js"></script>
-  <script type="text/javascript" src="js/three/ShaderPass.js"></script>
-  <script type="text/javascript" src="js/three/CopyShader.js"></script>
-  <script type="text/javascript" src="js/three/SSAOPass.js"></script>
-  <script type="text/javascript" src="js/three/SSAOShader.js"></script>
-  <script type="text/javascript" src="js/three/TransformControls.js"></script>
-  <script type="text/javascript" src="js/three/sky.js"></script>
+	<script type="text/javascript" src="js/three/ImprovedNoise.js" defer></script>
+	<script type="text/javascript" src="js/three/three.min.js"></script>
+	<script type="text/javascript" src="js/three/OrbitControls.js"></script>
+	<script type="text/javascript" src="js/three/stats.min.js"></script>
+	<script type="text/javascript" src="js/three/EffectComposer.js"></script>
+	<script type="text/javascript" src="js/three/RenderPass.js"></script>
+	<script type="text/javascript" src="js/three/SimplexNoise.js"></script>
+	<script type="text/javascript" src="js/three/ShaderPass.js"></script>
+	<script type="text/javascript" src="js/three/CopyShader.js"></script>
+	<script type="text/javascript" src="js/three/SSAOPass.js"></script>
+	<script type="text/javascript" src="js/three/SSAOShader.js"></script>
+	<script type="text/javascript" src="js/three/TransformControls.js"></script>
+	<script type="text/javascript" src="js/three/sky.js"></script>
+	<script type="text/javascript" src="js/three/gltfExporter.js"></script>
 </head>
 
 <body>
-  <div id="sidebar"></div>
+	<ul class="ul" id="controls">
+		<li id="logobutton" class="dropdown li"
+			onclick="gd.logicDisplay.importJSON(preset, gd.logicDisplay.components); localStorage.setItem('clicked84', true); this.classList.remove('tada');">
+			<a class="dropbtn cornerlogo">
+				<img src="css/HorangHill.png" style="width: 18px;">
+			</a>
+		</li>
 
-  <div id="main">
-    <div class="ribbon">
-      <div class="titlebar">
-        <ul class="ul">
+		<li class="dropdown li">
+			<a class="dropbtn"><span>File</span></a>
+			<div class="dropdown-content">
+				<input type="file" accept=".hhls" id="file-input" onchange="importScene()" style="display: none;">
+				<a onclick="window.location.reload()"><span>New</span></a>
+				<a onclick="exportScene()"><span>Save</span></a>
+				<a onclick="document.getElementById('file-input').click();"><span>Open</span></a>
+				<a href="https://horanghill.web.app/" target="_blank"><span>Publish Game</span></a>
+				<a onclick="exportGLTF()"><span>Export Scene</span></a>
+			</div>
+		</li>
 
-          <li class="dropdown li">
-            <a href="javascript:void(0)" class="dropbtn">File</a>
-            <div class="dropdown-content">
-              <a onclick="exportScene()"><i class="fa fa-save"></i> Save Project</a>
-              <input type="file" accept=".hhls" id="file-input" onchange="importScene()" style="display: none;" />
-              <a onclick="document.getElementById('file-input').click();"><i class="fa fa-folder-open"></i>
-                Open Project</a>
-            </div>
-          </li>
+		<li class="dropdown li">
+			<a class="dropbtn"><span>View</span></a>
+			<div class="dropdown-content">
+				<a onclick="camera.position.z += 1;"><span>Zoom Out</span></a>
+				<a onclick="camera.position.z -= 1;"><span>Zoom In</span></a>
+				<a onclick="openExplorer()"><span>Explorer</span></a>
+			</div>
+		</li>
 
-          <li class="dropdown li">
-            <a href="javascript:void(0)" class="dropbtn">Edit</a>
-            <div class="dropdown-content">
-              <a aria-disabled><i class="fa fa-undo"></i> Undo</a>
-              <a aria-disabled><i class="fa fa-redo"></i> Redo</a>
-            </div>
-          </li>
+		<li class="dropdown li">
+			<a class="dropbtn"><span>Edit</span></a>
+			<div class="dropdown-content">
+				<a onclick="undo()"><span>Undo</span></a>
+				<a onclick="redo()"><span>Redo</span></a>
+				<a><span>Snap to Grid</span> <input type="checkbox" onclick="setSnapping(this.checked)" id="snaptogrid"
+						checked></a>
+			</div>
+		</li>
 
-          <li class="dropdown li">
-            <a href="javascript:void(0)" class="dropbtn">Insert</a>
-            <div class="dropdown-content">
-              <a onclick="addElem.cube(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Cube</a>
-              <a onclick="addElem.cylinder(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Cylinder</a>
-              <a onclick="addElem.sphere(0,0,0,1,1,1,'#ff0000')"><i class="fa fa-cubes"></i> Sphere</a>
-              <a onclick="addElem.light(0,0,0,10,10,'#ffffff')"><i class="fa fa-cubes"></i> Light</a>
-              <a onclick="addElem.terrain(2, prompt('Enter terrain size... (Under development)'), '#008000')"><i
-                  class="fa fa-cubes"></i> Terrain</a>
-            </div>
-          </li>
+		<li class="dropdown li">
+			<a class="dropbtn"><span>Help</span></a>
+			<div class="dropdown-content">
+				<a><span>HorangHill Editor v2.0.0</span></a>
+				<a><span>Translations are automated and may be inaccurate.</span></a>
+				<a><select name="languages" id="languages" onchange="changeLang(this.value)">
+						<option value="am">Amharic</option>
+						<option value="ar">Arabic</option>
+						<option value="eu">Basque</option>
+						<option value="bn">Bengali</option>
+						<option value="default" selected>English (Default)</option>
+						<option value="pt-BR">Portuguese (Brazil)</option>
+						<option value="bg">Bulgarian</option>
+						<option value="ca">Catalan</option>
+						<option value="chr">Cherokee</option>
+						<option value="hr">Croatian</option>
+						<option value="cs">Czech</option>
+						<option value="da">Danish</option>
+						<option value="nl">Dutch</option>
+						<option value="et">Estonian</option>
+						<option value="fil">Filipino</option>
+						<option value="fi">Finnish</option>
+						<option value="fr">French</option>
+						<option value="de">German</option>
+						<option value="el">Greek</option>
+						<option value="gu">Gujarati</option>
+						<option value="iw">Hebrew</option>
+						<option value="hi">Hindi</option>
+						<option value="hu">Hungarian</option>
+						<option value="is">Icelandic</option>
+						<option value="id">Indonesian</option>
+						<option value="it">Italian</option>
+						<option value="ja">Japanese</option>
+						<option value="kn">Kannada</option>
+						<option value="ko">Korean</option>
+						<option value="lv">Latvian</option>
+						<option value="lt">Lithuanian</option>
+						<option value="ms">Malay</option>
+						<option value="ml">Malayalam</option>
+						<option value="mr">Marathi</option>
+						<option value="no">Norwegian</option>
+						<option value="pl">Polish</option>
+						<option value="pt-PT">Portuguese (Portugal)</option>
+						<option value="ro">Romanian</option>
+						<option value="ru">Russian</option>
+						<option value="sr">Serbian</option>
+						<option value="zh-CN">Chinese (PRC)</option>
+						<option value="sk">Slovak</option>
+						<option value="sl">Slovenian</option>
+						<option value="es">Spanish</option>
+						<option value="sw">Swahili</option>
+						<option value="sv">Swedish</option>
+						<option value="ta">Tamil</option>
+						<option value="te">Telugu</option>
+						<option value="th">Thai</option>
+						<option value="zh-TW">Chinese (Taiwan)</option>
+						<option value="tr">Turkish</option>
+						<option value="ur">Urdu</option>
+						<option value="uk">Ukrainian</option>
+						<option value="vi">Vietnamese</option>
+						<option value="cy">Welsh</option>
+					</select>
+				</a>
+			</div>
+		</li>
+	</ul>
+	<div id="sidecontainer">
+		<div id="sideButtons">
+			<button title="Explorer" onclick="openExplorer()">
+				<i class="fa-solid fa-list"></i>
+			</button>
 
-          <li class="dropdown li">
-            <a href="javascript:void(0)" class="dropbtn">Status</a>
-            <div class="dropdown-content counter">
-            </div>
-          </li>
+			<button class="separator">
+				<hr>
+			</button>
 
-        </ul>
-      </div>
+			<button title="Move" onclick="transformControls.setMode('translate');">
+				<i class="fa-solid fa-up-down-left-right"></i>
+			</button>
+			<button title="Rotate" onclick="transformControls.setMode('rotate');">
+				<i class="fa-solid fa-rotate"></i>
+			</button>
+			<button title="scale" onclick="transformControls.setMode('scale');">
+				<i class="fa-solid fa-maximize"></i>
+			</button>
 
-      <div style="display: inline-block;" class="transformControls">
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('translate');">
-          <img src="resources/icons/arrow_nsew.png">
-        </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('rotate');">
-          <img src="resources/icons/Silk_arrow_rotate_anticlockwise.png">
-        </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="transformControls.setMode('scale');">
-          <img src="resources/icons/Silk_arrow_out.png">
-        </button>
-      </div>
+			<button class="separator">
+				<hr>
+			</button>
 
-      <div style="display: inline-block;">
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.cube(0,0,0,1,1,1,'#ff0000')">
-          <img src="resources/icons/brick_add.png">
-        </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.cylinder(0,0,0,1,1,1,'#ff0000')">
-          <img src="resources/icons/database_add.png">
-        </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.sphere(0,0,0,1,1,1,'#ff0000')">
-          <img src="resources/icons/Contrast_high.png">
-        </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="addElem.light(0,0,0,10,10,'#ffffff')">
-          <img src="resources/icons/lightbulb_add.png">
-        </button>
-      </div>
+			<button title="Add Cube" onclick="addElem.cube(0,0,0,1,1,1,'#ff0000')">
+				<i class="fa-solid fa-cube"></i>
+			</button>
+			<button title="Add Cylinder" onclick="addElem.cylinder(0,0,0,1,1,1,'#ff0000')">
+				<i class="fa-solid fa-circle-half-stroke"></i>
+			</button>
+			<button title="Add Sphere" onclick="addElem.sphere(0,0,0,1,1,1,'#ff0000')">
+				<i class="fa-solid fa-circle-half-stroke"></i>
+			</button>
+			<button title="Add Light" onclick="addElem.light(0,0,0,10,10,'#ffffff')">
+				<i class="fa-solid fa-lightbulb"></i>
+			</button>
+			<button title="Generate Terrain"
+				onclick="addElem.terrain(2, prompt('Enter terrain size...'), prompt('Enter terrain color... (in hex)'))">
+				<i class="fa-solid fa-mountain"></i>
+			</button>
 
-      <div style="display: inline-block;">
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="CreateEditorCodeWindow()">
-          <img src="resources/icons/script_add.png">
-        </button>
-        <button role="menuitem" class="toolbaricon" tabindex="0" onclick="playScene()">
-          <img src="resources/icons/control_play_blue.png">
-        </button>
-      </div>
-    </div>
-  </div>
+			<button class="separator">
+				<hr>
+			</button>
+
+			<button title="Run Code" onclick="CreateEditorCodeWindow()">
+				<i class="fa-solid fa-terminal"></i>
+			</button>
+			<button title="Test Game" onclick="playScene()">
+				<i class="fa-solid fa-circle-play"></i>
+			</button>
+		</div>
+	</div>
+	<div id="inspector" style="width: 0vw; border-width: 0px;">
+		<div id="inspectorcontent">
+		</div>
+	</div>
+	<div id="explorer" style="width: 0vw; border-width: 0px;">
+		<div id="explorercontent">
+		</div>
+	</div>
 </body>
 
 </html>

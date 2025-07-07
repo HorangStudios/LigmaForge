@@ -15,13 +15,13 @@ function spawnCodeEditor(code, name) {
         var window = document.createElement("div");
         var header = document.createElement("div");
         var content = document.createElement("div");
-        var webview = document.createElement("textarea");
+        var editor = document.createElement("textarea");
         var close = document.createElement("button");
-        var appID = stringGen();
+        var windowID = stringGen();
 
         //create window
         window.classList.add('window');
-        window.id = name + appID;
+        window.id = name + windowID;
         window.style.display = "block";
         window.onclick = function () {
             focusWindow(window);
@@ -37,23 +37,23 @@ function spawnCodeEditor(code, name) {
         close.classList.add('closebutton');
         close.onclick = function () {
             window.remove();
-            resolve(webview.value);
+            resolve(editor.value);
         };
 
         //create content div
         content.classList.add('content');
 
-        //create webview
-        webview.style.height = '25vh';
-        webview.style.width = '25vw';
-        webview.innerHTML = code;
+        //create editor
+        editor.style.height = '25vh';
+        editor.style.width = '25vw';
+        editor.innerHTML = code;
 
         //append the elements
         section.appendChild(window);
         window.appendChild(header);
         header.appendChild(close);
         window.appendChild(content);
-        content.appendChild(webview);
+        content.appendChild(editor);
 
         //make the window draggable
         $(".window").draggable({
@@ -72,6 +72,3 @@ function focusWindow(windowElem) {
 async function CreateEditorCodeWindow() {
     eval(await spawnCodeEditor('', 'Run Editor Script'));
 }
-
-//spawn baseplate
-addElem.cube(0, -1, 0, 32, 1, 32, '#008000')

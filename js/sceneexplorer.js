@@ -15,8 +15,13 @@ const convertBase64 = (event) => {
 };
 
 function listSchematic(toClick = false) {
-    const shapesList = document.getElementById('sidebar');
-    shapesList.innerHTML = '';
+    const shapesList = document.getElementById('explorercontent');
+
+    if (sceneSchematics.length != 0) {
+        shapesList.innerHTML = '<h3>Explorer</h3><br>';
+    } else {
+        shapesList.innerHTML = '<h3>Explorer</h3><br><span>Add something to the project to see it here!</span>';
+    }
 
     loadScene(sceneSchematics, false, false)
 
@@ -52,6 +57,7 @@ function listSchematic(toClick = false) {
                 transformControls.detach()
                 sceneSchematics.splice(i, 1);
                 listSchematic()
+                addObject()
             }
 
             cloneButton.onclick = function () {
@@ -59,13 +65,10 @@ function listSchematic(toClick = false) {
                 var copy = JSON.parse(JSON.stringify(element));
                 sceneSchematics.push(copy)
                 listSchematic(i)
+                addObject()
             }
 
-            shapesList.appendChild(document.createElement('hr'));
-            shapesList.appendChild(backButton);
-            shapesList.appendChild(delButton);
-            shapesList.appendChild(cloneButton);
-            shapesList.appendChild(document.createElement('hr'));
+            shapesList.prepend(document.createElement('hr'));
 
             Object.entries(element).forEach(([key, value]) => {
                 let input = document.createElement('input');
@@ -78,6 +81,8 @@ function listSchematic(toClick = false) {
 
                 if (typeof value == 'number') {
                     input.type = "number"
+                } else {
+                    input.type = "text"
                 }
 
                 if (key == "color") {
@@ -105,6 +110,7 @@ function listSchematic(toClick = false) {
                         element[key] = input.value;
                         listSchematic(i);
                     }
+                    addObject()
                 };
 
                 if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript") {
@@ -120,13 +126,16 @@ function listSchematic(toClick = false) {
                     input.type = "file"
 
                     let clearBtn = document.createElement('a')
-                    clearBtn.innerText = '(Clear)'
+                    clearBtn.innerHTML = '&nbsp;(Clear)'
+                    clearBtn.style.cursor = 'pointer'
+                    clearBtn.style.textDecoration = 'underline'
                     label.appendChild(clearBtn)
 
                     clearBtn.onclick = function () {
                         transformControls.detach()
                         element[key] = false
                         listSchematic(i);
+                        addObject()
                     }
                 }
 
@@ -138,6 +147,7 @@ function listSchematic(toClick = false) {
                     button.onclick = async function () {
                         let code = await spawnCodeEditor(element.initScript, element.name + ' InitScript')
                         element['initScript'] = code;
+                        addObject()
                     }
 
                     shapesList.prepend(button);
@@ -151,6 +161,7 @@ function listSchematic(toClick = false) {
                     button.onclick = async function () {
                         let code = await spawnCodeEditor(element.updateScript, element.name + ' updateScript')
                         element['updateScript'] = code;
+                        addObject()
                     }
 
                     shapesList.prepend(button);
@@ -164,11 +175,16 @@ function listSchematic(toClick = false) {
                     button.onclick = async function () {
                         let code = await spawnCodeEditor(element.clickScript, element.name + ' clickScript')
                         element['clickScript'] = code;
+                        addObject()
                     }
 
                     shapesList.prepend(button);
                 }
             });
+
+            shapesList.prepend(delButton);
+            shapesList.prepend(cloneButton);
+            shapesList.prepend(backButton);
         };
 
         shapesList.appendChild(button);
@@ -178,3 +194,5 @@ function listSchematic(toClick = false) {
         }
     });
 }
+
+addElem.cube(0, -1, 0, 32, 1, 32, '#008000')

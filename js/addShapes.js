@@ -30,6 +30,7 @@ addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     })
 
     listSchematic()
+    addObject()
 }
 
 addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
@@ -62,6 +63,7 @@ addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     })
 
     listSchematic()
+    addObject()
 }
 
 addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
@@ -94,6 +96,7 @@ addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     })
 
     listSchematic()
+    addObject()
 }
 
 addElem.light = function (x, y, z, intensity, distance, color) {
@@ -115,6 +118,7 @@ addElem.light = function (x, y, z, intensity, distance, color) {
     })
 
     listSchematic()
+    addObject()
 }
 
 addElem.terrain = function (voxsize, tersize, color) {
@@ -155,8 +159,9 @@ addElem.terrain = function (voxsize, tersize, color) {
             generated += 1;
         }
 
-        if (generated == (terrainSize * terrainSize)) listSchematic();
+        if (generated == (terrainSize * terrainSize)) { listSchematic(); addObject() };
     }
+
 }
 
 spawnCube = addElem.cube
