@@ -40,14 +40,73 @@ function typeChat(e) {
   }
 }
 
+function playerModel(color) {
+  var group = new THREE.Group()
+  group.castShadow = true;
+  group.receiveShadow = true;
+  group.position.set(0, 0, 0);
+
+  leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }));
+  leftLeg.position.set(0, 0, 0);
+  leftLeg.castShadow = true;
+  leftLeg.receiveShadow = true;
+  const leftLegPivot = new THREE.Object3D();
+  leftLegPivot.position.set(-.25, 0, .25);
+  leftLegPivot.add(leftLeg);
+  leftLegPivot.rotation.x = -(Math.PI / 4);
+  group.add(leftLegPivot);
+
+  rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
+  rightLeg.position.set(.25, 0, 0)
+  rightLeg.castShadow = true;
+  rightLeg.receiveShadow = true;
+  const rightLegPivot = new THREE.Object3D();
+  rightLegPivot.position.set(0, 0, -.25);
+  rightLegPivot.add(rightLeg);
+  rightLegPivot.rotation.x = (Math.PI / 4);
+  group.add(rightLegPivot)
+
+  leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  leftArm.position.set(-.75, 1, 0)
+  leftArm.castShadow = true;
+  leftArm.receiveShadow = true;
+  const leftArmPivot = new THREE.Object3D();
+  leftArmPivot.position.set(0, .25, 1);
+  leftArmPivot.add(leftArm);
+  leftArmPivot.rotation.x = -(Math.PI / 4);
+  group.add(leftArmPivot);
+
+  rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  rightArm.position.set(.75, 1, 0)
+  rightArm.castShadow = true;
+  rightArm.receiveShadow = true;
+  const rightArmPivot = new THREE.Object3D();
+  rightArmPivot.position.set(0, .25, -1);
+  rightArmPivot.add(rightArm);
+  rightArmPivot.rotation.x = (Math.PI / 4);
+  group.add(rightArmPivot);
+
+  torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), new THREE.MeshPhongMaterial({ color: color }))
+  torso.position.set(0, 1, 0)
+  torso.castShadow = true;
+  torso.receiveShadow = true;
+  group.add(torso)
+
+  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  head.position.set(0, 1.75, 0)
+  head.castShadow = true;
+  head.receiveShadow = true;
+  group.add(head)
+
+  return group
+}
+
 var playerObject
 const playerUniqueID = makeid(256)
 const firstMessageID = Date.now() + makeid(16)
 
 function spawnPlayer() {
   var playerRotation = 0;
-  var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-  var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x800000 });
   var Health = 100;
 
   document.addEventListener('keydown', function (event) {
@@ -56,33 +115,12 @@ function spawnPlayer() {
     }
   });
 
-  leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
-  leftLeg.position.set(-.27, .25, 0)
-  rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
-  rightLeg.position.set(.27, .25, 0)
-  leftArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-  leftArm.position.set(-.75, 1.5, 0)
-  rightArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-  rightArm.position.set(.75, 1.5, 0)
-  torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1.25, .5), cubeMaterial)
-  torso.position.set(0, 1.5, 0)
-  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-  head.position.set(0, 2.4, 0)
-  sceneNode = new THREE.Group()
-  sceneNode.add(leftLeg)
-  sceneNode.add(torso)
-  sceneNode.add(rightLeg)
-  sceneNode.add(leftArm)
-  sceneNode.add(rightArm)
-  sceneNode.add(head)
-  sceneNode.castShadow = true;
-  sceneNode.receiveShadow = true;
-  sceneNode.position.set(0, 0, 0);
+  var sceneNode = playerModel(0x800000)
   scene.add(sceneNode);
 
   var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1.7, 1 / 2));
   var cubeBody = new CANNON.Body({ mass: parseInt(1) });
-  var shapeOffset = new CANNON.Vec3(0, 1, 0);
+  var shapeOffset = new CANNON.Vec3(0, 1.12, 0);
   var previousY = cubeBody.position.y;
   cubeBody.addShape(cubeShape, shapeOffset);
   cubeBody.position.set(0, 0, 0);
@@ -262,28 +300,9 @@ function otherPlayers() {
 
       if (element.id != playerUniqueID) {
         if (!allPlayersElem[element.id]) {
-          var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-          var cubeMaterial = new THREE.MeshPhongMaterial({ color: getRandomHexColor() });
-          allPlayersElem[element.id] = new THREE.Group()
-          leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
-          leftLeg.position.set(-.27, .25, 0)
-          rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
-          rightLeg.position.set(.27, .25, 0)
-          leftArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-          leftArm.position.set(-.75, 1.5, 0)
-          rightArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-          rightArm.position.set(.75, 1.5, 0)
-          torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1.25, .5), cubeMaterial)
-          torso.position.set(0, 1.5, 0)
-          head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-          head.position.set(0, 2.4, 0)
-          allPlayersElem[element.id].add(leftLeg)
-          allPlayersElem[element.id].add(torso)
-          allPlayersElem[element.id].add(rightLeg)
-          allPlayersElem[element.id].add(leftArm)
-          allPlayersElem[element.id].add(rightArm)
-          allPlayersElem[element.id].add(head)
-          scene.add(allPlayersElem[element.id])
+          const model = playerModel(getRandomHexColor());
+          allPlayersElem[element.id] = model;
+          scene.add(model);
         } else {
           try {
             allPlayersElem[element.id].position.x = element.pos.x
@@ -314,7 +333,7 @@ function otherPlayers() {
             allMessages.push(items.id)
             if (element.id == playerUniqueID) return;
             debug(items.content)
-            document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + `\n${playerUniqueID.slice(0,5)}: ` + items.content
+            document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + `\n${playerUniqueID.slice(0, 5)}: ` + items.content
           }
         }
       })
