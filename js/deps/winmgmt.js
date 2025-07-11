@@ -15,7 +15,7 @@ function spawnCodeEditor(code, name) {
         var window = document.createElement("div");
         var header = document.createElement("div");
         var content = document.createElement("div");
-        var editor = document.createElement("textarea");
+        var editorDiv = document.createElement("div");
         var close = document.createElement("button");
         var windowID = stringGen();
 
@@ -36,24 +36,30 @@ function spawnCodeEditor(code, name) {
         close.innerHTML = '<i class="fa-solid fa-xmark"></i>';
         close.classList.add('closebutton');
         close.onclick = function () {
+            var aceEditor = ace.edit(editorDiv.id);
             window.remove();
-            resolve(editor.value);
+            resolve(aceEditor.getValue());
         };
 
         //create content div
         content.classList.add('content');
 
-        //create editor
-        editor.style.height = '25vh';
-        editor.style.width = '25vw';
-        editor.innerHTML = code;
+        //create editor div for Ace
+        editorDiv.style.height = '25vh';
+        editorDiv.style.width = '25vw';
+        editorDiv.id = "ace-editor-" + windowID;
 
         //append the elements
         section.appendChild(window);
         window.appendChild(header);
         header.appendChild(close);
         window.appendChild(content);
-        content.appendChild(editor);
+        content.appendChild(editorDiv);
+
+        //initialize editor
+        var aceEditor = ace.edit(editorDiv.id);
+        aceEditor.setTheme("ace/theme/monokai");
+        aceEditor.session.setMode("ace/mode/javascript");
 
         //make the window draggable
         $(".window").draggable({

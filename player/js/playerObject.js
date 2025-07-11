@@ -56,16 +56,35 @@ function spawnPlayer() {
     }
   });
 
-  sceneNode = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
+  leftLeg.position.set(-.27, .25, 0)
+  rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
+  rightLeg.position.set(.27, .25, 0)
+  leftArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  leftArm.position.set(-.75, 1.5, 0)
+  rightArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  rightArm.position.set(.75, 1.5, 0)
+  torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1.25, .5), cubeMaterial)
+  torso.position.set(0, 1.5, 0)
+  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  head.position.set(0, 2.4, 0)
+  sceneNode = new THREE.Group()
+  sceneNode.add(leftLeg)
+  sceneNode.add(torso)
+  sceneNode.add(rightLeg)
+  sceneNode.add(leftArm)
+  sceneNode.add(rightArm)
+  sceneNode.add(head)
   sceneNode.castShadow = true;
   sceneNode.receiveShadow = true;
-  sceneNode.position.set(0, 1, 0);
+  sceneNode.position.set(0, 0, 0);
   scene.add(sceneNode);
 
-  var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1 / 2, 1 / 2));
+  var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1.7, 1 / 2));
   var cubeBody = new CANNON.Body({ mass: parseInt(1) });
+  var shapeOffset = new CANNON.Vec3(0, 1, 0);
   var previousY = cubeBody.position.y;
-  cubeBody.addShape(cubeShape);
+  cubeBody.addShape(cubeShape, shapeOffset);
   cubeBody.position.set(0, 0, 0);
   cubeBody.threeMesh = sceneNode;
   world.addBody(cubeBody)
@@ -245,7 +264,25 @@ function otherPlayers() {
         if (!allPlayersElem[element.id]) {
           var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
           var cubeMaterial = new THREE.MeshPhongMaterial({ color: getRandomHexColor() });
-          allPlayersElem[element.id] = new THREE.Mesh(cubeGeometry, cubeMaterial);
+          allPlayersElem[element.id] = new THREE.Group()
+          leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
+          leftLeg.position.set(-.27, .25, 0)
+          rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.2, .5), new THREE.MeshPhongMaterial({ color: 0x7d7d7d }))
+          rightLeg.position.set(.27, .25, 0)
+          leftArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+          leftArm.position.set(-.75, 1.5, 0)
+          rightArm = new THREE.Mesh(new THREE.BoxGeometry(.45, 1.25, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+          rightArm.position.set(.75, 1.5, 0)
+          torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1.25, .5), cubeMaterial)
+          torso.position.set(0, 1.5, 0)
+          head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+          head.position.set(0, 2.4, 0)
+          allPlayersElem[element.id].add(leftLeg)
+          allPlayersElem[element.id].add(torso)
+          allPlayersElem[element.id].add(rightLeg)
+          allPlayersElem[element.id].add(leftArm)
+          allPlayersElem[element.id].add(rightArm)
+          allPlayersElem[element.id].add(head)
           scene.add(allPlayersElem[element.id])
         } else {
           try {
