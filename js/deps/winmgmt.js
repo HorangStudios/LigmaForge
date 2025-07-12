@@ -46,6 +46,7 @@ function spawnCodeEditor(code, name) {
         //create editor
         editor.style.height = '25vh';
         editor.style.width = '25vw';
+        editor.style.overflow = "auto";
         editor.innerHTML = code;
 
         //append the elements
