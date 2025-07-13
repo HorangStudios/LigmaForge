@@ -42,18 +42,23 @@ function typeChat(e) {
 
 function playerModel(color) {
   var group = new THREE.Group()
+  var data = []
+  var step = 0
+  var walkingAnimation = false
+
   group.castShadow = true;
   group.receiveShadow = true;
   group.position.set(0, 0, 0);
+  data.isJumping = false
+  data.isWalking = false
 
   leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }));
-  leftLeg.position.set(0, 0, 0);
+  leftLeg.position.set(-.25, 0, 0);
   leftLeg.castShadow = true;
   leftLeg.receiveShadow = true;
   const leftLegPivot = new THREE.Object3D();
-  leftLegPivot.position.set(-.25, 0, .25);
+  leftLegPivot.position.set(0, 0, 0);
   leftLegPivot.add(leftLeg);
-  leftLegPivot.rotation.x = -(Math.PI / 4);
   group.add(leftLegPivot);
 
   rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
@@ -61,9 +66,8 @@ function playerModel(color) {
   rightLeg.castShadow = true;
   rightLeg.receiveShadow = true;
   const rightLegPivot = new THREE.Object3D();
-  rightLegPivot.position.set(0, 0, -.25);
+  rightLegPivot.position.set(0, 0, 0);
   rightLegPivot.add(rightLeg);
-  rightLegPivot.rotation.x = (Math.PI / 4);
   group.add(rightLegPivot)
 
   leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
@@ -71,9 +75,8 @@ function playerModel(color) {
   leftArm.castShadow = true;
   leftArm.receiveShadow = true;
   const leftArmPivot = new THREE.Object3D();
-  leftArmPivot.position.set(0, .25, 1);
+  leftArmPivot.position.set(0, 0, 0);
   leftArmPivot.add(leftArm);
-  leftArmPivot.rotation.x = -(Math.PI / 4);
   group.add(leftArmPivot);
 
   rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
@@ -81,9 +84,8 @@ function playerModel(color) {
   rightArm.castShadow = true;
   rightArm.receiveShadow = true;
   const rightArmPivot = new THREE.Object3D();
-  rightArmPivot.position.set(0, .25, -1);
+  rightArmPivot.position.set(0, 0, 0);
   rightArmPivot.add(rightArm);
-  rightArmPivot.rotation.x = (Math.PI / 4);
   group.add(rightArmPivot);
 
   torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), new THREE.MeshPhongMaterial({ color: color }))
@@ -98,7 +100,84 @@ function playerModel(color) {
   head.receiveShadow = true;
   group.add(head)
 
-  return group
+  function animLoop() {
+    const duration = 450;
+    const startStep = step;
+    const endStep = step === 0 ? 1 : 0;
+    const startTime = performance.now();
+
+    const phases = [
+      {
+        leftLeg: { pos: [0, 0, .25], rot: -(Math.PI / 4) },
+        rightLeg: { pos: [0, 0, -.25], rot: (Math.PI / 4) },
+      },
+      {
+        leftLeg: { pos: [0, 0, -.25], rot: (Math.PI / 4) },
+        rightLeg: { pos: [0, 0, .25], rot: -(Math.PI / 4) },
+      }
+    ];
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function animateTween() {
+      const now = performance.now();
+      const t = Math.min((now - startTime) / duration, 1);
+
+      leftLegPivot.position.set(
+        lerp(phases[startStep].leftLeg.pos[0], phases[endStep].leftLeg.pos[0], t),
+        lerp(phases[startStep].leftLeg.pos[1], phases[endStep].leftLeg.pos[1], t),
+        lerp(phases[startStep].leftLeg.pos[2], phases[endStep].leftLeg.pos[2], t)
+      );
+      leftLegPivot.rotation.x = lerp(phases[startStep].leftLeg.rot, phases[endStep].leftLeg.rot, t);
+
+      rightLegPivot.position.set(
+        lerp(phases[startStep].rightLeg.pos[0], phases[endStep].rightLeg.pos[0], t),
+        lerp(phases[startStep].rightLeg.pos[1], phases[endStep].rightLeg.pos[1], t),
+        lerp(phases[startStep].rightLeg.pos[2], phases[endStep].rightLeg.pos[2], t)
+      );
+      rightLegPivot.rotation.x = lerp(phases[startStep].rightLeg.rot, phases[endStep].rightLeg.rot, t);
+
+      if (t < 1) {
+        requestAnimationFrame(animateTween);
+      } else {
+        step = endStep;
+      }
+    }
+
+    animateTween();
+  }
+
+  setInterval(() => {
+    if (data.isJumping) {
+      rightArmPivot.position.set(0, .5, 0);
+      leftArmPivot.rotation.x = 0;
+
+      leftArmPivot.position.set(0, .5, 0);
+      rightArmPivot.rotation.x = 0;
+    } else {
+      if (!data.isWalking) {
+        leftArmPivot.position.set(0, 0, 0);
+        leftArmPivot.rotation.x = 0;
+
+        rightArmPivot.position.set(0, 0, 0);
+        rightArmPivot.rotation.x = 0;
+      }
+    }
+
+    if (data.isWalking) {
+      if (walkingAnimation == false) {
+        animLoop()
+        walkingAnimation = setInterval(animLoop, 500);
+      }
+    } else {
+      clearInterval(walkingAnimation);
+      walkingAnimation = false;
+    }
+  }, 1);
+
+  return [group, data]
 }
 
 var playerObject
@@ -115,7 +194,8 @@ function spawnPlayer() {
     }
   });
 
-  var sceneNode = playerModel(0x800000)
+  var createPlayer = playerModel(0x800000)
+  var sceneNode = createPlayer[0]
   scene.add(sceneNode);
 
   var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1.7, 1 / 2));
@@ -139,12 +219,14 @@ function spawnPlayer() {
     switch (event.code) {
       case 'KeyW':
         keyState.w = true;
+        createPlayer[1].isWalking = true;
         break;
       case 'KeyA':
         keyState.a = true;
         break;
       case 'KeyS':
         keyState.s = true;
+        createPlayer[1].isWalking = true;
         break;
       case 'KeyD':
         keyState.d = true;
@@ -159,12 +241,14 @@ function spawnPlayer() {
     switch (event.code) {
       case 'KeyW':
         keyState.w = false;
+        createPlayer[1].isWalking = false;
         break;
       case 'KeyA':
         keyState.a = false;
         break;
       case 'KeyS':
         keyState.s = false;
+        createPlayer[1].isWalking = false;
         break;
       case 'KeyD':
         keyState.d = false;
@@ -217,10 +301,14 @@ function spawnPlayer() {
     if (keyState.d) {
       playerRotation -= 0.02;
     }
-    if (keyState.space) {
-      if (checkPositionChange()) {
-        cubeBody.velocity.y = 7.5;
-      }
+    if (keyState.space && checkPositionChange()) {
+      cubeBody.velocity.y = 7.5;
+    }
+
+    if (checkPositionChange()) {
+      createPlayer[1].isJumping = false;
+    } else {
+      createPlayer[1].isJumping = true;
     }
 
     function lerpAngle(a, b, t) {
@@ -257,6 +345,8 @@ function spawnPlayer() {
         rot: playerRotation,
         pos: cubeBody.position,
         age: Date.now(),
+        isWalking: createPlayer[1].isWalking,
+        isJumping: createPlayer[1].isJumping
       });
     }
 
@@ -271,6 +361,8 @@ function spawnPlayer() {
       id: playerUniqueID,
       age: Date.now(),
       pos: cubeBody.position,
+      isWalking: false,
+      isJumping: false,
       messages: {}
     };
 
@@ -300,15 +392,17 @@ function otherPlayers() {
 
       if (element.id != playerUniqueID) {
         if (!allPlayersElem[element.id]) {
-          const model = playerModel(getRandomHexColor());
-          allPlayersElem[element.id] = model;
-          scene.add(model);
+          const createPlayer = playerModel(getRandomHexColor());
+          allPlayersElem[element.id] = createPlayer;
+          scene.add(createPlayer[0]);
         } else {
           try {
-            allPlayersElem[element.id].position.x = element.pos.x
-            allPlayersElem[element.id].position.y = element.pos.y
-            allPlayersElem[element.id].position.z = element.pos.z
-            allPlayersElem[element.id].rotation.y = element.rot
+            allPlayersElem[element.id][0].position.x = element.pos.x
+            allPlayersElem[element.id][0].position.y = element.pos.y
+            allPlayersElem[element.id][0].position.z = element.pos.z
+            allPlayersElem[element.id][0].rotation.y = element.rot
+            allPlayersElem[element.id][1].isWalking = element.isWalking
+            allPlayersElem[element.id][1].isJumping = element.isJumping
           } catch (error) { }
         }
       }
