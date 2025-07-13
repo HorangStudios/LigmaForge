@@ -174,6 +174,12 @@ function playerModel(color) {
     } else {
       clearInterval(walkingAnimation);
       walkingAnimation = false;
+
+      leftLegPivot.position.set(0, 0, 0);
+      leftLegPivot.rotation.x = 0;
+
+      rightLegPivot.position.set(0, 0, 0);
+      rightLegPivot.rotation.x = 0;
     }
   }, 1);
 
