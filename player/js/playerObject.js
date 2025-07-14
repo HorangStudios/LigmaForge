@@ -40,11 +40,19 @@ function typeChat(e) {
   }
 }
 
-function playerModel(color) {
+async function playerModel(color, avatar = {}) {
   var group = new THREE.Group()
   var data = []
   var step = 0
   var walkingAnimation = false
+
+  if (avatar.shirt) {
+    var shirt = await shirtDecoder(avatar.shirt)
+  }
+
+  if (avatar.pants) {
+    var pants = await shirtDecoder(avatar.pants)
+  }
 
   group.castShadow = true;
   group.receiveShadow = true;
@@ -52,43 +60,113 @@ function playerModel(color) {
   data.isJumping = false
   data.isWalking = false
 
-  leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }));
+  if (avatar.pants) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmRight) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmLeft) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmUp) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmDown) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmBack) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmFront) }),
+    ];
+    leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
+  } else {
+    leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
+  }
+
+  var leftLegPivot = new THREE.Object3D();
   leftLeg.position.set(-.25, 0, 0);
   leftLeg.castShadow = true;
   leftLeg.receiveShadow = true;
-  const leftLegPivot = new THREE.Object3D();
   leftLegPivot.position.set(0, 0, 0);
   leftLegPivot.add(leftLeg);
   group.add(leftLegPivot);
 
-  rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
+  if (avatar.pants) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmRight) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmLeft) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmUp) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmDown) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmBack) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmFront) }),
+    ];
+    rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
+  } else {
+    rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
+  }
+
+  var rightLegPivot = new THREE.Object3D();
   rightLeg.position.set(.25, 0, 0)
   rightLeg.castShadow = true;
   rightLeg.receiveShadow = true;
-  const rightLegPivot = new THREE.Object3D();
   rightLegPivot.position.set(0, 0, 0);
   rightLegPivot.add(rightLeg);
   group.add(rightLegPivot)
 
-  leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  if (avatar.shirt) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmRight) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmLeft) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmUp) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmDown) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmBack) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmFront) }),
+    ];
+    leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
+  } else {
+    leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  }
+
+  var leftArmPivot = new THREE.Object3D();
   leftArm.position.set(-.75, -0.25, 0)
   leftArm.castShadow = true;
   leftArm.receiveShadow = true;
-  const leftArmPivot = new THREE.Object3D();
   leftArmPivot.position.set(0, 1.25, 0);
   leftArmPivot.add(leftArm);
   group.add(leftArmPivot);
 
-  rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  if (avatar.shirt) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmRight) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmLeft) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmUp) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmDown) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmBack) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmFront) }),
+    ];
+    rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
+  } else {
+    rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  }
+
+  var rightArmPivot = new THREE.Object3D();
   rightArm.position.set(.75, -0.25, 0)
   rightArm.castShadow = true;
   rightArm.receiveShadow = true;
-  const rightArmPivot = new THREE.Object3D();
   rightArmPivot.position.set(0, 1.25, 0);
   rightArmPivot.add(rightArm);
   group.add(rightArmPivot);
 
-  torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), new THREE.MeshPhongMaterial({ color: color }))
+  if (avatar.shirt) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoRight) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoLeft) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoUp) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoDown) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoBack) }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoFront) }),
+    ];
+    torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), materials);
+  } else {
+    torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), new THREE.MeshPhongMaterial({ color: color }))
+  }
+
   torso.position.set(0, 1, 0)
   torso.castShadow = true;
   torso.receiveShadow = true;
@@ -142,10 +220,10 @@ function playerModel(color) {
         lerp(phases[startStep].rightLeg.pos[2], phases[endStep].rightLeg.pos[2], t)
       );
       rightLegPivot.rotation.x = lerp(phases[startStep].rightLeg.rot, phases[endStep].rightLeg.rot, t);
-      
+
       leftArmPivot.rotation.x = lerp(phases[startStep].leftArm.rot, phases[endStep].leftArm.rot, t);
       rightArmPivot.rotation.x = lerp(phases[startStep].rightArm.rot, phases[endStep].rightArm.rot, t);
-      
+
       if (t < 1) {
         requestAnimationFrame(animateTween);
       } else {
@@ -191,7 +269,7 @@ var playerObject
 const playerUniqueID = makeid(256)
 const firstMessageID = Date.now() + makeid(16)
 
-function spawnPlayer() {
+async function spawnPlayer() {
   var playerRotation = 0;
   var Health = 100;
 
@@ -201,7 +279,15 @@ function spawnPlayer() {
     }
   });
 
-  var createPlayer = playerModel(0x800000)
+  // var fetchshirt = await fetch("../resources/test_shirt.txt")
+  // var testShirt = await fetchshirt.text()
+
+  // var fetchpants = await fetch("../resources/test_pants.txt")
+  // var testPants = await fetchpants.text()
+
+  // var createPlayer = await playerModel(0x800000, { "shirt": testShirt, "pants": testPants })
+
+  var createPlayer = await playerModel(0x800000)
   var sceneNode = createPlayer[0]
   scene.add(sceneNode);
 
@@ -390,7 +476,7 @@ function otherPlayers() {
     var playerslist = snapshot.val()
     if (!playerslist) return;
 
-    Object.values(playerslist).forEach(element => {
+    Object.values(playerslist).forEach(async (element) => {
       const unixTimeMilliseconds = parseInt(element.age);
       const unixTimeDate = new Date(unixTimeMilliseconds);
       const currentTime = new Date();
@@ -399,7 +485,7 @@ function otherPlayers() {
 
       if (element.id != playerUniqueID) {
         if (!allPlayersElem[element.id]) {
-          const createPlayer = playerModel(getRandomHexColor());
+          const createPlayer = await playerModel(getRandomHexColor());
           allPlayersElem[element.id] = createPlayer;
           scene.add(createPlayer[0]);
         } else {
