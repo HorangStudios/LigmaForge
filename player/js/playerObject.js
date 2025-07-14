@@ -265,6 +265,44 @@ function spawnPlayer() {
         break;
     }
   });
+  
+  if (navigator.userAgentData.mobile) {
+    var Joy1 = new JoyStick('joyDiv', {}, function(stickData) {
+      if (stickData.cardinalDirection == "N") {
+        keyState.w = true;
+        createPlayer[1].isWalking = true;
+      } else if (stickData.cardinalDirection == "C") {
+        keyState.w = false;
+        keyState.a = false;
+        keyState.s = false;
+        keyState.d = false;
+        keyState.space = false;
+        createPlayer[1].isWalking = false;
+      } else if (stickData.cardinalDirection == "NW") {
+        keyState.w = true;
+        keyState.a = true;
+        createPlayer[1].isWalking = true;
+      } else if (stickData.cardinalDirection == "W") {
+        keyState.a = true;
+      } else if (stickData.cardinalDirection == "SW") {
+        keyState.a = true;
+        keyState.s = true;
+        createPlayer[1].isWalking = true;
+      } else if (stickData.cardinalDirection == "S") {
+        keyState.s = true;
+        createPlayer[1].isWalking = true;
+      } else if (stickData.cardinalDirection == "SE") {
+        keyState.s = true;
+        keyState.d = true;
+        createPlayer[1].isWalking = true;
+      } else if (stickData.cardinalDirection == "E") {
+        keyState.d = true;
+      }
+       else if (stickData.cardinalDirection == "NE") {
+        keyState.d = true;
+      }
+    });
+  }
 
   var cameraAngle = 0;
   function playerLoop() {
