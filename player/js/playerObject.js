@@ -71,20 +71,20 @@ function playerModel(color) {
   group.add(rightLegPivot)
 
   leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-  leftArm.position.set(-.75, 1, 0)
+  leftArm.position.set(-.75, -0.25, 0)
   leftArm.castShadow = true;
   leftArm.receiveShadow = true;
   const leftArmPivot = new THREE.Object3D();
-  leftArmPivot.position.set(0, 0, 0);
+  leftArmPivot.position.set(0, 1.25, 0);
   leftArmPivot.add(leftArm);
   group.add(leftArmPivot);
 
   rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
-  rightArm.position.set(.75, 1, 0)
+  rightArm.position.set(.75, -0.25, 0)
   rightArm.castShadow = true;
   rightArm.receiveShadow = true;
   const rightArmPivot = new THREE.Object3D();
-  rightArmPivot.position.set(0, 0, 0);
+  rightArmPivot.position.set(0, 1.25, 0);
   rightArmPivot.add(rightArm);
   group.add(rightArmPivot);
 
@@ -110,10 +110,14 @@ function playerModel(color) {
       {
         leftLeg: { pos: [0, 0, .25], rot: -(Math.PI / 4) },
         rightLeg: { pos: [0, 0, -.25], rot: (Math.PI / 4) },
+        leftArm: { pos: [0, 0, 0], rot: (Math.PI / 4) },
+        rightArm: { pos: [0, 0, 0], rot: -(Math.PI / 4) },
       },
       {
         leftLeg: { pos: [0, 0, -.25], rot: (Math.PI / 4) },
         rightLeg: { pos: [0, 0, .25], rot: -(Math.PI / 4) },
+        leftArm: { pos: [0, 0, 0], rot: -(Math.PI / 4) },
+        rightArm: { pos: [0, 0, 0], rot: (Math.PI / 4) },
       }
     ];
 
@@ -138,7 +142,10 @@ function playerModel(color) {
         lerp(phases[startStep].rightLeg.pos[2], phases[endStep].rightLeg.pos[2], t)
       );
       rightLegPivot.rotation.x = lerp(phases[startStep].rightLeg.rot, phases[endStep].rightLeg.rot, t);
-
+      
+      leftArmPivot.rotation.x = lerp(phases[startStep].leftArm.rot, phases[endStep].leftArm.rot, t);
+      rightArmPivot.rotation.x = lerp(phases[startStep].rightArm.rot, phases[endStep].rightArm.rot, t);
+      
       if (t < 1) {
         requestAnimationFrame(animateTween);
       } else {
@@ -151,17 +158,11 @@ function playerModel(color) {
 
   setInterval(() => {
     if (data.isJumping) {
-      rightArmPivot.position.set(0, .5, 0);
-      leftArmPivot.rotation.x = 0;
-
-      leftArmPivot.position.set(0, .5, 0);
-      rightArmPivot.rotation.x = 0;
+      leftArmPivot.rotation.x = (Math.PI);
+      rightArmPivot.rotation.x = (Math.PI);
     } else {
       if (!data.isWalking) {
-        leftArmPivot.position.set(0, 0, 0);
         leftArmPivot.rotation.x = 0;
-
-        rightArmPivot.position.set(0, 0, 0);
         rightArmPivot.rotation.x = 0;
       }
     }
