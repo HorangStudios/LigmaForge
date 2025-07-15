@@ -8,7 +8,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
-    
+
     <script type="text/javascript" src="../js/three/cannon.min.js"></script>
     <script type="text/javascript" src="../js/three/ImprovedNoise.js" defer></script>
     <script type="text/javascript" src="../js/three/three.min.js"></script>
@@ -34,7 +34,7 @@
 </head>
 
 <body id="section">
-    <div class="loadingScreen" id="gameload">
+    <div class="loadingScreen" id="gameload" style="display: none;">
         <button id="skiploading"
             onclick='document.getElementById("gameload").style.display = "none"; spawnPlayer();'>Skip loading</button>
         <div id="loadingMessageScreenForLigmaForge">
@@ -49,15 +49,18 @@
     </div>
 
     <div id="chats">
-        <input placeholder="Send a message..." onkeydown="typeChat(this)">
+        <input placeholder="Send a message..." onkeydown="typeChat(this)" autocomplete="one-time-code">
         <p id="chatcontent">Welcome to HorangHill !</p>
     </div>
 
-    <div id="joyDiv" style="width:10%;height:20%;bottom: 0;right: 1;margin: 30px; color: transparent; position: fixed;"></div>
+    <div id="joyDiv" style="width:10%;height:20%;bottom: 0;right: 1;margin: 30px; color: transparent; position: fixed;">
+    </div>
 
     <div id="Sidenav" class="sidenav" style="width: 0px;">
         <div class="topsidebar" id="topsidebar">
             <a onclick="window.close();" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
+            <a onclick="firebase.auth().signOut(); window.location.reload()"><i class="fa-solid fa-angle-left"></i> Log out from account</a>
+            <hr>
             <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer log</a>
         </div>
         <a id="gamename">Game</a>
@@ -65,5 +68,23 @@
 
     <div id="devtools" style="width: 0px;">
         <div id="terminal"></div>
+    </div>
+
+    <div class="loadingScreen" id="loginDialog">
+        <div id="loginCheck">
+          <i class="fa-solid fa-spinner fa-spin"></i><br><br>
+          Checking for authentication...
+        </div>
+        <div id="signinbox" style="display: none;">
+            <p>Authenticate LigmaForge player with HorangHill</p>
+            <br>
+            <input type="email" id="emailLogin" placeholder="HorangHill Account Email" required>
+            <br>
+            <input type="password" id="passwordLogin" placeholder="HorangHill Account Password" required>
+            <br><br>
+            <button onclick="loginacc(); this.disabled = true; this.innerText = 'Please Wait...'">Sign In</button>
+            <br>
+            <p id="error1" style="color: red; text-align: center;"></p>
+        </div>
     </div>
 </body>

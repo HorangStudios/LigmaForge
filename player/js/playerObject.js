@@ -31,7 +31,7 @@ function typeChat(e) {
 
     document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + '\nYou: ' + theMessage
     firebase.database().ref(`games/${id}/server/${playerUniqueID}/messages/${generatedMessageID}`).set({
-      content: theMessage,
+      content: (firebase.auth().currentUser.displayName || "Player") + ": " + theMessage,
       age: Date.now(),
       id: generatedMessageID
     })
@@ -40,17 +40,17 @@ function typeChat(e) {
   }
 }
 
-async function playerModel(color, avatar = {}) {
+async function playerModel(color, avatar) {
   var group = new THREE.Group()
   var data = []
   var step = 0
   var walkingAnimation = false
 
-  if (avatar.shirt) {
+  if (avatar.shirt !== false) {
     var shirt = await shirtDecoder(avatar.shirt)
   }
 
-  if (avatar.pants) {
+  if (avatar.pants !== false) {
     var pants = await shirtDecoder(avatar.pants)
   }
 
@@ -60,7 +60,7 @@ async function playerModel(color, avatar = {}) {
   data.isJumping = false
   data.isWalking = false
 
-  if (avatar.pants) {
+  if (avatar.pants !== false) {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmRight) }),
@@ -83,7 +83,7 @@ async function playerModel(color, avatar = {}) {
   leftLegPivot.add(leftLeg);
   group.add(leftLegPivot);
 
-  if (avatar.pants) {
+  if (avatar.pants !== false) {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmRight) }),
@@ -106,7 +106,7 @@ async function playerModel(color, avatar = {}) {
   rightLegPivot.add(rightLeg);
   group.add(rightLegPivot)
 
-  if (avatar.shirt) {
+  if (avatar.shirt !== false) {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmRight) }),
@@ -129,7 +129,7 @@ async function playerModel(color, avatar = {}) {
   leftArmPivot.add(leftArm);
   group.add(leftArmPivot);
 
-  if (avatar.shirt) {
+  if (avatar.shirt !== false) {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmRight) }),
@@ -152,7 +152,7 @@ async function playerModel(color, avatar = {}) {
   rightArmPivot.add(rightArm);
   group.add(rightArmPivot);
 
-  if (avatar.shirt) {
+  if (avatar.shirt !== false) {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoRight) }),
@@ -266,12 +266,15 @@ async function playerModel(color, avatar = {}) {
 }
 
 var playerObject
-const playerUniqueID = makeid(256)
-const firstMessageID = Date.now() + makeid(16)
+var playerUniqueID
+var firstMessageID = Date.now() + makeid(16)
 
 async function spawnPlayer() {
+  var playerData = await firebaseFetch(`players/${playerUniqueID}`)
   var playerRotation = 0;
   var Health = 100;
+  var shirt = false;
+  var pants = false;
 
   document.addEventListener('keydown', function (event) {
     if (event.keyCode == 27) {
@@ -279,15 +282,18 @@ async function spawnPlayer() {
     }
   });
 
-  // var fetchshirt = await fetch("../resources/test_shirt.txt")
-  // var testShirt = await fetchshirt.text()
+  if (playerData !== null) {
+    if (playerData.avatar.shirt !== false) {
+      var shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset
+    }
 
-  // var fetchpants = await fetch("../resources/test_pants.txt")
-  // var testPants = await fetchpants.text()
+    if (playerData.avatar.pants !== false) {
+      var pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset
+    }
+  }
 
-  // var createPlayer = await playerModel(0x800000, { "shirt": testShirt, "pants": testPants })
 
-  var createPlayer = await playerModel(0x800000)
+  var createPlayer = await playerModel(0x800000, { "shirt": shirt, "pants": pants })
   var sceneNode = createPlayer[0]
   scene.add(sceneNode);
 
@@ -351,9 +357,9 @@ async function spawnPlayer() {
         break;
     }
   });
-  
+
   if (navigator.userAgentData.mobile) {
-    var Joy1 = new JoyStick('joyDiv', {}, function(stickData) {
+    var Joy1 = new JoyStick('joyDiv', {}, function (stickData) {
       if (stickData.cardinalDirection == "N") {
         keyState.w = true;
         createPlayer[1].isWalking = true;
@@ -384,7 +390,7 @@ async function spawnPlayer() {
       } else if (stickData.cardinalDirection == "E") {
         keyState.d = true;
       }
-       else if (stickData.cardinalDirection == "NE") {
+      else if (stickData.cardinalDirection == "NE") {
         keyState.d = true;
       }
     });
@@ -489,16 +495,15 @@ async function spawnPlayer() {
   if (isFirebaseEnv) {
     var player = {
       rot: playerRotation,
-      id: playerUniqueID,
-      age: Date.now(),
       pos: cubeBody.position,
+      age: Date.now(),
       isWalking: false,
       isJumping: false,
       messages: {}
     };
 
     player.messages[firstMessageID] = {
-      content: "Joined the game",
+      content: (firebase.auth().currentUser.displayName || "Player") + " Joined the game",
       age: Date.now(),
       id: firstMessageID
     }
@@ -514,34 +519,36 @@ function otherPlayers() {
     var playerslist = snapshot.val()
     if (!playerslist) return;
 
-    Object.values(playerslist).forEach(async (element) => {
+    Object.keys(playerslist).forEach(async (key) => {
+      const element = playerslist[key]
+
       const unixTimeMilliseconds = parseInt(element.age);
       const unixTimeDate = new Date(unixTimeMilliseconds);
       const currentTime = new Date();
       const timeDifference = currentTime.getTime() - unixTimeDate.getTime();
       const messages = element.messages
 
-      if (element.id != playerUniqueID) {
-        if (!allPlayersElem[element.id]) {
-          const createPlayer = await playerModel(getRandomHexColor());
-          allPlayersElem[element.id] = createPlayer;
+      if (key != playerUniqueID) {
+        if (!allPlayersElem[key]) {
+          const createPlayer = await playerModel(getRandomHexColor(), { "shirt": false, "pants": false });
+          allPlayersElem[key] = createPlayer;
           scene.add(createPlayer[0]);
         } else {
           try {
-            allPlayersElem[element.id][0].position.x = element.pos.x
-            allPlayersElem[element.id][0].position.y = element.pos.y
-            allPlayersElem[element.id][0].position.z = element.pos.z
-            allPlayersElem[element.id][0].rotation.y = element.rot
-            allPlayersElem[element.id][1].isWalking = element.isWalking
-            allPlayersElem[element.id][1].isJumping = element.isJumping
+            allPlayersElem[key][0].position.x = element.pos.x
+            allPlayersElem[key][0].position.y = element.pos.y
+            allPlayersElem[key][0].position.z = element.pos.z
+            allPlayersElem[key][0].rotation.y = element.rot
+            allPlayersElem[key][1].isWalking = element.isWalking
+            allPlayersElem[key][1].isJumping = element.isJumping
           } catch (error) { }
         }
       }
 
       if (timeDifference >= 10000) {
-        firebase.database().ref(`games/${id}/server/${element.id}`).remove()
-        if (allPlayersElem[element.id]) {
-          scene.remove(allPlayersElem[element.id])
+        firebase.database().ref(`games/${id}/server/${key}`).remove()
+        if (allPlayersElem[key]) {
+          scene.remove(allPlayersElem[key][0])
         }
       }
 
@@ -552,13 +559,13 @@ function otherPlayers() {
         const currentTime = new Date();
         const timeDifference = currentTime.getTime() - unixTimeDate.getTime();
         if (timeDifference >= 10000) {
-          firebase.database().ref(`games/${id}/server/${element.id}/messages/${items.id}`).remove()
+          firebase.database().ref(`games/${id}/server/${key}/messages/${items.id}`).remove()
         } else {
           if (!allMessages.includes(items.id)) {
             allMessages.push(items.id)
-            if (element.id == playerUniqueID) return;
+            if (key == playerUniqueID) return;
             debug(items.content)
-            document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + `\n${playerUniqueID.slice(0, 5)}: ` + items.content
+            document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + "\n" + items.content
           }
         }
       })

@@ -65,6 +65,11 @@ body {
     padding-top: 0;
 }
 
+.sidenav hr {
+    margin: 10px 20px 20px;
+    border-color: #818181;
+}
+
 .sidenav a:first-child {
     padding-top: 10px;
 }
@@ -175,4 +180,16 @@ body {
     margin: 0;
     color: white;
     width: fit-content;
+}
+
+#signinbox {
+    backdrop-filter: blur(10px);
+    background: #1d1d1dab;
+    padding: 25px;
+    border-radius: 5px;
+}
+
+#signinbox input, #signinbox button {
+    padding: 10px;
+    width: 100%;
 }
