@@ -54,12 +54,15 @@ async function spawnPlayer() {
   if (isFirebaseEnv) {
     var playerData = await firebaseFetch(`players/${playerUniqueID}`)
     if (playerData !== null) {
-      colors = playerData.avatar.colors;
-      if (playerData.avatar.shirt !== false) {
+      if (playerData.avatar.colors != null) {
+        colors = playerData.avatar.colors;
+      }
+
+      if (playerData.avatar.shirt !== false && playerData.avatar.shirt != null) {
         shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset;
       }
 
-      if (playerData.avatar.pants !== false) {
+      if (playerData.avatar.pants !== false && playerData.avatar.shirt != null) {
         pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset;
       }
     }
@@ -298,19 +301,22 @@ function otherPlayers() {
     if (!playerslist) return;
 
     Object.keys(playerslist).forEach(async (key) => {
-      const element = playerslist[key]
-      const playerData = await firebaseFetch(`players/${key}`)
-
+      var element = playerslist[key]
+      var playerData = await firebaseFetch(`players/${key}`)
       var shirt = false;
       var pants = false;
       var colors = false;
+
       if (playerData !== null) {
-        colors = playerData.avatar.colors;
-        if (playerData.avatar.shirt !== false) {
+        if (playerData.avatar.colors != null) {
+          colors = playerData.avatar.colors;
+        }
+
+        if (playerData.avatar.shirt !== false && playerData.avatar.shirt != null) {
           var shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset
         }
 
-        if (playerData.avatar.pants !== false) {
+        if (playerData.avatar.pants !== false && playerData.avatar.pants != null) {
           var pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset
         }
       }
