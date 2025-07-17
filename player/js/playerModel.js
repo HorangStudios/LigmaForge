@@ -91,7 +91,7 @@ async function playerModel(color, avatar) {
     ];
     leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
   } else {
-    leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
+    leftLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: avatar.colors.leftLeg || 0X808080 }))
   }
 
   var leftLegPivot = new THREE.Object3D();
@@ -114,7 +114,7 @@ async function playerModel(color, avatar) {
     ];
     rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
   } else {
-    rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0X808080 }))
+    rightLeg = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: avatar.colors.rightLeg || 0X808080 }))
   }
 
   var rightLegPivot = new THREE.Object3D();
@@ -137,7 +137,7 @@ async function playerModel(color, avatar) {
     ];
     leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
   } else {
-    leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+    leftArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: avatar.colors.leftArm || 0xffffff }))
   }
 
   var leftArmPivot = new THREE.Object3D();
@@ -160,7 +160,7 @@ async function playerModel(color, avatar) {
     ];
     rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), materials);
   } else {
-    rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+    rightArm = new THREE.Mesh(new THREE.BoxGeometry(.5, 1, .5), new THREE.MeshPhongMaterial({ color: avatar.colors.rightArm || 0xffffff }))
   }
 
   var rightArmPivot = new THREE.Object3D();
@@ -183,7 +183,7 @@ async function playerModel(color, avatar) {
     ];
     torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), materials);
   } else {
-    torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), new THREE.MeshPhongMaterial({ color: color }))
+    torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1, .5), new THREE.MeshPhongMaterial({ color: avatar.colors.torso || color }))
   }
 
   torso.position.set(0, 1, 0)
@@ -191,7 +191,7 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
-  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: 0xffffff }))
+  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5), new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }))
   head.position.set(0, 1.75, 0)
   head.castShadow = true;
   head.receiveShadow = true;

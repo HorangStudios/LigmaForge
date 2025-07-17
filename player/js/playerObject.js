@@ -45,30 +45,34 @@ var playerUniqueID
 var firstMessageID = Date.now() + makeid(16)
 
 async function spawnPlayer() {
-  var playerData = await firebaseFetch(`players/${playerUniqueID}`)
   var playerRotation = 0;
   var Health = 100;
-
-  document.addEventListener('keydown', function (event) {
-    if (event.keyCode == 27) {
-      toggleSideBar()
-    }
-  });
-
   var shirt = false;
   var pants = false;
-  if (playerData !== null) {
-    if (playerData.avatar.shirt !== false) {
-      var shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset
-    }
+  var colors = false;
 
-    if (playerData.avatar.pants !== false) {
-      var pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset
+  if (isFirebaseEnv) {
+    var playerData = await firebaseFetch(`players/${playerUniqueID}`)
+    if (playerData !== null) {
+      colors = playerData.avatar.colors;
+      if (playerData.avatar.shirt !== false) {
+        shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset;
+      }
+
+      if (playerData.avatar.pants !== false) {
+        pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset;
+      }
     }
   }
 
-  var createPlayer = await playerModel(0x800000, { "shirt": shirt, "pants": pants })
-  var sceneNode = createPlayer[0]
+  document.addEventListener('keydown', function (event) {
+    if (event.keyCode == 27) {
+      toggleSideBar();
+    }
+  });
+
+  var createPlayer = await playerModel(0x800000, { "shirt": shirt, "pants": pants, "colors": colors });
+  var sceneNode = createPlayer[0];
   scene.add(sceneNode);
 
   var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1.7, 1 / 2));
@@ -78,7 +82,7 @@ async function spawnPlayer() {
   cubeBody.addShape(cubeShape, shapeOffset);
   cubeBody.position.set(0, 0, 0);
   cubeBody.threeMesh = sceneNode;
-  world.addBody(cubeBody)
+  world.addBody(cubeBody);
 
   var keyState = {
     w: false,
@@ -299,7 +303,9 @@ function otherPlayers() {
 
       var shirt = false;
       var pants = false;
+      var colors = false;
       if (playerData !== null) {
+        colors = playerData.avatar.colors;
         if (playerData.avatar.shirt !== false) {
           var shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset
         }
@@ -317,7 +323,7 @@ function otherPlayers() {
 
       if (key != playerUniqueID) {
         if (!allPlayersElem[key]) {
-          const createPlayer = await playerModel(getRandomHexColor(), { "shirt": shirt, "pants": pants });
+          const createPlayer = await playerModel(getRandomHexColor(), { "shirt": shirt, "pants": pants, "colors": colors });
           allPlayersElem[key] = createPlayer;
           scene.add(createPlayer[0]);
         } else {
