@@ -304,7 +304,6 @@ function otherPlayers() {
     var playerslist = snapshot.val();
     var listofplayers = await firebaseFetch(`games/${id}/server/`);
     var playeramount = Object.keys(listofplayers).length - 1;
-    console.log("amount needed: " +playeramount);
     if (!playerslist) return;
 
     Object.keys(playerslist).forEach(async (key) => {
@@ -351,7 +350,6 @@ function otherPlayers() {
       if (key != playerUniqueID) {
         if (!allPlayersElem[key] && !(timeDifference >= 10000) && (playeramount > spawnedPlayers)) {
           spawnedPlayers += 1;
-          console.log("already spawned: " + spawnedPlayers)
           allPlayersElem[key] = await playerModel(getRandomHexColor(), { "shirt": allPlayersFetchedAvatar[key]["shirt"], "pants": allPlayersFetchedAvatar[key]["pants"], "colors": allPlayersFetchedAvatar[key]["colors"] });
           scene.add(allPlayersElem[key][0]);
         } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
