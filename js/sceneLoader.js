@@ -564,12 +564,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
         if (i === sceneSchematics.length - 1 && isForPlayer) {
             document.getElementById('gameload').style.display = "none";
+
             spawnPlayer();
+            debug('Spawning Player...');
+            
             gamestarteou = true
-            if (typeof isFirebaseEnv !== 'undefined' && isFirebaseEnv) {
+            if (isFirebaseEnv  == 'true') {
                 otherPlayers();
             }
-            debug('Spawning Player...');
         }
     });
 

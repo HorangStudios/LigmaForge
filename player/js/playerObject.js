@@ -294,30 +294,47 @@ async function spawnPlayer() {
 }
 
 var allPlayersElem = {}
+var allPlayersElemData = {}
+var allPlayersFetchedAvatar = {}
 var allMessages = []
+
 function otherPlayers() {
   firebase.database().ref(`games/${id}/server/`).on('value', function (snapshot) {
-    var playerslist = snapshot.val()
+    var playerslist = snapshot.val();
     if (!playerslist) return;
 
     Object.keys(playerslist).forEach(async (key) => {
-      var element = playerslist[key]
-      var playerData = await firebaseFetch(`players/${key}`)
-      var shirt = false;
-      var pants = false;
-      var colors = false;
+      var element = playerslist[key];
+      var playerData = null;
+
+      if (!allPlayersElemData[key]) {
+        playerData = await firebaseFetch(`players/${key}`);
+        allPlayersElemData[key] = playerData;
+      } else {
+        playerData = allPlayersElemData[key];
+      }
+
+      if (!allPlayersFetchedAvatar[key]) {
+        allPlayersFetchedAvatar[key] = {
+          "colors": false,
+          "shirt": false,
+          "pants": false,
+        };
+      }
 
       if (playerData !== null) {
-        if (playerData.avatar.colors != null) {
-          colors = playerData.avatar.colors;
+        if (playerData.avatar.colors != null && !allPlayersFetchedAvatar[key]["colors"]) {
+          allPlayersFetchedAvatar[key]["colors"] = playerData.avatar.colors;
         }
 
-        if (playerData.avatar.shirt !== false && playerData.avatar.shirt != null) {
-          var shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset
+        if (playerData.avatar.shirt !== false && playerData.avatar.shirt != null && !allPlayersFetchedAvatar[key]["shirt"]) {
+          const shirtData = await firebaseFetch(`catalog/${playerData.avatar.shirt}`);
+          allPlayersFetchedAvatar[key]["shirt"] = shirtData.asset;
         }
 
-        if (playerData.avatar.pants !== false && playerData.avatar.pants != null) {
-          var pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset
+        if (playerData.avatar.pants !== false && playerData.avatar.pants != null && !allPlayersFetchedAvatar[key]["pants"]) {
+          const pantsData = await firebaseFetch(`catalog/${playerData.avatar.pants}`);
+          allPlayersFetchedAvatar[key]["pants"] = pantsData.asset;
         }
       }
 
@@ -325,49 +342,48 @@ function otherPlayers() {
       const unixTimeDate = new Date(unixTimeMilliseconds);
       const currentTime = new Date();
       const timeDifference = currentTime.getTime() - unixTimeDate.getTime();
-      const messages = element.messages
+      const messages = element.messages;
 
       if (key != playerUniqueID) {
-        if (!allPlayersElem[key]) {
-          const createPlayer = await playerModel(getRandomHexColor(), { "shirt": shirt, "pants": pants, "colors": colors });
-          allPlayersElem[key] = createPlayer;
-          scene.add(createPlayer[0]);
+        if (!allPlayersElem[key] && !(timeDifference >= 10000)) {
+          allPlayersElem[key] = await playerModel(getRandomHexColor(), { "shirt": allPlayersFetchedAvatar[key]["shirt"], "pants": allPlayersFetchedAvatar[key]["pants"], "colors": allPlayersFetchedAvatar[key]["colors"] });
+          scene.add(allPlayersElem[key][0]);
+        } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
+          scene.remove(allPlayersElem[key][0]);
+          delete allPlayersElem[key];
         } else {
-          try {
-            allPlayersElem[key][0].position.x = element.pos.x
-            allPlayersElem[key][0].position.y = element.pos.y
-            allPlayersElem[key][0].position.z = element.pos.z
-            allPlayersElem[key][0].rotation.y = element.rot
-            allPlayersElem[key][1].isWalking = element.isWalking
-            allPlayersElem[key][1].isJumping = element.isJumping
-          } catch (error) { }
-        }
-      }
-
-      if (timeDifference >= 10000) {
-        firebase.database().ref(`games/${id}/server/${key}`).remove()
-        if (allPlayersElem[key]) {
-          scene.remove(allPlayersElem[key][0])
+          if (!allPlayersElem[key]) return;
+          allPlayersElem[key][0].position.x = element.pos.x;
+          allPlayersElem[key][0].position.y = element.pos.y;
+          allPlayersElem[key][0].position.z = element.pos.z;
+          allPlayersElem[key][0].rotation.y = element.rot;
+          allPlayersElem[key][1].isWalking = element.isWalking;
+          allPlayersElem[key][1].isJumping = element.isJumping;
         }
       }
 
       if (!messages) return;
-      Object.values(messages).forEach((items, index) => {
+
+      Object.values(messages).forEach((items) => {
         const unixTimeMilliseconds = parseInt(items.age);
         const unixTimeDate = new Date(unixTimeMilliseconds);
         const currentTime = new Date();
         const timeDifference = currentTime.getTime() - unixTimeDate.getTime();
+
         if (timeDifference >= 10000) {
-          firebase.database().ref(`games/${id}/server/${key}/messages/${items.id}`).remove()
+          firebase.database().ref(`games/${id}/server/${key}/messages/${items.id}`).remove();
         } else {
           if (!allMessages.includes(items.id)) {
-            allMessages.push(items.id)
+            allMessages.push(items.id);
+
             if (key == playerUniqueID) return;
-            debug(items.content)
-            document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + "\n" + items.content
+
+            debug(items.content);
+            document.getElementById("chatcontent").innerText =
+              document.getElementById("chatcontent").innerText + "\n" + items.content;
           }
         }
-      })
+      });
     });
-  })
+  });
 }

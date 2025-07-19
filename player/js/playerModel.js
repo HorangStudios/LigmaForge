@@ -191,33 +191,25 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
-  const pathToTexture = /*"js/Manface.png"*/ "";
+  const pathToTexture = "js/Manface.png";
   const headtexture = new THREE.TextureLoader().load(pathToTexture);
   headtexture.wrapS = THREE.RepeatWrapping;
   headtexture.wrapT = THREE.RepeatWrapping;
   headtexture.offset.x = 0;
   headtexture.repeat.x = 1;
 
-  // Create materials: [side, top, bottom]
   var headMaterials = [];
   if (pathToTexture == "") {
-    headMaterials = [
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }), // side
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }), // top
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })  // bottom
-    ];
+    headMaterials = new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
   } else {
     headMaterials = [
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: headtexture, transparent: true }), // side
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }), // top
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })  // bottom
+      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: headtexture, transparent: true }),
+      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }),
+      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
     ];
   }
 
-  head = new THREE.Mesh(
-    new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2),
-    headMaterials
-  );
+  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), headMaterials);
   head.position.set(0, 1.75, 0)
   head.castShadow = true;
   head.receiveShadow = true;
