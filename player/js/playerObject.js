@@ -51,7 +51,7 @@ async function spawnPlayer() {
   var pants = false;
   var colors = false;
 
-  if (isFirebaseEnv) {
+  if (isFirebaseEnv == 'true') {
     var playerData = await firebaseFetch(`players/${playerUniqueID}`)
     if (playerData !== null) {
       if (playerData.avatar.colors != null) {
@@ -257,7 +257,7 @@ async function spawnPlayer() {
 
     document.getElementById("health").value = Health
 
-    if (isFirebaseEnv) {
+    if (isFirebaseEnv == 'true') {
       const playerRef = firebase.database().ref(`games/${id}/server/${playerUniqueID}`);
       playerRef.update({
         rot: playerRotation,
@@ -273,7 +273,7 @@ async function spawnPlayer() {
 
   playerLoop()
 
-  if (isFirebaseEnv) {
+  if (isFirebaseEnv == 'true') {
     var player = {
       rot: playerRotation,
       pos: cubeBody.position,
