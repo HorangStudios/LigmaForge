@@ -191,7 +191,7 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
-  const pathToTexture = "js/Manface.png";
+  const pathToTexture = "https://horangstudios.github.io/LigmaForge/player/js/Manface.png";
   const headtexture = new THREE.TextureLoader().load(pathToTexture);
   headtexture.wrapS = THREE.RepeatWrapping;
   headtexture.wrapT = THREE.RepeatWrapping;

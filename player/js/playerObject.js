@@ -297,10 +297,13 @@ var allPlayersElem = {}
 var allPlayersElemData = {}
 var allPlayersFetchedAvatar = {}
 var allMessages = []
+var spawnedPlayers = 0
 
 function otherPlayers() {
-  firebase.database().ref(`games/${id}/server/`).on('value', function (snapshot) {
+  firebase.database().ref(`games/${id}/server/`).on('value', async function (snapshot) {
     var playerslist = snapshot.val();
+    var listofplayers = await firebaseFetch(`games/${id}/server/`);
+    var playeramount = Object.keys(listofplayers).length - 1;
     if (!playerslist) return;
 
     Object.keys(playerslist).forEach(async (key) => {
@@ -345,7 +348,8 @@ function otherPlayers() {
       const messages = element.messages;
 
       if (key != playerUniqueID) {
-        if (!allPlayersElem[key] && !(timeDifference >= 10000)) {
+        if (!allPlayersElem[key] && !(timeDifference >= 10000) && (playeramount > spawnedPlayers)) {
+          spawnedPlayers += 1;
           allPlayersElem[key] = await playerModel(getRandomHexColor(), { "shirt": allPlayersFetchedAvatar[key]["shirt"], "pants": allPlayersFetchedAvatar[key]["pants"], "colors": allPlayersFetchedAvatar[key]["colors"] });
           scene.add(allPlayersElem[key][0]);
         } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
