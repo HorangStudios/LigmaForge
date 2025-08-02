@@ -243,3 +243,4 @@ console.log(`
 `);
 console.log(`HorangHill Client Version ${ver} (LigmaForge)`)
 document.getElementById('clientversion').innerText = `HorangHill Client Version ${ver}`
+document.getElementById('clientversion1').innerText = `HorangHill Client Version ${ver}`

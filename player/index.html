@@ -35,11 +35,10 @@
 
 <body id="section">
     <div class="loadingScreen" id="gameload" style="display: none;">
-        <button id="skiploading"
-            onclick='document.getElementById("gameload").style.display = "none"; spawnPlayer();'>Skip loading</button>
         <div id="loadingMessageScreenForLigmaForge">
-            <h1>Loading Game...</h1>
-            <span id="clientversion"></span>
+            <h1 id="gameloader">Loading Game...</h1>
+            <span id="clientversion"></span><br><br>
+            <i class="fa-solid fa-spinner fa-spin"></i>
         </div>
     </div>
 
@@ -59,7 +58,8 @@
     <div id="Sidenav" class="sidenav" style="width: 0px;">
         <div class="topsidebar" id="topsidebar">
             <a onclick="window.close();" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
-            <a onclick="firebase.auth().signOut(); window.location.reload()"><i class="fa-solid fa-angle-left"></i> Log out from account</a>
+            <a onclick="firebase.auth().signOut(); window.location.reload()"><i class="fa-solid fa-angle-left"></i> Log
+                out from account</a>
             <hr>
             <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer log</a>
         </div>
@@ -72,8 +72,9 @@
 
     <div class="loadingScreen" id="loginDialog">
         <div id="loginCheck">
-          <i class="fa-solid fa-spinner fa-spin"></i><br><br>
-          Checking for authentication...
+            <h1>Checking for authentication...</h1>
+            <span id="clientversion1"></span><br><br>
+            <i class="fa-solid fa-spinner fa-spin"></i>
         </div>
         <div id="signinbox" style="display: none;">
             <p>Authenticate LigmaForge player with HorangHill</p>

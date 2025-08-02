@@ -46,10 +46,26 @@ var firstMessageID = Date.now() + makeid(16)
 
 async function spawnPlayer() {
   var playerRotation = 0;
+  var playerSpeed = 0.1;
   var Health = 100;
   var shirt = false;
   var pants = false;
   var colors = false;
+
+  var lastMouseX = 0;
+  var canvasHoldDown = false;
+
+  renderer.domElement.addEventListener("mousedown", (e) => { if (e.button == 2) { canvasHoldDown = true; lastMouseX = e.clientX; } });
+  renderer.domElement.addEventListener("mouseup", (e) => { if (e.button == 2) { canvasHoldDown = false; lastMouseX = 0; } });
+  renderer.domElement.addEventListener("contextmenu", (e) => { e.preventDefault(); });
+  renderer.domElement.addEventListener("mousemove", (e) => {
+    if (canvasHoldDown && lastMouseX !== 0) {
+      const deltaX = e.clientX - lastMouseX;
+      const sensitivity = 0.0025;
+      playerRotation += deltaX * sensitivity;
+      lastMouseX = e.clientX;
+    }
+  });
 
   if (isFirebaseEnv == 'true') {
     var playerData = await firebaseFetch(`players/${playerUniqueID}`)
@@ -103,6 +119,7 @@ async function spawnPlayer() {
         break;
       case 'KeyA':
         keyState.a = true;
+        createPlayer[1].isWalking = true;
         break;
       case 'KeyS':
         keyState.s = true;
@@ -110,6 +127,7 @@ async function spawnPlayer() {
         break;
       case 'KeyD':
         keyState.d = true;
+        createPlayer[1].isWalking = true;
         break;
       case 'Space':
         keyState.space = true;
@@ -125,6 +143,7 @@ async function spawnPlayer() {
         break;
       case 'KeyA':
         keyState.a = false;
+        createPlayer[1].isWalking = false;
         break;
       case 'KeyS':
         keyState.s = false;
@@ -132,6 +151,7 @@ async function spawnPlayer() {
         break;
       case 'KeyD':
         keyState.d = false;
+        createPlayer[1].isWalking = false;
         break;
       case 'Space':
         keyState.space = false;
@@ -170,14 +190,15 @@ async function spawnPlayer() {
         createPlayer[1].isWalking = true;
       } else if (stickData.cardinalDirection == "E") {
         keyState.d = true;
+        createPlayer[1].isWalking = true;
       }
       else if (stickData.cardinalDirection == "NE") {
         keyState.d = true;
+        createPlayer[1].isWalking = true;
       }
     });
   }
 
-  var cameraAngle = 0;
   function playerLoop() {
     function normalizeRotation(rotation) {
       while (rotation > Math.PI) rotation -= 2 * Math.PI;
@@ -205,20 +226,37 @@ async function spawnPlayer() {
       }
     }
 
+    let moveX = 0;
+    let moveZ = 0;
+
     if (keyState.w) {
-      cubeBody.position.x -= calcMovement().deltaX / 10;
-      cubeBody.position.z -= calcMovement().deltaZ / 10;
+      moveX -= calcMovement().deltaX;
+      moveZ -= calcMovement().deltaZ;
     }
+
     if (keyState.s) {
-      cubeBody.position.x += calcMovement().deltaX / 10;
-      cubeBody.position.z += calcMovement().deltaZ / 10;
+      moveX += calcMovement().deltaX;
+      moveZ += calcMovement().deltaZ;
     }
+
     if (keyState.a) {
-      playerRotation += 0.02;
+      moveX -= calcMovement().deltaZ;
+      moveZ += calcMovement().deltaX;
     }
+
     if (keyState.d) {
-      playerRotation -= 0.02;
+      moveX += calcMovement().deltaZ;
+      moveZ -= calcMovement().deltaX;
     }
+
+    if (moveX !== 0 || moveZ !== 0) {
+      const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
+      moveX /= length;
+      moveZ /= length;
+      cubeBody.position.x += moveX * playerSpeed;
+      cubeBody.position.z += moveZ * playerSpeed;
+    }
+
     if (keyState.space && checkPositionChange()) {
       cubeBody.velocity.y = 7.5;
     }
@@ -229,18 +267,11 @@ async function spawnPlayer() {
       createPlayer[1].isJumping = true;
     }
 
-    function lerpAngle(a, b, t) {
-      let difference = b - a;
-      difference = ((difference + Math.PI) % (2 * Math.PI)) - Math.PI;
-      return a + difference * t;
-    }
-
     playerRotation = normalizeRotation(playerRotation);
     sceneNode.rotation.y = playerRotation
     cubeBody.quaternion.setFromEuler(0, playerRotation, 0);
 
-    cameraAngle = lerpAngle(cameraAngle, playerRotation, 0.1);
-    camera.position.setFromSphericalCoords(5, 1, cameraAngle);
+    camera.position.setFromSphericalCoords(5, 1, playerRotation);
     camera.position.add(sceneNode.position);
     camera.lookAt(sceneNode.position);
 
