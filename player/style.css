@@ -1,6 +1,7 @@
 body {
     overflow: hidden;
     user-select: none;
+    touch-action: manipulation;
     transition: all 0.5s ease !important;
     background: #000000;
     height: 100vh;
@@ -172,7 +173,7 @@ body {
 }
 
 #chats input::placeholder {
-  color: black;
+    color: black;
 }
 
 #chats p {
@@ -189,7 +190,36 @@ body {
     border-radius: 5px;
 }
 
-#signinbox input, #signinbox button {
+#signinbox input,
+#signinbox button {
     padding: 10px;
     width: 100%;
+}
+
+#joyDiv {
+    width: 10%;
+    height: 20%;
+    bottom: 0;
+    left: 0;
+    margin: 30px;
+    color: transparent;
+    position: fixed;
+    z-index: 1;
+}
+
+#jumpDiv {
+    width: 10%;
+    height: 20%;
+    bottom: 0;
+    right: 0;
+    margin: 30px;
+    color: #00000050;
+    position: fixed;
+    font-size: 55px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#jumpDiv i {
+    pointer-events: all;
 }

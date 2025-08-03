@@ -53,7 +53,11 @@ async function spawnPlayer() {
   var colors = false;
 
   var lastMouseX = 0;
+  var lastTouchX = 0;
   var canvasHoldDown = false;
+
+  document.getElementById("chats").style.display = 'flex'
+  document.getElementById("navigation").style.display = 'block'
 
   renderer.domElement.addEventListener("mousedown", (e) => { if (e.button == 2) { canvasHoldDown = true; lastMouseX = e.clientX; } });
   renderer.domElement.addEventListener("mouseup", (e) => { if (e.button == 2) { canvasHoldDown = false; lastMouseX = 0; } });
@@ -66,6 +70,31 @@ async function spawnPlayer() {
       lastMouseX = e.clientX;
     }
   });
+
+  renderer.domElement.addEventListener("touchstart", (e) => { lastTouchX = e.targetTouches[0].clientX; });
+  renderer.domElement.addEventListener("touchend", (e) => { lastTouchX = 0; });
+  renderer.domElement.addEventListener("touchmove", (e) => {
+    if (lastTouchX !== 0) {
+      const deltaX = e.targetTouches[0].clientX - lastTouchX;
+      const sensitivity = 0.0025;
+      playerRotation += deltaX * sensitivity;
+      lastTouchX = e.targetTouches[0].clientX;
+    }
+  });
+
+  function checkPositionChange() {
+    const cubeBodynewValue = cubeBody.position.y;
+    const change = Math.abs(cubeBodynewValue - previousY);
+    const smallChangeThreshold = 0.0005;
+
+    if (change <= smallChangeThreshold) {
+      previousY = cubeBodynewValue;
+      return true
+    } else {
+      previousY = cubeBodynewValue;
+      return false
+    }
+  }
 
   if (isFirebaseEnv == 'true') {
     var playerData = await firebaseFetch(`players/${playerUniqueID}`)
@@ -83,12 +112,6 @@ async function spawnPlayer() {
       }
     }
   }
-
-  document.addEventListener('keydown', function (event) {
-    if (event.keyCode == 27) {
-      toggleSideBar();
-    }
-  });
 
   var createPlayer = await playerModel(0x800000, { "shirt": shirt, "pants": pants, "colors": colors });
   var sceneNode = createPlayer[0];
@@ -132,6 +155,9 @@ async function spawnPlayer() {
       case 'Space':
         keyState.space = true;
         break;
+      case 'Escape':
+        toggleSideBar();
+        break;
     }
   });
 
@@ -160,23 +186,24 @@ async function spawnPlayer() {
   });
 
   if (navigator.userAgentData.mobile) {
-    var Joy1 = new JoyStick('joyDiv', {}, function (stickData) {
+    document.getElementById("joyDiv").style.display = 'block'
+    document.getElementById("jumpDiv").style.display = 'block'
+    document.getElementById("jumpBtn").addEventListener("touchstart", () => {
+      keyState.space = true
+      setTimeout(() => { keyState.space = false }, 100);
+    })
+
+    new JoyStick('joyDiv', {}, function (stickData) {
       if (stickData.cardinalDirection == "N") {
         keyState.w = true;
         createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "C") {
-        keyState.w = false;
-        keyState.a = false;
-        keyState.s = false;
-        keyState.d = false;
-        keyState.space = false;
-        createPlayer[1].isWalking = false;
       } else if (stickData.cardinalDirection == "NW") {
         keyState.w = true;
         keyState.a = true;
         createPlayer[1].isWalking = true;
       } else if (stickData.cardinalDirection == "W") {
         keyState.a = true;
+        createPlayer[1].isWalking = true;
       } else if (stickData.cardinalDirection == "SW") {
         keyState.a = true;
         keyState.s = true;
@@ -191,10 +218,16 @@ async function spawnPlayer() {
       } else if (stickData.cardinalDirection == "E") {
         keyState.d = true;
         createPlayer[1].isWalking = true;
-      }
-      else if (stickData.cardinalDirection == "NE") {
+      } else if (stickData.cardinalDirection == "NE") {
+        keyState.w = true;
         keyState.d = true;
         createPlayer[1].isWalking = true;
+      } else if (stickData.cardinalDirection == "C") {
+        keyState.w = false;
+        keyState.a = false;
+        keyState.s = false;
+        keyState.d = false;
+        createPlayer[1].isWalking = false;
       }
     });
   }
@@ -210,20 +243,6 @@ async function spawnPlayer() {
       const deltaX = Math.sin(playerRotation);
       const deltaZ = Math.cos(playerRotation);
       return { deltaX, deltaZ };
-    }
-
-    function checkPositionChange() {
-      const cubeBodynewValue = cubeBody.position.y;
-      const change = Math.abs(cubeBodynewValue - previousY);
-      const smallChangeThreshold = 0.0005;
-
-      if (change <= smallChangeThreshold) {
-        previousY = cubeBodynewValue;
-        return true
-      } else {
-        previousY = cubeBodynewValue;
-        return false
-      }
     }
 
     let moveX = 0;

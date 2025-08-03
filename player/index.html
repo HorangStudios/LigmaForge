@@ -42,17 +42,19 @@
         </div>
     </div>
 
-    <div id="navigation">
+    <div id="navigation" style="display: none;">
         <img src="../css/HorangHill.png" onclick="toggleSideBar()">
         <progress value="100" max="100" id="health"></progress>
     </div>
 
-    <div id="chats">
+    <div id="chats" style="display: none;">
         <input placeholder="Send a message..." onkeydown="typeChat(this)" autocomplete="one-time-code">
         <p id="chatcontent">Welcome to HorangHill !</p>
     </div>
 
-    <div id="joyDiv" style="width:10%;height:20%;bottom: 0;right: 1;margin: 30px; color: transparent; position: fixed;">
+    <div id="joyDiv" style="display: none;"></div>
+    <div id="jumpDiv" style="display: none;">
+        <i class="fa-solid fa-circle-arrow-up" id="jumpBtn"></i>
     </div>
 
     <div id="Sidenav" class="sidenav" style="width: 0px;">
