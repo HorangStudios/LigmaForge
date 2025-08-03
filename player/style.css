@@ -220,6 +220,18 @@ body {
     z-index: 1;
 }
 
+#shiftLock {
+    color: #00000050;
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    place-items: center;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+}
+
 #jumpDiv i {
     pointer-events: all;
 }

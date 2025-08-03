@@ -59,15 +59,13 @@ async function spawnPlayer() {
   document.getElementById("chats").style.display = 'flex'
   document.getElementById("navigation").style.display = 'block'
 
-  renderer.domElement.addEventListener("mousedown", (e) => { if (e.button == 2) { canvasHoldDown = true; lastMouseX = e.clientX; } });
-  renderer.domElement.addEventListener("mouseup", (e) => { if (e.button == 2) { canvasHoldDown = false; lastMouseX = 0; } });
+  renderer.domElement.addEventListener("mousedown", async (e) => { if (e.button == 2) { await renderer.domElement.requestPointerLock(); } });
+  renderer.domElement.addEventListener("mouseup", (e) => { if (e.button == 2) { document.exitPointerLock(); } });
   renderer.domElement.addEventListener("contextmenu", (e) => { e.preventDefault(); });
   renderer.domElement.addEventListener("mousemove", (e) => {
-    if (canvasHoldDown && lastMouseX !== 0) {
-      const deltaX = e.clientX - lastMouseX;
+    if (document.pointerLockElement === renderer.domElement) {
       const sensitivity = 0.0025;
-      playerRotation += deltaX * sensitivity;
-      lastMouseX = e.clientX;
+      playerRotation += e.movementX * sensitivity;
     }
   });
 
@@ -134,7 +132,7 @@ async function spawnPlayer() {
     space: false
   };
 
-  document.addEventListener('keydown', function (event) {
+  document.addEventListener('keydown', async function (event) {
     switch (event.code) {
       case 'KeyW':
         keyState.w = true;
@@ -157,6 +155,13 @@ async function spawnPlayer() {
         break;
       case 'Escape':
         toggleSideBar();
+        break;
+      case 'ShiftLeft':
+        if (document.pointerLockElement) {
+          document.exitPointerLock();
+        } else {
+          await renderer.domElement.requestPointerLock();
+        }
         break;
     }
   });
@@ -284,6 +289,12 @@ async function spawnPlayer() {
       createPlayer[1].isJumping = false;
     } else {
       createPlayer[1].isJumping = true;
+    }
+
+    if (document.pointerLockElement) {
+      document.getElementById("shiftLock").style.display = 'flex'
+    } else {
+      document.getElementById("shiftLock").style.display = 'none'
     }
 
     playerRotation = normalizeRotation(playerRotation);
