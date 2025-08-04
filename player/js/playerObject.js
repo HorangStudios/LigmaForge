@@ -51,10 +51,7 @@ async function spawnPlayer() {
   var shirt = false;
   var pants = false;
   var colors = false;
-
-  var lastMouseX = 0;
   var lastTouchX = 0;
-  var canvasHoldDown = false;
 
   document.getElementById("chats").style.display = 'flex'
   document.getElementById("navigation").style.display = 'block'
@@ -65,7 +62,7 @@ async function spawnPlayer() {
   renderer.domElement.addEventListener("mousemove", (e) => {
     if (document.pointerLockElement === renderer.domElement) {
       const sensitivity = 0.0025;
-      playerRotation += e.movementX * sensitivity;
+      playerRotation -= e.movementX * sensitivity;
     }
   });
 
@@ -75,7 +72,7 @@ async function spawnPlayer() {
     if (lastTouchX !== 0) {
       const deltaX = e.targetTouches[0].clientX - lastTouchX;
       const sensitivity = 0.0025;
-      playerRotation += deltaX * sensitivity;
+      playerRotation -= deltaX * sensitivity;
       lastTouchX = e.targetTouches[0].clientX;
     }
   });
