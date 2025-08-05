@@ -188,6 +188,7 @@ async function spawnPlayer() {
   });
 
   if (navigator.userAgentData.mobile) {
+    document.getElementById("chats").style.display = 'none'
     document.getElementById("joyDiv").style.display = 'block'
     document.getElementById("jumpDiv").style.display = 'block'
     document.getElementById("jumpBtn").addEventListener("touchstart", () => {
@@ -195,7 +196,13 @@ async function spawnPlayer() {
       setTimeout(() => { keyState.space = false }, 100);
     })
 
-    new JoyStick('joyDiv', {}, function (stickData) {
+    new JoyStick('joyDiv', {
+      width: 150, 
+      height: 150, 
+      internalFillColor: "#00000050", 
+      internalStrokeColor: "#00000050", 
+      externalStrokeColor: "#00000050"
+    }, function (stickData) {
       if (stickData.cardinalDirection == "N") {
         keyState.w = true;
         createPlayer[1].isWalking = true;
