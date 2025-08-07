@@ -191,53 +191,18 @@ async function spawnPlayer() {
     document.getElementById("chats").style.display = 'none'
     document.getElementById("joyDiv").style.display = 'block'
     document.getElementById("jumpDiv").style.display = 'block'
+    
     document.getElementById("jumpBtn").addEventListener("touchstart", () => {
       keyState.space = true
       setTimeout(() => { keyState.space = false }, 100);
     })
 
-    new JoyStick('joyDiv', {
-      width: 150, 
-      height: 150, 
-      internalFillColor: "#00000050", 
-      internalStrokeColor: "#00000050", 
+    var playerJoystick = new JoyStick('joyDiv', {
+      width: 150,
+      height: 150,
+      internalFillColor: "#00000050",
+      internalStrokeColor: "#00000050",
       externalStrokeColor: "#00000050"
-    }, function (stickData) {
-      if (stickData.cardinalDirection == "N") {
-        keyState.w = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "NW") {
-        keyState.w = true;
-        keyState.a = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "W") {
-        keyState.a = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "SW") {
-        keyState.a = true;
-        keyState.s = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "S") {
-        keyState.s = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "SE") {
-        keyState.s = true;
-        keyState.d = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "E") {
-        keyState.d = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "NE") {
-        keyState.w = true;
-        keyState.d = true;
-        createPlayer[1].isWalking = true;
-      } else if (stickData.cardinalDirection == "C") {
-        keyState.w = false;
-        keyState.a = false;
-        keyState.s = false;
-        keyState.d = false;
-        createPlayer[1].isWalking = false;
-      }
     });
   }
 
@@ -256,6 +221,53 @@ async function spawnPlayer() {
 
     let moveX = 0;
     let moveZ = 0;
+
+    if (navigator.userAgentData.mobile) {
+      let joystickDir = playerJoystick.GetDir()
+      if (joystickDir == "N") {
+        moveX -= calcMovement().deltaX;
+        moveZ -= calcMovement().deltaZ;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "NW") {
+        moveX -= calcMovement().deltaX;
+        moveZ -= calcMovement().deltaZ;
+        moveX -= calcMovement().deltaZ;
+        moveZ += calcMovement().deltaX;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "W") {
+        moveX -= calcMovement().deltaZ;
+        moveZ += calcMovement().deltaX;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "SW") {
+        moveX -= calcMovement().deltaZ;
+        moveZ += calcMovement().deltaX;
+        moveX += calcMovement().deltaX;
+        moveZ += calcMovement().deltaZ;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "S") {
+        moveX += calcMovement().deltaX;
+        moveZ += calcMovement().deltaZ;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "SE") {
+        moveX += calcMovement().deltaX;
+        moveZ += calcMovement().deltaZ;
+        moveX += calcMovement().deltaZ;
+        moveZ -= calcMovement().deltaX;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "E") {
+        moveX += calcMovement().deltaZ;
+        moveZ -= calcMovement().deltaX;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "NE") {
+        moveX += calcMovement().deltaZ;
+        moveZ -= calcMovement().deltaX;
+        moveX -= calcMovement().deltaX;
+        moveZ -= calcMovement().deltaZ;
+        createPlayer[1].isWalking = true;
+      } else if (joystickDir == "C") {
+        createPlayer[1].isWalking = false;
+      }
+    }
 
     if (keyState.w) {
       moveX -= calcMovement().deltaX;
