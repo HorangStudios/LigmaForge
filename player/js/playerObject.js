@@ -191,7 +191,6 @@ async function spawnPlayer() {
     document.getElementById("chats").style.display = 'none'
     document.getElementById("joyDiv").style.display = 'block'
     document.getElementById("jumpDiv").style.display = 'block'
-    
     document.getElementById("jumpBtn").addEventListener("touchstart", () => {
       keyState.space = true
       setTimeout(() => { keyState.space = false }, 100);
