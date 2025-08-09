@@ -29,16 +29,6 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
-//transform controls
-var transformControls = new THREE.TransformControls(camera, renderer.domElement);
-scene.add(transformControls);
-transformControls.setTranslationSnap(0.5)
-transformControls.setRotationSnap(0.5)
-transformControls.setScaleSnap(0.5)
-transformControls.addEventListener('dragging-changed', function (event) {
-    controls.enabled = !event.value;
-});
-
 //AAA game graphics
 composer = new THREE.EffectComposer(renderer);
 ssaoPass = new THREE.SSAOPass(scene, camera);
@@ -63,8 +53,9 @@ var prevWidth = 0
 var prevHeight = 0
 function resizeCanvas() {
     let sideButtonsWidth = document.getElementById('sideButtons').getBoundingClientRect().width
+    let explorerWidth = document.getElementById('explorercontent').getBoundingClientRect().width
     let controlsHeight = document.getElementById('controls').getBoundingClientRect().height
-    let currWidth = window.innerWidth - (sideButtonsWidth + 2)
+    let currWidth = window.innerWidth - ((sideButtonsWidth + 2) + (explorerWidth + 2))
     let currHeight = window.innerHeight - (controlsHeight + 1)
 
     if ((currHeight != prevHeight) || (currWidth != prevWidth)) {
@@ -72,6 +63,7 @@ function resizeCanvas() {
         prevHeight = currHeight
 
         document.getElementById("canvas").style.marginTop = 0
+        document.getElementById("canvas").style.marginRight = explorerWidth + 1
         document.getElementById("canvas").width = currWidth;
         document.getElementById("canvas").height = currHeight;
 
@@ -80,6 +72,47 @@ function resizeCanvas() {
         renderer.setSize(currWidth, currHeight);
     }
 }
+
+//select item
+function onDocumentMouseDown(event) {
+    if (event.target !== renderer.domElement || document.getElementById("clicktosel").checked == false) return;
+
+    var canvasDimensions = renderer.domElement.getBoundingClientRect();
+    var mouse = new THREE.Vector2();
+    mouse.x = ((event.clientX - canvasDimensions.left) / canvasDimensions.width) * 2 - 1;
+    mouse.y = - ((event.clientY - canvasDimensions.top) / canvasDimensions.height) * 2 + 1;
+
+    var raycaster = new THREE.Raycaster();
+    raycaster.params.Points = { threshold: 0.01 };
+    raycaster.setFromCamera(mouse, camera);
+
+    var objectsToIntersect = scene.children.filter(obj => !(obj.type === "TransformControls" || obj.isTransformControls));
+    var intersects = raycaster.intersectObjects(objectsToIntersect, true);
+
+    if (intersects.length > 0) {
+        var selectedObject = intersects[0].object;
+
+        if (selectedObject instanceof THREE.InstancedMesh && intersects[0].instanceId !== undefined) {
+            let instanceId = intersects[0].instanceId;
+            let data = null;
+
+            if (selectedObject === cubemesh) data = cubeInstanceData[instanceId];
+            else if (selectedObject === spheremesh) data = sphereInstanceData[instanceId];
+            else if (selectedObject === cylindermesh) data = cylinderInstanceData[instanceId];
+
+            if ('itemIndex' in data) {
+                listSchematic(data.itemIndex, true)
+            }
+        } else {
+            if ('itemIndex' in selectedObject.userData) {
+                listSchematic(selectedObject.userData.itemIndex, true)
+            } else if (transformControls.object) {
+                listSchematic()
+            }
+        }
+    }
+}
+document.getElementById('canvas').addEventListener('click', onDocumentMouseDown, false);
 
 // save
 function exportScene() {
@@ -118,51 +151,8 @@ function playScene() {
     });
 }
 
-//close sidebar
-function closeExplorer() {
-    listSchematic()
-
-    explorerMenu.style.transition = "all 0.1s ease";
-    explorerMenu.style.width = "0vw"
-    explorerMenu.style.borderWidth = "0px";
-
-    setTimeout(() => { explorerMenu.style.transition = "none"; }, 100);
-}
-
-//show sidebar
-function openExplorer() {
-    if (explorerMenu.style.width == "0vw") {
-        explorerMenu.style.transition = "all 0.1s ease";
-        explorerMenu.style.borderWidth = "1px";
-
-        if (window.matchMedia('(pointer: none), (pointer: coarse)').matches) {
-            explorerMenu.style.width = "100vw";
-            explorerMenu.style.marginLeft = "0px";
-            explorerMenu.style.marginTop = document.getElementById("sidecontainer").getBoundingClientRect().height;
-            explorerMenu.style.height = `calc(100vh - ${document.getElementById("controls").getBoundingClientRect().height}px - ${document.getElementById("sidecontainer").getBoundingClientRect().height}px)`;
-        } else {
-            explorerMenu.style.width = "25vw";
-            explorerMenu.style.marginLeft = document.getElementById("sidecontainer").getBoundingClientRect().width;
-            explorerMenu.style.marginTop = "0px";
-            explorerMenu.style.height = `calc(100vh - ${document.getElementById("controls").getBoundingClientRect().height}px)`;
-        }
-    } else {
-        closeExplorer()
-    }
-}
-
 //toggle transformcontrols snapping
-function setSnapping(val) {
-    if (val == true) {
-        transformControls.setTranslationSnap(0.5)
-        transformControls.setRotationSnap(0.5)
-        transformControls.setScaleSnap(0.5)
-    } else {
-        transformControls.setTranslationSnap(0)
-        transformControls.setRotationSnap(0)
-        transformControls.setScaleSnap(0)
-    }
-}
+var setSnapping
 
 //export scene to gltf model
 function exportGLTF() {

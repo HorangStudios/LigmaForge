@@ -80,7 +80,7 @@ async function spawnPlayer() {
   function checkPositionChange() {
     const cubeBodynewValue = cubeBody.position.y;
     const change = Math.abs(cubeBodynewValue - previousY);
-    const smallChangeThreshold = 0.0005;
+    const smallChangeThreshold = 0.025;
 
     if (change <= smallChangeThreshold) {
       previousY = cubeBodynewValue;
@@ -112,9 +112,9 @@ async function spawnPlayer() {
   var sceneNode = createPlayer[0];
   scene.add(sceneNode);
 
-  var cubeShape = new CANNON.Box(new CANNON.Vec3(1 / 2, 1.7, 1 / 2));
+  var cubeShape = threeToCannon(sceneNode).shape;
   var cubeBody = new CANNON.Body({ mass: parseInt(1) });
-  var shapeOffset = new CANNON.Vec3(0, 1.12, 0);
+  var shapeOffset = new CANNON.Vec3(0, 0.75, 0);
   var previousY = cubeBody.position.y;
   cubeBody.addShape(cubeShape, shapeOffset);
   cubeBody.position.set(0, 0, 0);

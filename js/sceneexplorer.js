@@ -14,8 +14,17 @@ const convertBase64 = (event) => {
     });
 };
 
-function listSchematic(toClick = false) {
+let lastSelectedObj
+function listSchematic(toClick = false, clickSelect = false) {
+    if (toClick === lastSelectedObj && clickSelect) {
+        return
+    } else {
+        lastSelectedObj = toClick
+    }
+
     const shapesList = document.getElementById('explorercontent');
+    const itemProperties = document.getElementById('detailscontent');
+    itemProperties.innerHTML = '<h3>Inspect</h3><br><span>Select something on the explorer to edit its properties here!</span>';
 
     if (sceneSchematics.length != 0) {
         shapesList.innerHTML = '<h3>Explorer</h3><br>';
@@ -32,43 +41,30 @@ function listSchematic(toClick = false) {
 
         button.onclick = function () {
             loadScene(sceneSchematics, false, i)
-            scene.add(transformControls)
 
-            shapesList.innerHTML = '';
-
-            let backButton = document.createElement('button');
-            backButton.innerHTML = `<i class="fa-solid fa-circle-left"></i> Back`
-            backButton.className = "sceneNodeIcon";
+            itemProperties.innerHTML = '';
 
             let delButton = document.createElement('button');
-            delButton.innerHTML = `<i class="fa-solid fa-trash"></i> Delete`
-            delButton.className = "sceneNodeIcon";
+            delButton.innerHTML = `<i class="fa-solid fa-trash"></i>`
+            delButton.className = "sceneNodeIcon halfbutton";
 
             let cloneButton = document.createElement('button');
-            cloneButton.innerHTML = `<i class="fa-regular fa-clone"></i> Clone`
-            cloneButton.className = "sceneNodeIcon";
-
-            backButton.onclick = function () {
-                transformControls.detach()
-                listSchematic()
-            }
+            cloneButton.innerHTML = `<i class="fa-regular fa-clone"></i>`
+            cloneButton.className = "sceneNodeIcon halfbutton";
 
             delButton.onclick = function () {
-                transformControls.detach()
                 sceneSchematics.splice(i, 1);
                 listSchematic()
                 addObject()
             }
 
             cloneButton.onclick = function () {
-                transformControls.detach()
-                var copy = JSON.parse(JSON.stringify(element));
-                sceneSchematics.push(copy)
+                sceneSchematics.push(JSON.parse(JSON.stringify(element)))
                 listSchematic(i)
                 addObject()
             }
 
-            shapesList.prepend(document.createElement('hr'));
+            itemProperties.prepend(document.createElement('hr'));
 
             Object.entries(element).forEach(([key, value]) => {
                 let input = document.createElement('input');
@@ -92,7 +88,6 @@ function listSchematic(toClick = false) {
                 label.className = "nodeSceneLabel";
 
                 input.onchange = async function (event) {
-                    transformControls.detach()
                     if (key == "color") {
                         element[key] = input.value;
                         listSchematic(i);
@@ -113,9 +108,9 @@ function listSchematic(toClick = false) {
                     addObject()
                 };
 
-                if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript") {
-                    shapesList.appendChild(label);
-                    shapesList.appendChild(input);
+                if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript" && key !== "gltfData") {
+                    itemProperties.appendChild(label);
+                    itemProperties.appendChild(input);
                 }
 
                 if (key == "color") {
@@ -124,6 +119,7 @@ function listSchematic(toClick = false) {
 
                 if (key == "tex") {
                     input.type = "file"
+                    input.accept = 'image/png, image/jpeg'
 
                     let clearBtn = document.createElement('a')
                     clearBtn.innerHTML = '&nbsp;(Clear)'
@@ -132,7 +128,6 @@ function listSchematic(toClick = false) {
                     label.appendChild(clearBtn)
 
                     clearBtn.onclick = function () {
-                        transformControls.detach()
                         element[key] = false
                         listSchematic(i);
                         addObject()
@@ -150,7 +145,7 @@ function listSchematic(toClick = false) {
                         addObject()
                     }
 
-                    shapesList.prepend(button);
+                    itemProperties.prepend(button);
                 }
 
                 if (key == "updateScript") {
@@ -164,7 +159,7 @@ function listSchematic(toClick = false) {
                         addObject()
                     }
 
-                    shapesList.prepend(button);
+                    itemProperties.prepend(button);
                 }
 
                 if (key == "clickScript") {
@@ -178,13 +173,17 @@ function listSchematic(toClick = false) {
                         addObject()
                     }
 
-                    shapesList.prepend(button);
+                    itemProperties.prepend(button);
                 }
             });
 
-            shapesList.prepend(delButton);
-            shapesList.prepend(cloneButton);
-            shapesList.prepend(backButton);
+            itemProperties.prepend(delButton);
+            itemProperties.prepend(cloneButton);
+            itemProperties.prepend(document.createElement("br"));
+
+            let title = document.createElement("h3");
+            title.innerText = 'Inspect';
+            itemProperties.prepend(title);
         };
 
         shapesList.appendChild(button);

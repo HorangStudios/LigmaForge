@@ -169,35 +169,49 @@ select {
 
 #explorer {
     background: var(--ui-base-color);
-    border: var(--ui-button-hover-color) solid;
+    border: var(--ui-button-hover-color) solid 1px;
     position: absolute;
     box-sizing: border-box;
-    resize: horizontal;
+    right: 0;
+    height: calc((100vh - 44px) / 2);
+    width: 250px;
 }
 
-#explorercontent {
+#details {
+    background: var(--ui-base-color);
+    border: var(--ui-button-hover-color) solid 1px;
+    border-top: none;
+    position: absolute;
+    box-sizing: border-box;
+    right: 0;
+    height: calc((100vh - 44px) / 2);
+    width: 250px;
+    bottom: 0;
+}
+
+.sidebarContent {
     padding: 15px;
     height: 100%;
     overflow: auto;
 }
 
-#explorercontent label {
+.sidebarContent label {
     display: inline-block;
     margin: 5px;
     margin-left: 0;
 }
 
-#explorercontent input[type=checkbox] {
+.sidebarContent input[type=checkbox] {
     margin: 7px;
     position: absolute;
     margin-left: 0;
 }
 
-#explorercontent input[type=number],
-#explorercontent input[type=text],
-#explorercontent input[type=file],
-#explorercontent input[type=color],
-#explorercontent button {
+.sidebarContent input[type=number],
+.sidebarContent input[type=text],
+.sidebarContent input[type=file],
+.sidebarContent input[type=color],
+.sidebarContent button {
     width: 100%;
     padding: 8px;
     background-color: #202020;
@@ -226,4 +240,13 @@ select {
     position: absolute !important;
     right: 0;
     height: 40px;
+}
+
+.halfbutton {
+    width: calc(50% - 5px) !important;
+    text-align: center !important;
+}
+
+.halfbutton:first-of-type {
+    float: right;
 }

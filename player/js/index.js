@@ -57,7 +57,7 @@ composer.addPass(ssaoPass);
 //update physics
 function updatePhysics() {
     scene.traverse(function (object) {
-        if (object instanceof THREE.Mesh && object.userData.scriptFunction) {
+        if ((object instanceof THREE.Mesh || object instanceof THREE.Object3D) && object.userData.scriptFunction) {
             try {
                 object.userData.scriptFunction(object);
 

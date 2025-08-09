@@ -6,6 +6,7 @@ const sphereInstanceData = [];
 const cylinderInstanceData = [];
 const dummy = new THREE.Object3D();
 let cubemesh, spheremesh, cylindermesh, gamestarteou;
+let transformControls
 
 function loadScene(sceneSchematics, isForPlayer, select) {
     scene.remove.apply(scene, scene.children);
@@ -47,6 +48,37 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     sun.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 2), THREE.MathUtils.degToRad(180));
     sky.material.uniforms.sunPosition.value.copy(sun);
 
+    if (!isForPlayer) {
+        if (transformControls) {
+            transformControls.detach();
+        }
+
+        transformControls = new THREE.TransformControls(camera, renderer.domElement);
+        transformControls.setTranslationSnap(0.5)
+        transformControls.setRotationSnap(0.5)
+        transformControls.setScaleSnap(0.5)
+        transformControls.addEventListener('dragging-changed', function (event) {
+            controls.enabled = !event.value;
+        });
+
+        document.getElementById("transformMove").onclick = () => { transformControls.setMode('translate') };
+        document.getElementById("transformRotate").onclick = () => { transformControls.setMode('rotate') };
+        document.getElementById("transformScale").onclick = () => { transformControls.setMode('scale') };
+
+        scene.add(transformControls);
+        setSnapping = function (val) {
+            if (val == true) {
+                transformControls.setTranslationSnap(0.5)
+                transformControls.setRotationSnap(0.5)
+                transformControls.setScaleSnap(0.5)
+            } else {
+                transformControls.setTranslationSnap(0)
+                transformControls.setRotationSnap(0)
+                transformControls.setScaleSnap(0)
+            }
+        }
+    }
+
     cubeInstanceData.length = 0;
     sphereInstanceData.length = 0;
     cylinderInstanceData.length = 0;
@@ -72,18 +104,28 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     cylindermesh.castShadow = true;
     cylindermesh.receiveShadow = true;
 
-    sceneSchematics.forEach((element, i) => {
+    sceneSchematics.forEach(async (element, i) => {
         let color = new THREE.Color();
         let dummy = new THREE.Object3D();
+        let geometry
+        let material
+        let scenenode
 
         switch (element.type) {
             case "cube":
-                if (element.tex || select == i || element.opacity != 1) {
-                    const geometry = new THREE.BoxGeometry(1, 1, 1);
-                    const material = new THREE.MeshPhongMaterial({ color: element.color });
-                    material.transparent = true;
-                    material.opacity = element.opacity || 1;
+                geometry = new THREE.BoxGeometry(1, 1, 1);
+                material = new THREE.MeshPhongMaterial({ color: element.color });
+                material.transparent = true;
+                material.opacity = element.opacity || 1;
 
+                scenenode = new THREE.Mesh(geometry, material);
+                scenenode.position.set(element.x, element.y, element.z);
+                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+                scenenode.castShadow = true;
+                scenenode.receiveShadow = true;
+
+                if (element.tex || select == i || element.opacity != 1) {
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
                             scenenode.material.map = texture;
@@ -91,12 +133,6 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
-                    const scenenode = new THREE.Mesh(geometry, material);
-                    scenenode.position.set(element.x, element.y, element.z);
-                    scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                    scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                    scenenode.castShadow = true;
-                    scenenode.receiveShadow = true;
                     scene.add(scenenode);
 
                     if (i == select && select !== false) {
@@ -136,9 +172,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.userData.scriptFunction = scriptFunction;
                     scenenode.userData.clickscriptfunction = clickscriptFunction;
                     scenenode.userData.initscriptFunction = initscriptFunction;
+                    scenenode.userData.itemIndex = i
 
                     if (isForPlayer) {
-                        const cubeShape = new CANNON.Box(new CANNON.Vec3(element.sizeX / 2, element.sizeY / 2, element.sizeZ / 2));
+                        const cubeShape = threeToCannon(scenenode).shape;
                         const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
                         cubeBody.addShape(cubeShape);
                         cubeBody.position.set(element.x, element.y, element.z);
@@ -156,7 +193,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     cubemesh.setColorAt(cubeIndex, color);
 
                     if (isForPlayer) {
-                        const cubeShape = new CANNON.Box(new CANNON.Vec3(element.sizeX / 2, element.sizeY / 2, element.sizeZ / 2));
+                        const cubeShape = threeToCannon(scenenode).shape;
                         const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
                         cubeBody.addShape(cubeShape);
                         cubeBody.position.set(element.x, element.y, element.z);
@@ -175,6 +212,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             initiated: false,
                             color: element.color
                         });
+                    } else {
+                        cubeInstanceData.push({
+                            itemIndex: i
+                        })
                     };
 
                     cubeIndex++;
@@ -182,12 +223,19 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "spherev2":
-                if (element.tex || select == i || element.opacity != 1) {
-                    const geometry = new THREE.SphereGeometry(1, 16, 12);
-                    const material = new THREE.MeshPhongMaterial({ color: element.color });
-                    material.transparent = true;
-                    material.opacity = element.opacity || 1;
+                geometry = new THREE.SphereGeometry(1, 16, 12);
+                material = new THREE.MeshPhongMaterial({ color: element.color });
+                material.transparent = true;
+                material.opacity = element.opacity || 1;
 
+                scenenode = new THREE.Mesh(geometry, material);
+                scenenode.position.set(element.x, element.y, element.z);
+                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+                scenenode.castShadow = true;
+                scenenode.receiveShadow = true;
+
+                if (element.tex || select == i || element.opacity != 1) {
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
                             scenenode.material.map = texture;
@@ -195,12 +243,6 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
-                    const scenenode = new THREE.Mesh(geometry, material);
-                    scenenode.position.set(element.x, element.y, element.z);
-                    scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                    scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                    scenenode.castShadow = true;
-                    scenenode.receiveShadow = true;
                     scene.add(scenenode);
 
                     if (i == select && select !== false) {
@@ -240,9 +282,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.userData.scriptFunction = scriptFunction;
                     scenenode.userData.clickscriptfunction = clickscriptFunction;
                     scenenode.userData.initscriptFunction = initscriptFunction;
+                    scenenode.userData.itemIndex = i
 
                     if (isForPlayer) {
-                        const sphereShape = new CANNON.Box(new CANNON.Vec3(element.sizeX / 2, element.sizeY / 2, element.sizeZ / 2));
+                        const sphereShape = threeToCannon(scenenode).shape;
                         const sphereBody = new CANNON.Body({ mass: parseFloat(element.mass) });
                         sphereBody.addShape(sphereShape);
                         sphereBody.position.set(element.x, element.y, element.z);
@@ -260,7 +303,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     spheremesh.setColorAt(sphereIndex, color);
 
                     if (isForPlayer) {
-                        const sphereShape = new CANNON.Box(new CANNON.Vec3(element.sizeX / 2, element.sizeY / 2, element.sizeZ / 2));
+                        const sphereShape = threeToCannon(scenenode).shape;
                         const sphereBody = new CANNON.Body({ mass: parseFloat(element.mass) });
                         sphereBody.addShape(sphereShape);
                         sphereBody.position.set(element.x, element.y, element.z);
@@ -279,6 +322,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             initiated: false,
                             color: element.color
                         });
+                    } else {
+                        sphereInstanceData.push({
+                            itemIndex: i
+                        })
                     };
 
                     sphereIndex++;
@@ -286,11 +333,19 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "cylinderv2":
+                geometry = new THREE.CylinderGeometry(4.5, 4.5, 7.5, 32);
+                material = new THREE.MeshPhongMaterial({ color: element.color });
+                material.transparent = true;
+                material.opacity = element.opacity || 1;
+
+                scenenode = new THREE.Mesh(geometry, material);
+                scenenode.position.set(element.x, element.y, element.z);
+                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+                scenenode.scale.set(element.sizeX / 10, element.sizeY / 10, element.sizeZ / 10);
+                scenenode.castShadow = true;
+                scenenode.receiveShadow = true;
+
                 if (element.tex || select == i || element.opacity != 1) {
-                    const geometry = new THREE.CylinderGeometry(4.5, 4.5, 7.5, 32);
-                    const material = new THREE.MeshPhongMaterial({ color: element.color });
-                    material.transparent = true;
-                    material.opacity = element.opacity || 1;
 
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
@@ -299,12 +354,6 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
-                    const scenenode = new THREE.Mesh(geometry, material);
-                    scenenode.position.set(element.x, element.y, element.z);
-                    scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                    scenenode.scale.set(element.sizeX / 10, element.sizeY / 10, element.sizeZ / 10);
-                    scenenode.castShadow = true;
-                    scenenode.receiveShadow = true;
                     scene.add(scenenode);
 
                     if (i == select && select !== false) {
@@ -344,9 +393,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.userData.scriptFunction = scriptFunction;
                     scenenode.userData.clickscriptfunction = clickscriptFunction;
                     scenenode.userData.initscriptFunction = initscriptFunction;
+                    scenenode.userData.itemIndex = i
 
                     if (isForPlayer) {
-                        const cylinderShape = new CANNON.Box(new CANNON.Vec3(element.sizeX / 2, element.sizeY / 2, element.sizeZ / 2));
+                        const cylinderShape = threeToCannon(scenenode).shape;
                         const cylinderBody = new CANNON.Body({ mass: parseFloat(element.mass) });
                         cylinderBody.addShape(cylinderShape);
                         cylinderBody.position.set(element.x, element.y, element.z);
@@ -364,7 +414,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     cylindermesh.setColorAt(cylinderIndex, color);
 
                     if (isForPlayer) {
-                        const cylinderShape = new CANNON.Box(new CANNON.Vec3(element.sizeX / 2, element.sizeY / 2, element.sizeZ / 2));
+                        const cylinderShape = threeToCannon(scenenode).shape;
                         const cylinderBody = new CANNON.Body({ mass: parseFloat(element.mass) });
                         cylinderBody.addShape(cylinderShape);
                         cylinderBody.position.set(element.x, element.y, element.z);
@@ -383,6 +433,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             initiated: false,
                             color: element.color
                         });
+                    } else {
+                        cylinderInstanceData.push({
+                            itemIndex: i
+                        })
                     };
 
                     cylinderIndex++;
@@ -390,78 +444,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "sphere":
-                var sphereGeometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                var sphereMaterial = new THREE.MeshPhongMaterial({ color: element.color });
-
-                sphereMaterial.opacity = element.opacity || 1
-                sphereMaterial.transparent = true
-
-                scenenode = new THREE.Mesh(sphereGeometry, sphereMaterial);
-                scenenode.castShadow = true;
-                scenenode.receiveShadow = true;
-                scenenode.position.set(element.x, element.y, element.z);
-                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                scene.add(scenenode);
-
-                if (i == select && select !== false) {
-                    transformControls.attach(scenenode);
-                    transformControls.addEventListener('change', function () {
-                        if (!transformControls.dragging) return
-
-                        element["x"] = scenenode.position.x;
-                        element["y"] = scenenode.position.y;
-                        element["z"] = scenenode.position.z;
-
-                        element["rotx"] = scenenode.rotation.x;
-                        element["roty"] = scenenode.rotation.y;
-                        element["rotz"] = scenenode.rotation.z;
-
-                        element["sizeX"] = scenenode.scale.x;
-                        element["sizeY"] = scenenode.scale.y;
-                        element["sizeZ"] = scenenode.scale.z;
-
-                        document.getElementById("x").value = scenenode.position.x;
-                        document.getElementById("y").value = scenenode.position.y;
-                        document.getElementById("z").value = scenenode.position.z;
-
-                        document.getElementById("rotx").value = scenenode.rotation.x;
-                        document.getElementById("roty").value = scenenode.rotation.y;
-                        document.getElementById("rotz").value = scenenode.rotation.z;
-
-                        document.getElementById("sizeX").value = scenenode.scale.x;
-                        document.getElementById("sizeY").value = scenenode.scale.y;
-                        document.getElementById("sizeZ").value = scenenode.scale.z;
-                    });
-                }
-
-                if (isForPlayer) {
-                    var sphereShape = new CANNON.Sphere(element.sphereradius);
-                    var sphereBody = new CANNON.Body({ mass: element.mass });
-                    sphereBody.addShape(sphereShape);
-                    sphereBody.position.set(element.x, element.y, element.z);
-                    sphereBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                    world.addBody(sphereBody);
-                    sphereBody.threeMesh = scenenode;
-                }
-
-                var scriptFunction = new Function("mesh", element.updateScript);
-                var clickscriptFunction = new Function("mesh", element.clickScript);
-                var initscriptFunction = new Function("mesh", element.initScript);
-                scenenode.userData.scriptFunction = scriptFunction;
-                scenenode.userData.clickscriptfunction = clickscriptFunction;
-                scenenode.userData.initscriptFunction = initscriptFunction;
-
-                if (element.tex) {
-                    const texture = new THREE.TextureLoader().load(element.tex);
-                    scenenode.material.map = texture;
-                    scenenode.material.needsUpdate = true;
-                }
-                break;
-
-            case "cylinder":
-                var geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                var material = new THREE.MeshPhongMaterial({ color: element.color });
-
+                geometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
+                material = new THREE.MeshPhongMaterial({ color: element.color });
                 material.opacity = element.opacity || 1
                 material.transparent = true
 
@@ -504,7 +488,76 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 }
 
                 if (isForPlayer) {
-                    var cylinderShape = new CANNON.Cylinder(element.radius, element.radius, element.height, element.radialSegments);
+                    var sphereShape = threeToCannon(scenenode).shape;
+                    var sphereBody = new CANNON.Body({ mass: element.mass });
+                    sphereBody.addShape(sphereShape);
+                    sphereBody.position.set(element.x, element.y, element.z);
+                    sphereBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
+                    world.addBody(sphereBody);
+                    sphereBody.threeMesh = scenenode;
+                }
+
+                var scriptFunction = new Function("mesh", element.updateScript);
+                var clickscriptFunction = new Function("mesh", element.clickScript);
+                var initscriptFunction = new Function("mesh", element.initScript);
+                scenenode.userData.scriptFunction = scriptFunction;
+                scenenode.userData.clickscriptfunction = clickscriptFunction;
+                scenenode.userData.initscriptFunction = initscriptFunction;
+                scenenode.userData.itemIndex = i
+
+                if (element.tex) {
+                    const texture = new THREE.TextureLoader().load(element.tex);
+                    scenenode.material.map = texture;
+                    scenenode.material.needsUpdate = true;
+                }
+                break;
+
+            case "cylinder":
+                geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
+                material = new THREE.MeshPhongMaterial({ color: element.color });
+                material.opacity = element.opacity || 1
+                material.transparent = true
+
+                scenenode = new THREE.Mesh(geometry, material);
+                scenenode.castShadow = true;
+                scenenode.receiveShadow = true;
+                scenenode.position.set(element.x, element.y, element.z);
+                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+                scene.add(scenenode);
+
+                if (i == select && select !== false) {
+                    transformControls.attach(scenenode);
+                    transformControls.addEventListener('change', function () {
+                        if (!transformControls.dragging) return
+
+                        element["x"] = scenenode.position.x;
+                        element["y"] = scenenode.position.y;
+                        element["z"] = scenenode.position.z;
+
+                        element["rotx"] = scenenode.rotation.x;
+                        element["roty"] = scenenode.rotation.y;
+                        element["rotz"] = scenenode.rotation.z;
+
+                        element["sizeX"] = scenenode.scale.x;
+                        element["sizeY"] = scenenode.scale.y;
+                        element["sizeZ"] = scenenode.scale.z;
+
+                        document.getElementById("x").value = scenenode.position.x;
+                        document.getElementById("y").value = scenenode.position.y;
+                        document.getElementById("z").value = scenenode.position.z;
+
+                        document.getElementById("rotx").value = scenenode.rotation.x;
+                        document.getElementById("roty").value = scenenode.rotation.y;
+                        document.getElementById("rotz").value = scenenode.rotation.z;
+
+                        document.getElementById("sizeX").value = scenenode.scale.x;
+                        document.getElementById("sizeY").value = scenenode.scale.y;
+                        document.getElementById("sizeZ").value = scenenode.scale.z;
+                    });
+                }
+
+                if (isForPlayer) {
+                    var cylinderShape = threeToCannon(scenenode).shape;
                     var cylinderBody = new CANNON.Body({ mass: element.mass });
                     cylinderBody.addShape(cylinderShape);
                     cylinderBody.position.set(element.x, element.y, element.z);
@@ -519,6 +572,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.userData.scriptFunction = scriptFunction;
                 scenenode.userData.clickscriptfunction = clickscriptFunction;
                 scenenode.userData.initscriptFunction = initscriptFunction;
+                scenenode.userData.itemIndex = i
 
                 if (element.tex) {
                     const texture = new THREE.TextureLoader().load(element.tex);
@@ -555,7 +609,78 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         document.getElementById("rotz").value = scenenode.rotation.z;
                     });
                 }
+                break;
 
+            case "importedGLTFModel":
+                const importedGLTF = await new THREE.GLTFLoader().loadAsync(element.gltfData);
+                importedGLTF.scene.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scenenode = importedGLTF.scene
+                scenenode.position.set(element.x, element.y, element.z);
+                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+                scene.add(scenenode)
+
+                if (i == select && select !== false) {
+                    transformControls.attach(scenenode);
+                    transformControls.addEventListener('change', function () {
+                        if (!transformControls.dragging) return
+
+                        element["x"] = scenenode.position.x;
+                        element["y"] = scenenode.position.y;
+                        element["z"] = scenenode.position.z;
+
+                        element["rotx"] = scenenode.rotation.x;
+                        element["roty"] = scenenode.rotation.y;
+                        element["rotz"] = scenenode.rotation.z;
+
+                        element["sizeX"] = scenenode.scale.x;
+                        element["sizeY"] = scenenode.scale.y;
+                        element["sizeZ"] = scenenode.scale.z;
+
+                        document.getElementById("x").value = scenenode.position.x;
+                        document.getElementById("y").value = scenenode.position.y;
+                        document.getElementById("z").value = scenenode.position.z;
+
+                        document.getElementById("rotx").value = scenenode.rotation.x;
+                        document.getElementById("roty").value = scenenode.rotation.y;
+                        document.getElementById("rotz").value = scenenode.rotation.z;
+
+                        document.getElementById("sizeX").value = scenenode.scale.x;
+                        document.getElementById("sizeY").value = scenenode.scale.y;
+                        document.getElementById("sizeZ").value = scenenode.scale.z;
+                    });
+                }
+
+                if (isForPlayer) {
+                    var cylinderShape = threeToCannon(scenenode).shape;
+                    var cylinderBody = new CANNON.Body({ mass: element.mass });
+                    cylinderBody.addShape(cylinderShape);
+                    cylinderBody.position.set(element.x, element.y, element.z);
+                    cylinderBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
+                    world.addBody(cylinderBody);
+                    cylinderBody.threeMesh = scenenode;
+                }
+
+                var scriptFunction = new Function("mesh", element.updateScript);
+                var clickscriptFunction = new Function("mesh", element.clickScript);
+                var initscriptFunction = new Function("mesh", element.initScript);
+                scenenode.userData.scriptFunction = scriptFunction;
+                scenenode.userData.clickscriptfunction = clickscriptFunction;
+                scenenode.userData.initscriptFunction = initscriptFunction;
+                scenenode.userData.itemIndex = i
+
+                scenenode.traverse((child) => {
+                    if (child.isMesh) {
+                        child.userData.clickscriptfunction = clickscriptFunction;
+                        child.userData.itemIndex = i
+                    }
+                });
                 break;
 
             default:
@@ -567,9 +692,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
             spawnPlayer();
             debug('Spawning Player...');
-            
+
             gamestarteou = true
-            if (isFirebaseEnv  == 'true') {
+            if (isFirebaseEnv == 'true') {
                 otherPlayers();
             }
         }

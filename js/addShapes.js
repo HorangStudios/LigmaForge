@@ -121,6 +121,50 @@ addElem.light = function (x, y, z, intensity, distance, color) {
     addObject()
 }
 
+addElem.importGLTFModel = function (x, y, z) {
+    var input = document.createElement("input")
+    var reader = new FileReader();
+    input.type = 'file'
+    input.accept = '.glb, .gltf'
+
+    input.onchange = function () {
+        const file = input.files[0];
+        reader.readAsDataURL(file);
+    }
+
+    reader.onload = function (event) {
+        const contents = event.target.result;
+        sceneSchematics.push({
+            "name": input.files[0].name,
+            "type": "importedGLTFModel",
+
+            "x": x,
+            "y": y,
+            "z": z,
+
+            "sizeX": 1,
+            "sizeY": 1,
+            "sizeZ": 1,
+
+            "rotx": 0,
+            "roty": 0,
+            "rotz": 0,
+
+            "initScript": "",
+            "updateScript": "",
+            "clickScript": "",
+
+            "gltfData": contents,
+            "mass": 0
+        })
+
+        listSchematic()
+        addObject()
+    };
+
+    input.click()
+}
+
 addElem.terrain = function (voxsize, tersize, color) {
     var noise = new THREE.ImprovedNoise();
     var voxelSize = voxsize;
