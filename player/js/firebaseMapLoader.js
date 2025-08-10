@@ -43,7 +43,7 @@ if (isFirebaseEnv == 'true') {
   };
   firebase.initializeApp(firebaseConfig);
 
-  loadScene([])
+  loadScene([], true, false)
   document.getElementById('quitbtn').onclick = function () {
     window.location.href = 'https://horanghill.web.app/'
   }
