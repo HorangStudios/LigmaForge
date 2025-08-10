@@ -191,7 +191,7 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
-  const pathToTexture = "assets/Manface.png";
+  const pathToTexture = "";
   const headtexture = new THREE.TextureLoader().load(pathToTexture);
   headtexture.wrapS = THREE.RepeatWrapping;
   headtexture.wrapT = THREE.RepeatWrapping;
@@ -219,9 +219,7 @@ async function playerModel(color, avatar) {
     const result = await new THREE.GLTFLoader().loadAsync('assets/Arrow.glb');
     result.scene.position.set(-0.25, 1.75, 0)
     //group.add(result.scene)
-  } catch (error) {
-    console.log(error)
-  }
+  } catch (error) {}
 
   function animLoop() {
     const duration = 450;
