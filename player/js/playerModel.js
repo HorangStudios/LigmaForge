@@ -217,7 +217,7 @@ async function playerModel(color, avatar) {
 
   const result = await new THREE.GLTFLoader().loadAsync('assets/Arrow.glb');
   result.scene.position.set(-0.25, 1.75, 0)
-  group.add(result.scene)
+  //group.add(result.scene)
 
   function animLoop() {
     const duration = 450;
