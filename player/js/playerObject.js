@@ -80,13 +80,20 @@ async function spawnPlayer() {
   function checkPositionChange() {
     const cubeBodynewValue = cubeBody.position.y;
     const change = Math.abs(cubeBodynewValue - previousY);
-    const smallChangeThreshold = 0.025;
+    const smallChangeThreshold = 0.02;
+    console.log("before " + previousY)
+    console.log("after " + cubeBodynewValue)
+    console.log("change " + change)
 
     if (change <= smallChangeThreshold) {
-      previousY = cubeBodynewValue;
+      setTimeout(function () {
+        previousY = cubeBodynewValue
+      }, 700);
       return true
     } else {
-      previousY = cubeBodynewValue;
+      setTimeout(function () {
+        previousY = cubeBodynewValue
+      }, 700);
       return false
     }
   }
