@@ -194,7 +194,8 @@ async function spawnPlayer() {
     }
   });
 
-  if (navigator.userAgentData.mobile) {
+  if (navigator.userAgentData) {
+    if (!navigator.userAgentData.mobile) return;
     document.getElementById("chats").style.display = 'none'
     document.getElementById("joyDiv").style.display = 'block'
     document.getElementById("jumpDiv").style.display = 'block'
@@ -228,7 +229,8 @@ async function spawnPlayer() {
     let moveX = 0;
     let moveZ = 0;
 
-    if (navigator.userAgentData.mobile) {
+    if (navigator.userAgentData) {
+      if (!navigator.userAgentData.mobile) return;
       let joystickDir = playerJoystick.GetDir()
       if (joystickDir == "N") {
         moveX -= calcMovement().deltaX;
