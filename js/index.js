@@ -23,25 +23,28 @@ renderer.setSize(1920, 1080);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.5;
 renderer.domElement.id = 'canvas';
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
-//AAA game graphics
-composer = new THREE.EffectComposer(renderer);
-ssaoPass = new THREE.SSAOPass(scene, camera);
+//Outline Effect
+const composer = new THREE.EffectComposer(renderer);
+const renderPass = new THREE.RenderPass(scene, camera);
+const outlinePass = new THREE.OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+const ssaoPass = new THREE.SSAOPass(scene, camera);
 ssaoPass.kernelRadius = 1
 ssaoPass.minDistance = 0.001
 ssaoPass.maxDistance = 0.3
-composer.addPass(ssaoPass);
+composer.addPass(renderPass);
+composer.addPass(outlinePass);
+//composer.addPass(ssaoPass);
 
 //render
 function animate() {
     stats.begin();
     controls.update()
-    renderer.render(scene, camera);
+    composer.render(scene, camera);
     resizeCanvas()
     stats.end();
     requestAnimationFrame(animate);

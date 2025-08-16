@@ -7,6 +7,7 @@ const cylinderInstanceData = [];
 const dummy = new THREE.Object3D();
 let cubemesh, spheremesh, cylindermesh, gamestarteou;
 let transformControls
+let selSceneNode
 
 function loadScene(sceneSchematics, isForPlayer, select) {
     scene.remove.apply(scene, scene.children);
@@ -53,6 +54,11 @@ function loadScene(sceneSchematics, isForPlayer, select) {
             transformControls.detach();
         }
 
+        if (select == false) {
+            selSceneNode = false
+            outlinePass.selectedObjects = [];
+        }
+
         transformControls = new THREE.TransformControls(camera, renderer.domElement);
         transformControls.setTranslationSnap(0.5)
         transformControls.setRotationSnap(0.5)
@@ -61,9 +67,34 @@ function loadScene(sceneSchematics, isForPlayer, select) {
             controls.enabled = !event.value;
         });
 
-        document.getElementById("transformMove").onclick = () => { transformControls.setMode('translate') };
-        document.getElementById("transformRotate").onclick = () => { transformControls.setMode('rotate') };
-        document.getElementById("transformScale").onclick = () => { transformControls.setMode('scale') };
+        document.getElementById("transformMove").onclick = () => {
+            document.getElementById("clicktosel").checked = false;
+            transformControls.setMode('translate')
+
+            if (selSceneNode === false) return;
+            transformControls.attach(selSceneNode);
+        };
+
+        document.getElementById("transformRotate").onclick = () => {
+            document.getElementById("clicktosel").checked = false;
+            transformControls.setMode('rotate')
+
+            if (selSceneNode === false) return;
+            transformControls.attach(selSceneNode);
+        };
+
+        document.getElementById("transformScale").onclick = () => {
+            document.getElementById("clicktosel").checked = false;
+            transformControls.setMode('scale')
+
+            if (selSceneNode === false) return;
+            transformControls.attach(selSceneNode);
+        };
+
+        document.getElementById("transformSelect").onclick = () => {
+            document.getElementById("clicktosel").checked = true;
+            transformControls.detach()
+        };
 
         scene.add(transformControls);
         setSnapping = function (val) {
@@ -136,7 +167,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scene.add(scenenode);
 
                     if (i == select && select !== false) {
-                        transformControls.attach(scenenode);
+                        selSceneNode = scenenode;
+                        outlinePass.selectedObjects = [scenenode];
+
                         transformControls.addEventListener('change', function (event) {
                             if (!transformControls.dragging) return
 
@@ -164,6 +197,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             document.getElementById("sizeY").value = scenenode.scale.y;
                             document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
+
+                        if (document.getElementById("clicktosel").checked == true) return;
+                        transformControls.attach(scenenode);
                     }
 
                     var scriptFunction = new Function("mesh", element.updateScript);
@@ -246,7 +282,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scene.add(scenenode);
 
                     if (i == select && select !== false) {
-                        transformControls.attach(scenenode);
+                        selSceneNode = scenenode;
+                        outlinePass.selectedObjects = [scenenode];
+
                         transformControls.addEventListener('change', function () {
                             if (!transformControls.dragging) return
 
@@ -274,6 +312,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             document.getElementById("sizeY").value = scenenode.scale.y;
                             document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
+
+                        if (document.getElementById("clicktosel").checked == true) return;
+                        transformControls.attach(scenenode);
                     }
 
                     var scriptFunction = new Function("mesh", element.updateScript);
@@ -357,7 +398,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scene.add(scenenode);
 
                     if (i == select && select !== false) {
-                        transformControls.attach(scenenode);
+                        selSceneNode = scenenode;
+                        outlinePass.selectedObjects = [scenenode];
+
                         transformControls.addEventListener('change', function () {
                             if (!transformControls.dragging) return
 
@@ -385,6 +428,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             document.getElementById("sizeY").value = scenenode.scale.y;
                             document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
+
+                        if (document.getElementById("clicktosel").checked == true) return;
+                        transformControls.attach(scenenode);
                     }
 
                     var scriptFunction = new Function("mesh", element.updateScript);
@@ -457,7 +503,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scene.add(scenenode);
 
                 if (i == select && select !== false) {
-                    transformControls.attach(scenenode);
+                    selSceneNode = scenenode;
+                    outlinePass.selectedObjects = [scenenode];
+
                     transformControls.addEventListener('change', function () {
                         if (!transformControls.dragging) return
 
@@ -485,6 +533,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         document.getElementById("sizeY").value = scenenode.scale.y;
                         document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
+
+                    if (document.getElementById("clicktosel").checked == true) return;
+                    transformControls.attach(scenenode);
                 }
 
                 if (isForPlayer) {
@@ -526,7 +577,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scene.add(scenenode);
 
                 if (i == select && select !== false) {
-                    transformControls.attach(scenenode);
+                    selSceneNode = scenenode;
+                    outlinePass.selectedObjects = [scenenode];
+
                     transformControls.addEventListener('change', function () {
                         if (!transformControls.dragging) return
 
@@ -554,6 +607,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         document.getElementById("sizeY").value = scenenode.scale.y;
                         document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
+
+                    if (document.getElementById("clicktosel").checked == true) return;
+                    transformControls.attach(scenenode);
                 }
 
                 if (isForPlayer) {
@@ -627,7 +683,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scene.add(scenenode)
 
                 if (i == select && select !== false) {
-                    transformControls.attach(scenenode);
+                    selSceneNode = scenenode;
+                    outlinePass.selectedObjects = [scenenode];
+
                     transformControls.addEventListener('change', function () {
                         if (!transformControls.dragging) return
 
@@ -655,6 +713,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         document.getElementById("sizeY").value = scenenode.scale.y;
                         document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
+
+                    if (document.getElementById("clicktosel").checked == true) return;
+                    transformControls.attach(scenenode);
                 }
 
                 if (isForPlayer) {

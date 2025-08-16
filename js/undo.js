@@ -27,13 +27,24 @@ function redo() {
 }
 
 document.addEventListener("keydown", function (event) {
-    if (event.ctrlKey && event.key === "z") {
+    event.preventDefault()
+    if (event.ctrlKey && event.key == "z") {
         undo();
-    }
-});
-
-document.addEventListener("keydown", function (event) {
-    if (event.ctrlKey && event.key === "y") {
+    } else if (event.ctrlKey && event.key == "y") {
         redo();
+    } else if (event.ctrlKey && event.key == "d" && document.getElementById("cloneNodeBtn")) {
+        document.getElementById("cloneNodeBtn").click()
+    } else if (event.key == "s") {
+        document.getElementById("transformSelect").click()
+    } else if (event.key == "m") {
+        document.getElementById("transformMove").click()
+    } else if (event.key == "r") {
+        document.getElementById("transformRotate").click()
+    } else if (event.key == "c") {
+        document.getElementById("transformScale").click()
+    } else if (event.key == "t") {
+        playScene()
+    } else if (event.key == "Delete" && document.getElementById("deleteNodeBtn")) {
+        document.getElementById("deleteNodeBtn").click()
     }
 });

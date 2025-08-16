@@ -47,10 +47,12 @@ function listSchematic(toClick = false, clickSelect = false) {
             let delButton = document.createElement('button');
             delButton.innerHTML = `<i class="fa-solid fa-trash"></i>`
             delButton.className = "sceneNodeIcon halfbutton";
+            delButton.id = 'deleteNodeBtn';
 
             let cloneButton = document.createElement('button');
             cloneButton.innerHTML = `<i class="fa-regular fa-clone"></i>`
             cloneButton.className = "sceneNodeIcon halfbutton";
+            cloneButton.id = 'cloneNodeBtn';
 
             delButton.onclick = function () {
                 sceneSchematics.splice(i, 1);

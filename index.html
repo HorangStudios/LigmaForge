@@ -36,6 +36,7 @@
 	<script type="text/javascript" src="js/three/sky.js"></script>
 	<script type="text/javascript" src="js/three/gltfExporter.js"></script>
     <script type="text/javascript" src="js/three/gltfLoader.js"></script>
+    <script type="text/javascript" src="js/three/OutlinePass.js"></script>
 </head>
 
 <body>
@@ -73,7 +74,7 @@
 				<a onclick="redo()"><span>Redo</span></a>
 				<a><span>Snap to Grid</span> <input type="checkbox" onclick="setSnapping(this.checked)" id="snaptogrid"
 						checked></a>
-				<a><span>Click to Select</span> <input type="checkbox" id="clicktosel"></a>
+				<a style="display: none;"><span>Click to Select</span> <input type="checkbox" id="clicktosel"></a>
 			</div>
 		</li>
 
@@ -145,13 +146,16 @@
 	</ul>
 	<div id="sidecontainer">
 		<div id="sideButtons">
-			<button title="Move" id="transformMove">
+			<button title="Select (S)" id="transformSelect">
+				<i class="fa-solid fa-arrow-pointer"></i>
+			</button>
+			<button title="Move (M)" id="transformMove">
 				<i class="fa-solid fa-up-down-left-right"></i>
 			</button>
-			<button title="Rotate" id="transformRotate">
+			<button title="Rotate (R)" id="transformRotate">
 				<i class="fa-solid fa-rotate"></i>
 			</button>
-			<button title="scale" id="transformScale">
+			<button title="Scale (C)" id="transformScale">
 				<i class="fa-solid fa-maximize"></i>
 			</button>
 
@@ -187,7 +191,7 @@
 			<button title="Run Code" onclick="CreateEditorCodeWindow()">
 				<i class="fa-solid fa-terminal"></i>
 			</button>
-			<button title="Test Game" onclick="playScene()">
+			<button title="Test Game (R)" onclick="playScene()">
 				<i class="fa-solid fa-circle-play"></i>
 			</button>
 		</div>
