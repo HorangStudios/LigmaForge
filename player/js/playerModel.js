@@ -60,10 +60,11 @@ async function shirtDecoder(dataURL) {
 }
 
 async function playerModel(color, avatar) {
-  var group = new THREE.Group()
-  var data = []
-  var step = 0
-  var walkingAnimation = false
+  var group = new THREE.Group();
+  var data = [];
+  var step = 0;
+  var walkingAnimation = false;
+  var jumpingAnimation = false;
 
   if (avatar.shirt !== false) {
     var shirt = await shirtDecoder(avatar.shirt)
@@ -219,7 +220,11 @@ async function playerModel(color, avatar) {
     const result = await new THREE.GLTFLoader().loadAsync('assets/Arrow.glb');
     result.scene.position.set(-0.25, 1.75, 0)
     //group.add(result.scene)
-  } catch (error) {}
+  } catch (error) { }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
 
   function animLoop() {
     const duration = 450;
@@ -241,10 +246,6 @@ async function playerModel(color, avatar) {
         rightArm: { pos: [0, 0, 0], rot: (Math.PI / 4) },
       }
     ];
-
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
-    }
 
     function animateTween() {
       const now = performance.now();
@@ -277,14 +278,48 @@ async function playerModel(color, avatar) {
     animateTween();
   }
 
+  function animLoopJump(target) {
+    const duration = 450;
+    const startTime = performance.now();
+    const originalRotationLeft = leftArmPivot.rotation.x
+    const originalRotationRight = rightArmPivot.rotation.x
+
+    function lerpTheJump() {
+      const now = performance.now();
+      const t = Math.min((now - startTime) / duration, 1);
+
+      leftArmPivot.rotation.set(
+        lerp(originalRotationLeft, target, t),
+        leftArmPivot.rotation.y,
+        leftArmPivot.rotation.z
+      )
+
+      rightArmPivot.rotation.set(
+        lerp(originalRotationRight, target, t),
+        rightArmPivot.rotation.y,
+        rightArmPivot.rotation.z
+      )
+
+      if (t < 1) {
+        requestAnimationFrame(lerpTheJump);
+      }
+    }
+
+    lerpTheJump();
+  }
+
   setInterval(() => {
     if (data.isJumping) {
-      leftArmPivot.rotation.x = (Math.PI);
-      rightArmPivot.rotation.x = (Math.PI);
+      if (jumpingAnimation == false) {
+        jumpingAnimation = true;
+        animLoopJump(Math.PI);
+      }
     } else {
       if (!data.isWalking) {
-        leftArmPivot.rotation.x = 0;
-        rightArmPivot.rotation.x = 0;
+        if (jumpingAnimation == true) {
+          jumpingAnimation = false;
+          animLoopJump(0);
+        }
       }
     }
 

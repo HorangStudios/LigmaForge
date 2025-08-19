@@ -77,20 +77,15 @@ async function spawnPlayer() {
     }
   });
 
+  var largestChange = 0
+
   function checkPositionChange() {
-    const cubeBodynewValue = cubeBody.position.y;
-    const change = Math.abs(cubeBodynewValue - previousY);
-    const smallChangeThreshold = 0.02;
+    const change = Math.abs(cubeBody.velocity.y);
+    const smallChangeThreshold = 0.16416666666666666;
 
     if (change <= smallChangeThreshold) {
-      setTimeout(function () {
-        previousY = cubeBodynewValue
-      }, 700);
       return true
     } else {
-      setTimeout(function () {
-        previousY = cubeBodynewValue
-      }, 700);
       return false
     }
   }
