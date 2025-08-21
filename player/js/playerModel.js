@@ -238,24 +238,21 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
-  var headMaterials = [];
   if (avatar.face !== false && typeof avatar.face !== 'undefined') {
-    const editFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff)
-    const headtexture = new THREE.TextureLoader().load(editFace);
-    headtexture.wrapS = THREE.RepeatWrapping;
-    headtexture.wrapT = THREE.RepeatWrapping;
-    headtexture.offset.x = 0;
-    headtexture.repeat.x = 1;
-    headMaterials = [
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: headtexture, transparent: true }),
+    const loader = new THREE.TextureLoader();
+    const loadFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff)
+    const headMaterials = [
+      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: loader.load(loadFace), transparent: true }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
     ];
+
+    head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), headMaterials);
   } else {
-    headMaterials = new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
+    const headMaterials = new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff });
+    head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), headMaterials);
   }
 
-  head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), headMaterials);
   head.position.set(0, 1.75, 0)
   head.castShadow = true;
   head.receiveShadow = true;
