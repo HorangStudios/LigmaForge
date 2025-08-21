@@ -48,7 +48,7 @@ async function spawnPlayer() {
   var playerRotation = 0;
   var playerSpeed = 0.1;
   var Health = 100;
-  var avatarData = {}
+  var avatarData = {colors: {}}
   var lastTouchX = 0;
 
   document.getElementById("chats").style.display = 'flex'
