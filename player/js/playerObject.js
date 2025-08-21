@@ -48,9 +48,7 @@ async function spawnPlayer() {
   var playerRotation = 0;
   var playerSpeed = 0.1;
   var Health = 100;
-  var shirt = false;
-  var pants = false;
-  var colors = false;
+  var avatarData = {}
   var lastTouchX = 0;
 
   document.getElementById("chats").style.display = 'flex'
@@ -77,8 +75,6 @@ async function spawnPlayer() {
     }
   });
 
-  var largestChange = 0
-
   function checkPositionChange() {
     const change = Math.abs(cubeBody.velocity.y);
     const smallChangeThreshold = 0.16416666666666666;
@@ -99,21 +95,24 @@ async function spawnPlayer() {
   if (isFirebaseEnv == 'true') {
     var playerData = await firebaseFetch(`players/${playerUniqueID}`)
     if (playerData !== null) {
-      if (playerData.avatar.colors != null) {
-        colors = playerData.avatar.colors;
-      }
-
-      if (playerData.avatar.shirt !== false && playerData.avatar.shirt != null) {
-        shirt = (await firebaseFetch(`catalog/${playerData.avatar.shirt}`)).asset;
-      }
-
-      if (playerData.avatar.pants !== false && playerData.avatar.shirt != null) {
-        pants = (await firebaseFetch(`catalog/${playerData.avatar.pants}`)).asset;
+      const avatarKeys = Object.keys(playerData.avatar);
+      for (let i = 0; i < avatarKeys.length; i++) {
+        const avatarkey = avatarKeys[i];
+        const avatarvalue = playerData.avatar[avatarkey];
+        if (avatarkey == 'colors') {
+          avatarData["colors"] = playerData.avatar.colors;
+        } else {
+          if (avatarvalue === false) {
+            avatarData[avatarkey] = false;
+          } else {
+            avatarData[avatarkey] = (await firebaseFetch(`catalog/${avatarvalue}`)).asset;
+          }
+        }
       }
     }
   }
 
-  var createPlayer = await playerModel(0x800000, { "shirt": shirt, "pants": pants, "colors": colors });
+  var createPlayer = await playerModel(0x800000, avatarData);
   var sceneNode = createPlayer[0];
   scene.add(sceneNode);
 
@@ -399,26 +398,23 @@ function otherPlayers() {
       }
 
       if (!allPlayersFetchedAvatar[key]) {
-        allPlayersFetchedAvatar[key] = {
-          "colors": false,
-          "shirt": false,
-          "pants": false,
-        };
+        allPlayersFetchedAvatar[key] = {};
       }
 
       if (playerData !== null) {
-        if (playerData.avatar.colors != null && !allPlayersFetchedAvatar[key]["colors"]) {
-          allPlayersFetchedAvatar[key]["colors"] = playerData.avatar.colors;
-        }
-
-        if (playerData.avatar.shirt !== false && playerData.avatar.shirt != null && !allPlayersFetchedAvatar[key]["shirt"]) {
-          const shirtData = await firebaseFetch(`catalog/${playerData.avatar.shirt}`);
-          allPlayersFetchedAvatar[key]["shirt"] = shirtData.asset;
-        }
-
-        if (playerData.avatar.pants !== false && playerData.avatar.pants != null && !allPlayersFetchedAvatar[key]["pants"]) {
-          const pantsData = await firebaseFetch(`catalog/${playerData.avatar.pants}`);
-          allPlayersFetchedAvatar[key]["pants"] = pantsData.asset;
+        const avatarKeys = Object.keys(playerData.avatar);
+        for (let i = 0; i < avatarKeys.length; i++) {
+          const avatarkey = avatarKeys[i];
+          const avatarvalue = playerData.avatar[avatarkey];
+          if (avatarkey == 'colors') {
+            allPlayersFetchedAvatar[key]["colors"] = playerData.avatar.colors;
+          } else {
+            if (avatarvalue === false) {
+              allPlayersFetchedAvatar[key][avatarkey] = false;
+            } else {
+              allPlayersFetchedAvatar[key][avatarkey] = (await firebaseFetch(`catalog/${avatarvalue}`)).asset;
+            }
+          }
         }
       }
 
@@ -431,7 +427,7 @@ function otherPlayers() {
       if (key != playerUniqueID) {
         if (!allPlayersElem[key] && !(timeDifference >= 10000) && (playeramount > spawnedPlayers)) {
           spawnedPlayers += 1;
-          allPlayersElem[key] = await playerModel(getRandomHexColor(), { "shirt": allPlayersFetchedAvatar[key]["shirt"], "pants": allPlayersFetchedAvatar[key]["pants"], "colors": allPlayersFetchedAvatar[key]["colors"] });
+          allPlayersElem[key] = await playerModel(getRandomHexColor(), allPlayersFetchedAvatar[key]);
           scene.add(allPlayersElem[key][0]);
         } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
           scene.remove(allPlayersElem[key][0]);

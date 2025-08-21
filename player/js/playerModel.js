@@ -1,3 +1,49 @@
+async function faceDecoder(dataURL, headColor, eyeColor) {
+  const img = new Image();
+  img.src = dataURL;
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 3215 * (img.height / 1024);
+  canvas.height = img.height;
+
+  const ctx = canvas.getContext('2d');
+  const x = (canvas.width - img.width) / 2;
+  const y = (canvas.height - img.height) / 2;
+  ctx.fillStyle = `#${headColor.toString(16)}`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, x, y);
+
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  for (var i = 0; i < imageData.data.length; i += 4) {
+    if (
+      imageData.data[i] === 255 &&
+      imageData.data[i + 1] === 0 &&
+      imageData.data[i + 2] === 244
+    ) {
+      imageData.data[i] = hexToRgb(`#${eyeColor.toString(16)}`)[0];
+      imageData.data[i + 1] = hexToRgb(`#${eyeColor.toString(16)}`)[1];
+      imageData.data[i + 2] = hexToRgb(`#${eyeColor.toString(16)}`)[2];
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  const result = canvas.toDataURL()
+  return result;
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(x => x + x).join('');
+  }
+  const num = parseInt(hex, 16);
+  return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+}
+
 async function shirtDecoder(dataURL) {
   const scale = { x: 585, y: 559 }
   const results = {}
@@ -66,11 +112,11 @@ async function playerModel(color, avatar) {
   var walkingAnimation = false;
   var jumpingAnimation = false;
 
-  if (avatar.shirt !== false) {
+  if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     var shirt = await shirtDecoder(avatar.shirt)
   }
 
-  if (avatar.pants !== false) {
+  if (avatar.pants !== false && typeof avatar.pants !== 'undefined') {
     var pants = await shirtDecoder(avatar.pants)
   }
 
@@ -80,7 +126,7 @@ async function playerModel(color, avatar) {
   data.isJumping = false
   data.isWalking = false
 
-  if (avatar.pants !== false) {
+  if (avatar.pants !== false && typeof avatar.pants !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.leftArmRight) }),
@@ -103,7 +149,7 @@ async function playerModel(color, avatar) {
   leftLegPivot.add(leftLeg);
   group.add(leftLegPivot);
 
-  if (avatar.pants !== false) {
+  if (avatar.pants !== false && typeof avatar.pants !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(pants.rightArmRight) }),
@@ -126,7 +172,7 @@ async function playerModel(color, avatar) {
   rightLegPivot.add(rightLeg);
   group.add(rightLegPivot)
 
-  if (avatar.shirt !== false) {
+  if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.leftArmRight) }),
@@ -149,7 +195,7 @@ async function playerModel(color, avatar) {
   leftArmPivot.add(leftArm);
   group.add(leftArmPivot);
 
-  if (avatar.shirt !== false) {
+  if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.rightArmRight) }),
@@ -172,7 +218,7 @@ async function playerModel(color, avatar) {
   rightArmPivot.add(rightArm);
   group.add(rightArmPivot);
 
-  if (avatar.shirt !== false) {
+  if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
       new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(shirt.torsoRight) }),
@@ -192,22 +238,21 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
-  const pathToTexture = "";
-  const headtexture = new THREE.TextureLoader().load(pathToTexture);
-  headtexture.wrapS = THREE.RepeatWrapping;
-  headtexture.wrapT = THREE.RepeatWrapping;
-  headtexture.offset.x = 0;
-  headtexture.repeat.x = 1;
-
   var headMaterials = [];
-  if (pathToTexture == "") {
-    headMaterials = new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
-  } else {
+  if (avatar.face !== false && typeof avatar.face !== 'undefined') {
+    const editFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff)
+    const headtexture = new THREE.TextureLoader().load(editFace);
+    headtexture.wrapS = THREE.RepeatWrapping;
+    headtexture.wrapT = THREE.RepeatWrapping;
+    headtexture.offset.x = 0;
+    headtexture.repeat.x = 1;
     headMaterials = [
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: headtexture, transparent: true }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
     ];
+  } else {
+    headMaterials = new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
   }
 
   head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), headMaterials);
@@ -215,12 +260,6 @@ async function playerModel(color, avatar) {
   head.castShadow = true;
   head.receiveShadow = true;
   group.add(head)
-
-  try {
-    const result = await new THREE.GLTFLoader().loadAsync('assets/Arrow.glb');
-    result.scene.position.set(-0.25, 1.75, 0)
-    //group.add(result.scene)
-  } catch (error) { }
 
   function lerp(a, b, t) {
     return a + (b - a) * t;
