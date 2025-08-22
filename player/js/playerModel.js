@@ -247,19 +247,15 @@ async function playerModel(color, avatar) {
   if (avatar.face !== false && typeof avatar.face !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const loadFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff);
-    const headMaterials = [
+
+    head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), [
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: loader.load(loadFace), transparent: true }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
-    ];
-
-    head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), headMaterials);
+    ]);
   } else {
     head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }));
   }
-
-  console.log(avatar.face !== false && typeof avatar.face !== 'undefined')
-  console.log(head)
 
   head.position.set(0, 1.75, 0)
   head.castShadow = true;
