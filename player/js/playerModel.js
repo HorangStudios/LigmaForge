@@ -17,12 +17,12 @@ async function faceDecoder(dataURL, headColor, eyeColor) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, x, y);
 
-  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   for (var i = 0; i < imageData.data.length; i += 4) {
     if (
       imageData.data[i] === 255 &&
       imageData.data[i + 1] === 0 &&
-      imageData.data[i + 2] === 244
+      (imageData.data[i + 2] === 244 || imageData.data[i + 2] === 242)
     ) {
       imageData.data[i] = hexToRgb(`#${eyeColor.toString(16)}`)[0];
       imageData.data[i + 1] = hexToRgb(`#${eyeColor.toString(16)}`)[1];
