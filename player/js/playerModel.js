@@ -126,6 +126,7 @@ async function playerModel(color, avatar) {
   data.isJumping = false
   data.isWalking = false
 
+  var leftLeg
   if (avatar.pants !== false && typeof avatar.pants !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
@@ -149,6 +150,7 @@ async function playerModel(color, avatar) {
   leftLegPivot.add(leftLeg);
   group.add(leftLegPivot);
 
+  var rightLeg
   if (avatar.pants !== false && typeof avatar.pants !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
@@ -172,6 +174,7 @@ async function playerModel(color, avatar) {
   rightLegPivot.add(rightLeg);
   group.add(rightLegPivot)
 
+  var leftArm
   if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
@@ -195,6 +198,7 @@ async function playerModel(color, avatar) {
   leftArmPivot.add(leftArm);
   group.add(leftArmPivot);
 
+  var rightArm
   if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
@@ -218,6 +222,7 @@ async function playerModel(color, avatar) {
   rightArmPivot.add(rightArm);
   group.add(rightArmPivot);
 
+  var torso
   if (avatar.shirt !== false && typeof avatar.shirt !== 'undefined') {
     const loader = new THREE.TextureLoader();
     const materials = [
@@ -238,9 +243,10 @@ async function playerModel(color, avatar) {
   torso.receiveShadow = true;
   group.add(torso)
 
+  var head
   if (avatar.face !== false && typeof avatar.face !== 'undefined') {
     const loader = new THREE.TextureLoader();
-    const loadFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff)
+    const loadFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff);
     const headMaterials = [
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: loader.load(loadFace), transparent: true }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }),
