@@ -248,7 +248,7 @@ async function playerModel(color, avatar) {
     const loader = new THREE.TextureLoader();
     const loadFace = await faceDecoder(avatar.face, avatar.colors.head || 0xffffff, avatar.colors.eye || 0xffffff);
     const headMaterials = [
-      new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff, map: loader.load(loadFace), transparent: true }),
+      new THREE.MeshPhongMaterial({ color: 0xffffff, map: loader.load(loadFace) }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }),
       new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff })
     ];
