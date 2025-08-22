@@ -258,6 +258,9 @@ async function playerModel(color, avatar) {
     head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 32, 1, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({ color: avatar.colors.head || 0xffffff }));
   }
 
+  console.log(avatar.face !== false && typeof avatar.face !== 'undefined')
+  console.log(head)
+
   head.position.set(0, 1.75, 0)
   head.castShadow = true;
   head.receiveShadow = true;
