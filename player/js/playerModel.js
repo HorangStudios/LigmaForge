@@ -13,7 +13,7 @@ async function faceDecoder(dataURL, headColor, eyeColor) {
   const ctx = canvas.getContext('2d');
   const x = (canvas.width - img.width) / 2;
   const y = (canvas.height - img.height) / 2;
-  ctx.fillStyle = `#${headColor.toString(16)}`;
+  ctx.fillStyle = headColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, x, y);
 
@@ -24,9 +24,9 @@ async function faceDecoder(dataURL, headColor, eyeColor) {
       imageData.data[i + 1] === 0 &&
       (imageData.data[i + 2] === 244 || imageData.data[i + 2] === 242)
     ) {
-      imageData.data[i] = hexToRgb(`#${eyeColor.toString(16)}`)[0];
-      imageData.data[i + 1] = hexToRgb(`#${eyeColor.toString(16)}`)[1];
-      imageData.data[i + 2] = hexToRgb(`#${eyeColor.toString(16)}`)[2];
+      imageData.data[i] = hexToRgb(eyeColor)[0];
+      imageData.data[i + 1] = hexToRgb(eyeColor)[1];
+      imageData.data[i + 2] = hexToRgb(eyeColor)[2];
     }
   }
   ctx.putImageData(imageData, 0, 0);

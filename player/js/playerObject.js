@@ -48,7 +48,7 @@ async function spawnPlayer() {
   var playerRotation = 0;
   var playerSpeed = 0.1;
   var Health = 100;
-  var avatarData = {colors: {}}
+  var avatarData = { colors: {} }
   var lastTouchX = 0;
 
   document.getElementById("chats").style.display = 'flex'
@@ -373,13 +373,13 @@ async function spawnPlayer() {
   }
 }
 
-var allPlayersElem = {}
-var allPlayersElemData = {}
-var allPlayersFetchedAvatar = {}
-var allMessages = []
-var spawnedPlayers = 0
-
 function otherPlayers() {
+  var allPlayersElem = {}
+  var allPlayersElemData = {}
+  var allPlayersFetchedAvatar = {}
+  var allMessages = []
+  var spawnedPlayers = 0
+
   firebase.database().ref(`games/${id}/server/`).on('value', async function (snapshot) {
     var playerslist = snapshot.val();
     var listofplayers = await firebaseFetch(`games/${id}/server/`);
