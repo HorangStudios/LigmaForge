@@ -428,11 +428,9 @@ function otherPlayers() {
       if (key != playerUniqueID) {
         if (!allPlayersElem[key] && !(timeDifference >= 10000) && (playeramount > spawnedPlayers)) {
           spawnedPlayers += 1;
-          console.log(spawnedPlayers)
           allPlayersElem[key] = await playerModel(getRandomHexColor(), allPlayersFetchedAvatar[key]);
           scene.add(allPlayersElem[key][0]);
         } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
-          console.log(spawnedPlayers)
           scene.remove(allPlayersElem[key][0]);
           delete allPlayersElem[key];
           firebase.database().ref(`games/${id}/real-time/${key}`).remove();
