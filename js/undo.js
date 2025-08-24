@@ -1,17 +1,21 @@
+// HorangHill LigmaForge Editor Engine - Undo, Redo and keyboard shortcuts
 let sceneHistory = [];
 let currentIndex = -1;
 
+// add to scene history for new changes
 function addObject() {
     sceneHistory.splice(currentIndex + 1, sceneHistory.length - currentIndex - 1);
     sceneHistory.push(JSON.parse(JSON.stringify(sceneSchematics)));
     currentIndex = sceneHistory.length - 1;
 }
 
+// apply undo or redo
 function updateScene() {
     sceneSchematics = JSON.parse(JSON.stringify(sceneHistory[currentIndex]));
     listSchematic();
 }
 
+// undo
 function undo() {
     if (currentIndex > 0) {
         currentIndex--;
@@ -19,6 +23,7 @@ function undo() {
     }
 }
 
+// redo
 function redo() {
     if (currentIndex < sceneHistory.length - 1) {
         currentIndex++;
@@ -26,6 +31,7 @@ function redo() {
     }
 }
 
+// keyboard shortcuts
 document.addEventListener("keydown", function (event) {
     event.preventDefault()
     if (event.ctrlKey && event.key == "z") {

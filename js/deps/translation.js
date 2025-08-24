@@ -1,5 +1,8 @@
+// HorangHill LigmaForge Editor Engine - Translate editor interface
+// get preferred language
 var prefLang = localStorage.getItem("prefLang") || "default";
 
+// translate text or load from cache if already translated
 async function translateOrLoadFromCache(word, targetLang) {
     if (/^\s+$/.test(word)) return word;
     if (targetLang == "default") return word;
@@ -34,6 +37,7 @@ async function translateOrLoadFromCache(word, targetLang) {
     }
 };
 
+// start translation for each element types
 async function startAutomaticTranslation() {
     for (let item of document.getElementsByTagName("span")) {
         item.innerText = await translateOrLoadFromCache(item.innerText, prefLang)
@@ -52,6 +56,7 @@ async function startAutomaticTranslation() {
     }
 }
 
+// changed preferred language
 async function changeLang(lang) {
     localStorage.setItem('prefLang', lang);
     window.alert(await translateOrLoadFromCache('Please reload the page to apply the changes.', prefLang))

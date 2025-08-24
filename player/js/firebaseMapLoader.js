@@ -1,6 +1,9 @@
+// HorangHill LigmaForge Player Engine - Map loader for multiplayer games
+// get url args
 const isFirebaseEnv = new URLSearchParams(window.location.search).get('online');
 const id = new URLSearchParams(window.location.search).get('id');
 
+// load game if multiplayer
 function loadFirebaseGame() {
   document.getElementById("gameload").style.display = "flex"
   var ref = firebase.database().ref(`games/${id}`);
@@ -15,6 +18,7 @@ function loadFirebaseGame() {
   });
 }
 
+// connect horanghill account
 function loginacc() {
   event.preventDefault();
 
@@ -24,12 +28,14 @@ function loginacc() {
   firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) { document.getElementById('error1').innerText = error.message; });
 };
 
+// easy way of fetching firebase data
 async function firebaseFetch(dir) {
   var ref = firebase.database().ref(dir);
   const snapshot = await ref.once('value');
   return snapshot.val();
 }
 
+// initialize player
 if (isFirebaseEnv == 'true') {
   const firebaseConfig = {
     apiKey: "AIzaSyDE-mQcJoquJxLrHAcS1kZbpjUbHYQmzsE",

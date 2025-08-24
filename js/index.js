@@ -1,3 +1,4 @@
+// HorangHill LigmaForge Editor Engine - 3d scene, orbitcontrols, save, open, preview, click to select and render
 //threejs r131
 var scene = new THREE.Scene();
 var sceneSchematics = [];

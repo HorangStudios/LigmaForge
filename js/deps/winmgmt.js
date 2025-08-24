@@ -1,3 +1,5 @@
+// HorangHill LigmaForge Editor Engine - Code editor window
+// make randomized uuid
 function stringGen() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -8,6 +10,7 @@ function stringGen() {
     return text;
 }
 
+// code editor window
 function spawnCodeEditor(code, name) {
     return new Promise((resolve, reject) => {
         //configure elements
@@ -64,12 +67,14 @@ function spawnCodeEditor(code, name) {
     });
 }
 
+// focus on a window (put focused on top from .focused css)
 function focusWindow(windowElem) {
     const windows = document.querySelectorAll('.window');
     windows.forEach((elem) => elem.classList.remove('focused'));
     windowElem.classList.add('focused');
 }
 
+// immediately run code after editor window closed (for run script window)
 async function CreateEditorCodeWindow() {
     eval(await spawnCodeEditor('', 'Run Editor Script'));
 }

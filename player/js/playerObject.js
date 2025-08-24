@@ -171,6 +171,7 @@ async function spawnPlayer() {
         keyState.space = true;
         break;
       case 'Escape':
+        // show sidebar when escape pressed
         toggleSideBar();
         break;
       case 'ShiftLeft':
@@ -229,7 +230,7 @@ async function spawnPlayer() {
     });
   }
 
-  // movement, animation loops
+  // player movement loop
   function playerLoop() {
     // calculate player movement direction
     function normalizeRotation(rotation) {

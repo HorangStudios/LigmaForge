@@ -1,5 +1,7 @@
+// HorangHill LigmaForge Multipurpose Engine - Node templates
 var addElem = {}
 
+// create cube
 addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "cube",
@@ -33,6 +35,7 @@ addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     addObject()
 }
 
+// create sphere
 addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "sphere",
@@ -66,6 +69,7 @@ addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     addObject()
 }
 
+// create cylinder
 addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "cylinder",
@@ -99,6 +103,7 @@ addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     addObject()
 }
 
+// create light
 addElem.light = function (x, y, z, intensity, distance, color) {
     sceneSchematics.push({
         "name": "light",
@@ -121,6 +126,7 @@ addElem.light = function (x, y, z, intensity, distance, color) {
     addObject()
 }
 
+// import 3d model
 addElem.importGLTFModel = function (x, y, z) {
     var input = document.createElement("input")
     var reader = new FileReader();
@@ -165,6 +171,7 @@ addElem.importGLTFModel = function (x, y, z) {
     input.click()
 }
 
+// generate terrain
 addElem.terrain = function (voxsize, tersize, color) {
     var noise = new THREE.ImprovedNoise();
     var voxelSize = voxsize;
@@ -208,6 +215,7 @@ addElem.terrain = function (voxsize, tersize, color) {
 
 }
 
+// backwards compatibility for old api - will remove in the future
 spawnCube = addElem.cube
 addSphere = addElem.sphere
 addCylinder = addElem.cylinder

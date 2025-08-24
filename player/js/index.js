@@ -1,4 +1,5 @@
-//editor debug
+// HorangHill LigmaForge Player Engine - 3d scene, physics setup and render, physics update loops
+// editor debug
 function debug(text) {
     const today = new Date();
     const yyyy = today.getFullYear();

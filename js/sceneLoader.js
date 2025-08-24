@@ -1,3 +1,4 @@
+// HorangHill LigmaForge Multipurpose Engine - Parse and load scene
 const cubeBodies = [];
 const sphereBodies = [];
 const cylinderBodies = [];
@@ -9,14 +10,19 @@ let cubemesh, spheremesh, cylindermesh, gamestarteou;
 let transformControls
 let selSceneNode
 
+// load scene
 function loadScene(sceneSchematics, isForPlayer, select) {
+    // clear scene
     scene.remove.apply(scene, scene.children);
+
+    // create hemisphere light
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
     hemiLight.color.setHSL(0.6, 1, 0.6);
     hemiLight.groundColor.setHSL(0.095, 1, 0.75);
     hemiLight.position.set(0, 50, 0);
     scene.add(hemiLight);
 
+    // create directional light
     const dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.color.setHSL(0.1, 1, 0.95);
     dirLight.position.set(0, 1.75, -1.75);
@@ -32,9 +38,11 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     dirLight.shadow.bias = - 0.00001;
     scene.add(dirLight);
 
+    // create ambient light
     const light = new THREE.AmbientLight(0x404040);
     scene.add(light);
 
+    // create sky
     const sky = new THREE.Sky();
     sky.scale.setScalar(450000);
     scene.add(sky);
@@ -45,20 +53,25 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         mieDirectionalG: { value: 0.7 }
     });
 
+    // create sun on sky
     const sun = new THREE.Vector3();
     sun.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 2), THREE.MathUtils.degToRad(180));
     sky.material.uniforms.sunPosition.value.copy(sun);
 
+    // editor-specific features
     if (!isForPlayer) {
+        // hide transform controls
         if (transformControls) {
             transformControls.detach();
         }
 
+        // unhighlight if nothing is selected
         if (select == false) {
             selSceneNode = false
             outlinePass.selectedObjects = [];
         }
 
+        // create transform controls
         transformControls = new THREE.TransformControls(camera, renderer.domElement);
         transformControls.setTranslationSnap(0.5)
         transformControls.setRotationSnap(0.5)
@@ -67,6 +80,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
             controls.enabled = !event.value;
         });
 
+        // move tool
         document.getElementById("transformMove").onclick = () => {
             document.getElementById("clicktosel").checked = false;
             transformControls.setMode('translate')
@@ -75,6 +89,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
             transformControls.attach(selSceneNode);
         };
 
+        // rotate tool
         document.getElementById("transformRotate").onclick = () => {
             document.getElementById("clicktosel").checked = false;
             transformControls.setMode('rotate')
@@ -83,6 +98,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
             transformControls.attach(selSceneNode);
         };
 
+        // scale tool
         document.getElementById("transformScale").onclick = () => {
             document.getElementById("clicktosel").checked = false;
             transformControls.setMode('scale')
@@ -91,11 +107,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
             transformControls.attach(selSceneNode);
         };
 
+        // select tool
         document.getElementById("transformSelect").onclick = () => {
             document.getElementById("clicktosel").checked = true;
             transformControls.detach()
         };
 
+        // spawn transformcontrols and set snapping
         scene.add(transformControls);
         setSnapping = function (val) {
             if (val == true) {
@@ -110,10 +128,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         }
     }
 
+    // instanced meshes - initial setup
     cubeInstanceData.length = 0;
     sphereInstanceData.length = 0;
     cylinderInstanceData.length = 0;
 
+    // cube instance - initial setup
     let cubeIndex = 0;
     const cubegeometry = new THREE.BoxGeometry(1, 1, 1);
     const cubematerial = new THREE.MeshPhongMaterial({ color: 0xffffff });
@@ -121,6 +141,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     cubemesh.castShadow = true;
     cubemesh.receiveShadow = true;
 
+    // sphere instance - initial setup
     let sphereIndex = 0;
     const spheregeometry = new THREE.SphereGeometry(1, 16, 12);
     const spherematerial = new THREE.MeshPhongMaterial({ color: 0xffffff });
@@ -128,6 +149,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     spheremesh.castShadow = true;
     spheremesh.receiveShadow = true;
 
+    // cylinder instance - initial setup
     let cylinderIndex = 0;
     const cylindergeometry = new THREE.CylinderGeometry(4.5, 4.5, 7.5, 32);
     const cylindermaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
@@ -135,6 +157,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     cylindermesh.castShadow = true;
     cylindermesh.receiveShadow = true;
 
+    // create all nodes
     sceneSchematics.forEach(async (element, i) => {
         let color = new THREE.Color();
         let dummy = new THREE.Object3D();
@@ -142,13 +165,16 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         let material
         let scenenode
 
+        // check node type
         switch (element.type) {
             case "cube":
+                // create geometry
                 geometry = new THREE.BoxGeometry(1, 1, 1);
                 material = new THREE.MeshPhongMaterial({ color: element.color });
                 material.transparent = true;
                 material.opacity = element.opacity || 1;
 
+                // change geometry
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
@@ -156,7 +182,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
 
+                // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
                 if (element.tex || select == i || element.opacity != 1) {
+                    // apply texture if available
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
                             scenenode.material.map = texture;
@@ -164,8 +192,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
+                    // spawn node
                     scene.add(scenenode);
 
+                    // apply transformcontrols
                     if (i == select && select !== false) {
                         selSceneNode = scenenode;
                         outlinePass.selectedObjects = [scenenode];
@@ -198,10 +228,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
 
+                        // attach transformcontrols if not in select mode
                         if (document.getElementById("clicktosel").checked == true) return;
                         transformControls.attach(scenenode);
                     }
 
+                    // add node script to object data
                     var scriptFunction = new Function("mesh", element.updateScript);
                     var clickscriptFunction = new Function("mesh", element.clickScript);
                     var initscriptFunction = new Function("mesh", element.initScript);
@@ -210,6 +242,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.userData.initscriptFunction = initscriptFunction;
                     scenenode.userData.itemIndex = i
 
+                    // create physics body
                     if (isForPlayer) {
                         const cubeShape = threeToCannon(scenenode).shape;
                         const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
@@ -220,6 +253,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         world.addBody(cubeBody);
                     };
                 } else {
+                    // add node to instance
                     dummy.position.set(element.x, element.y, element.z);
                     dummy.rotation.set(element.rotx, element.roty, element.rotz);
                     dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
@@ -228,6 +262,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     cubemesh.setMatrixAt(cubeIndex, dummy.matrix);
                     cubemesh.setColorAt(cubeIndex, color);
 
+                    // create physics model if run on player
                     if (isForPlayer) {
                         const cubeShape = threeToCannon(scenenode).shape;
                         const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
@@ -259,11 +294,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "spherev2":
+                // create geometry
                 geometry = new THREE.SphereGeometry(1, 16, 12);
                 material = new THREE.MeshPhongMaterial({ color: element.color });
                 material.transparent = true;
                 material.opacity = element.opacity || 1;
 
+                // change geometry
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
@@ -271,7 +308,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
 
+                // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
                 if (element.tex || select == i || element.opacity != 1) {
+                    // apply texture if available
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
                             scenenode.material.map = texture;
@@ -279,8 +318,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
+                    // spawn node
                     scene.add(scenenode);
 
+                    // apply transformcontrols
                     if (i == select && select !== false) {
                         selSceneNode = scenenode;
                         outlinePass.selectedObjects = [scenenode];
@@ -313,10 +354,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
 
+                        // attach transformcontrols if not in select mode
                         if (document.getElementById("clicktosel").checked == true) return;
                         transformControls.attach(scenenode);
                     }
 
+                    // add node script to object data
                     var scriptFunction = new Function("mesh", element.updateScript);
                     var clickscriptFunction = new Function("mesh", element.clickScript);
                     var initscriptFunction = new Function("mesh", element.initScript);
@@ -325,6 +368,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.userData.initscriptFunction = initscriptFunction;
                     scenenode.userData.itemIndex = i
 
+                    // create physics body
                     if (isForPlayer) {
                         const sphereShape = threeToCannon(scenenode).shape;
                         const sphereBody = new CANNON.Body({ mass: parseFloat(element.mass) });
@@ -335,6 +379,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         world.addBody(sphereBody);
                     };
                 } else {
+                    // add node to instance
                     dummy.position.set(element.x, element.y, element.z);
                     dummy.rotation.set(element.rotx, element.roty, element.rotz);
                     dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
@@ -343,6 +388,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     spheremesh.setMatrixAt(sphereIndex, dummy.matrix);
                     spheremesh.setColorAt(sphereIndex, color);
 
+                    // create physics model if run on player
                     if (isForPlayer) {
                         const sphereShape = threeToCannon(scenenode).shape;
                         const sphereBody = new CANNON.Body({ mass: parseFloat(element.mass) });
@@ -374,11 +420,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "cylinderv2":
+                // create geometry
                 geometry = new THREE.CylinderGeometry(4.5, 4.5, 7.5, 32);
                 material = new THREE.MeshPhongMaterial({ color: element.color });
                 material.transparent = true;
                 material.opacity = element.opacity || 1;
 
+                // change geometry
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
@@ -386,8 +434,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
 
+                // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
                 if (element.tex || select == i || element.opacity != 1) {
-
+                    // apply texture if available
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
                             scenenode.material.map = texture;
@@ -395,8 +444,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
+                    // spawn node
                     scene.add(scenenode);
 
+                    // apply transformcontrols
                     if (i == select && select !== false) {
                         selSceneNode = scenenode;
                         outlinePass.selectedObjects = [scenenode];
@@ -429,10 +480,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                             document.getElementById("sizeZ").value = scenenode.scale.z;
                         });
 
+                        // attach transformcontrols if not in select mode
                         if (document.getElementById("clicktosel").checked == true) return;
                         transformControls.attach(scenenode);
                     }
 
+                    // add node script to object data
                     var scriptFunction = new Function("mesh", element.updateScript);
                     var clickscriptFunction = new Function("mesh", element.clickScript);
                     var initscriptFunction = new Function("mesh", element.initScript);
@@ -441,6 +494,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.userData.initscriptFunction = initscriptFunction;
                     scenenode.userData.itemIndex = i
 
+                    // create physics body
                     if (isForPlayer) {
                         const cylinderShape = threeToCannon(scenenode).shape;
                         const cylinderBody = new CANNON.Body({ mass: parseFloat(element.mass) });
@@ -451,6 +505,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         world.addBody(cylinderBody);
                     };
                 } else {
+                    // add node to instance
                     dummy.position.set(element.x, element.y, element.z);
                     dummy.rotation.set(element.rotx, element.roty, element.rotz);
                     dummy.scale.set(element.sizeX / 10, element.sizeY / 10, element.sizeZ / 10);
@@ -459,6 +514,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     cylindermesh.setMatrixAt(cylinderIndex, dummy.matrix);
                     cylindermesh.setColorAt(cylinderIndex, color);
 
+                    // create physics model if run on player
                     if (isForPlayer) {
                         const cylinderShape = threeToCannon(scenenode).shape;
                         const cylinderBody = new CANNON.Body({ mass: parseFloat(element.mass) });
@@ -490,11 +546,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "sphere":
+                // legacy sphere object - will be removed in the future
+                // create geometry and material
                 geometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
                 material = new THREE.MeshPhongMaterial({ color: element.color });
                 material.opacity = element.opacity || 1
                 material.transparent = true
 
+                // create 3d object
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
@@ -502,6 +561,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scene.add(scenenode);
 
+                // apply transformcontrols
                 if (i == select && select !== false) {
                     selSceneNode = scenenode;
                     outlinePass.selectedObjects = [scenenode];
@@ -534,10 +594,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
 
+                    // attach transformcontrols if not in select mode
                     if (document.getElementById("clicktosel").checked == true) return;
                     transformControls.attach(scenenode);
                 }
 
+                // create physics body
                 if (isForPlayer) {
                     var sphereShape = threeToCannon(scenenode).shape;
                     var sphereBody = new CANNON.Body({ mass: element.mass });
@@ -548,6 +610,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     sphereBody.threeMesh = scenenode;
                 }
 
+                // add node script to object data
                 var scriptFunction = new Function("mesh", element.updateScript);
                 var clickscriptFunction = new Function("mesh", element.clickScript);
                 var initscriptFunction = new Function("mesh", element.initScript);
@@ -556,6 +619,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.userData.initscriptFunction = initscriptFunction;
                 scenenode.userData.itemIndex = i
 
+                // apply texture
                 if (element.tex) {
                     const texture = new THREE.TextureLoader().load(element.tex);
                     scenenode.material.map = texture;
@@ -564,11 +628,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "cylinder":
+                // legacy cylinder object - will be removed in the future
+                // create geometry and material
                 geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
                 material = new THREE.MeshPhongMaterial({ color: element.color });
                 material.opacity = element.opacity || 1
                 material.transparent = true
 
+                // create 3d object
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
@@ -576,6 +643,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scene.add(scenenode);
 
+                // apply transformcontrols
                 if (i == select && select !== false) {
                     selSceneNode = scenenode;
                     outlinePass.selectedObjects = [scenenode];
@@ -608,10 +676,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         document.getElementById("sizeZ").value = scenenode.scale.z;
                     });
 
+                    // attach transformcontrols if not in select mode
                     if (document.getElementById("clicktosel").checked == true) return;
                     transformControls.attach(scenenode);
                 }
 
+                // create physics body
                 if (isForPlayer) {
                     var cylinderShape = threeToCannon(scenenode).shape;
                     var cylinderBody = new CANNON.Body({ mass: element.mass });
@@ -622,6 +692,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     cylinderBody.threeMesh = scenenode;
                 }
 
+                // add node script to object data
                 var scriptFunction = new Function("mesh", element.updateScript);
                 var clickscriptFunction = new Function("mesh", element.clickScript);
                 var initscriptFunction = new Function("mesh", element.initScript);
@@ -630,6 +701,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.userData.initscriptFunction = initscriptFunction;
                 scenenode.userData.itemIndex = i
 
+                // apply texture
                 if (element.tex) {
                     const texture = new THREE.TextureLoader().load(element.tex);
                     scenenode.material.map = texture;
@@ -638,11 +710,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "light":
+                // create light
                 scenenode = new THREE.PointLight(element.color, element.intensity, element.distance);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.castShadow = true;
                 scene.add(scenenode);
 
+                // apply transformcontrols
                 if (i == select && select !== false) {
                     transformControls.attach(scenenode);
                     transformControls.addEventListener('change', function () {
@@ -668,20 +742,24 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             case "importedGLTFModel":
+                // load 3d model dataurl
                 const importedGLTF = await new THREE.GLTFLoader().loadAsync(element.gltfData);
                 importedGLTF.scene.traverse((child) => {
+                    // enable shadows in 3d model
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
                     }
                 });
 
+                // change 3d model geometry and spawn 3d model
                 scenenode = importedGLTF.scene
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
                 scene.add(scenenode)
 
+                // apply transformcontrols
                 if (i == select && select !== false) {
                     selSceneNode = scenenode;
                     outlinePass.selectedObjects = [scenenode];
@@ -718,6 +796,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     transformControls.attach(scenenode);
                 }
 
+                // create physics body
                 if (isForPlayer) {
                     var cylinderShape = threeToCannon(scenenode).shape;
                     var cylinderBody = new CANNON.Body({ mass: element.mass });
@@ -728,6 +807,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     cylinderBody.threeMesh = scenenode;
                 }
 
+                // add node script to object data
                 var scriptFunction = new Function("mesh", element.updateScript);
                 var clickscriptFunction = new Function("mesh", element.clickScript);
                 var initscriptFunction = new Function("mesh", element.initScript);
@@ -736,6 +816,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.userData.initscriptFunction = initscriptFunction;
                 scenenode.userData.itemIndex = i
 
+                // apply click script to 3d model
                 scenenode.traverse((child) => {
                     if (child.isMesh) {
                         child.userData.clickscriptfunction = clickscriptFunction;
@@ -748,6 +829,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 console.warn('Unknown Scene Node! ' + element.type)
         }
 
+        // spawn player if done loading
         if (i === sceneSchematics.length - 1 && isForPlayer) {
             document.getElementById('gameload').style.display = "none";
 
@@ -761,11 +843,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         }
     });
 
+    // spawn all instance on scene
     scene.add(cubemesh);
     scene.add(spheremesh);
     scene.add(cylindermesh);
 }
 
+// special for instanced meshes - update individual instance to its physics model
 function syncPhysicsToGraphics() {
     if (!cubemesh || !spheremesh || !cylindermesh) return;
 
