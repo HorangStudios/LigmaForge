@@ -370,6 +370,7 @@ async function spawnPlayer() {
     }
 
     firebase.database().ref(`games/${id}/server/${playerUniqueID}`).set(player)
+    firebase.database().ref(`games/${id}/real-time/${playerUniqueID}`).set(player)
   }
 }
 
@@ -382,7 +383,7 @@ function otherPlayers() {
 
   firebase.database().ref(`games/${id}/server/`).on('value', async function (snapshot) {
     var playerslist = snapshot.val();
-    var listofplayers = await firebaseFetch(`games/${id}/server/`);
+    var listofplayers = await firebaseFetch(`games/${id}/real-time/`);
     var playeramount = Object.keys(listofplayers).length - 1;
     if (!playerslist) return;
 
@@ -427,11 +428,14 @@ function otherPlayers() {
       if (key != playerUniqueID) {
         if (!allPlayersElem[key] && !(timeDifference >= 10000) && (playeramount > spawnedPlayers)) {
           spawnedPlayers += 1;
+          console.log(spawnedPlayers)
           allPlayersElem[key] = await playerModel(getRandomHexColor(), allPlayersFetchedAvatar[key]);
           scene.add(allPlayersElem[key][0]);
         } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
+          console.log(spawnedPlayers)
           scene.remove(allPlayersElem[key][0]);
           delete allPlayersElem[key];
+          firebase.database().ref(`games/${id}/real-time/${key}`).remove();
         } else {
           if (!allPlayersElem[key]) return;
           allPlayersElem[key][0].position.x = element.pos.x;
