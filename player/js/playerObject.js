@@ -86,11 +86,16 @@ async function spawnPlayer() {
   });
 
   // check if player is falling or jumping
-  function checkPositionChange() {
+  window.checkPositionChange = function(type) {
     const change = Math.abs(cubeBody.velocity.y);
-    const smallChangeThreshold = 0.16416666666666666;
+    var smallChangeThreshold;
+    if (type == "anim") {
+      smallChangeThreshold = 0.25
+    } else {
+      smallChangeThreshold = 0.01
+    }
 
-    if (change <= smallChangeThreshold) {
+    if (change < smallChangeThreshold) {
       return true
     } else {
       return false
@@ -337,7 +342,7 @@ async function spawnPlayer() {
     }
 
     // apply animation if player is falling/jumping
-    if (checkPositionChange()) {
+    if (checkPositionChange("anim")) {
       createPlayer[1].isJumping = false;
     } else {
       createPlayer[1].isJumping = true;
