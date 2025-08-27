@@ -77,9 +77,10 @@ function resizeCanvas() {
     }
 }
 
-//select item
-function onDocumentMouseDown(event) {
-    if (event.target !== renderer.domElement || document.getElementById("clicktosel").checked == false) return;
+// click to select
+var startTime;
+function onDocumentMouseDown(event, duration) {
+    if (event.target !== renderer.domElement || document.getElementById("clicktosel").checked == false || duration > 250) return;
 
     var canvasDimensions = renderer.domElement.getBoundingClientRect();
     var mouse = new THREE.Vector2();
@@ -146,7 +147,19 @@ function onDocumentMouseDown(event) {
         }
     }
 }
-document.getElementById('canvas').addEventListener('click', onDocumentMouseDown, false);
+
+// click to select - when mouse held
+document.getElementById('canvas').addEventListener('mousedown', () => {
+    startTime = Date.now();
+});
+
+// click to select - when mouse released
+document.getElementById('canvas').addEventListener('mouseup', (event) => {
+    if (startTime) {
+        const duration = Date.now() - startTime;
+        onDocumentMouseDown(event, duration)
+    }
+});
 
 // save
 function exportScene() {
