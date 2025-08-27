@@ -10,11 +10,96 @@ let cubemesh, spheremesh, cylindermesh, gamestarteou;
 let transformControls
 let selSceneNode
 
-// load scene
-function loadScene(sceneSchematics, isForPlayer, select) {
-    // clear scene
-    scene.remove.apply(scene, scene.children);
+// apply transformcontrols for individual node
+function applyTC(scenenode, element, supportScaling) {
+    selSceneNode = scenenode;
+    outlinePass.selectedObjects = [scenenode];
 
+    transformControls.addEventListener('change', function (event) {
+        if (!transformControls.dragging) return
+
+        element["x"] = scenenode.position.x;
+        element["y"] = scenenode.position.y;
+        element["z"] = scenenode.position.z;
+
+        element["rotx"] = scenenode.rotation.x;
+        element["roty"] = scenenode.rotation.y;
+        element["rotz"] = scenenode.rotation.z;
+
+        element["sizeX"] = scenenode.scale.x;
+        element["sizeY"] = scenenode.scale.y;
+        element["sizeZ"] = scenenode.scale.z;
+
+        document.getElementById("x").value = scenenode.position.x;
+        document.getElementById("y").value = scenenode.position.y;
+        document.getElementById("z").value = scenenode.position.z;
+
+        document.getElementById("rotx").value = scenenode.rotation.x;
+        document.getElementById("roty").value = scenenode.rotation.y;
+        document.getElementById("rotz").value = scenenode.rotation.z;
+
+        if (!supportScaling) return;
+
+        document.getElementById("sizeX").value = scenenode.scale.x;
+        document.getElementById("sizeY").value = scenenode.scale.y;
+        document.getElementById("sizeZ").value = scenenode.scale.z;
+    });
+
+    // attach transformcontrols if not in select mode
+    if (document.getElementById("clicktosel").checked == true) return;
+    transformControls.attach(scenenode);
+}
+
+// apply transformcontrols for an item to be added to a multiselect group
+function applyGroupTC(scenenode, sceneSchematics, selectGroup, itemIndex, supportScaling) {
+    selSceneNode = selectGroup;
+    scenenode.userData.nodeUUID = itemIndex;
+    outlinePass.selectedObjects = selectGroup.children;
+
+    if (!selectGroup.children.includes(scenenode)) {
+        selectGroup.add(scenenode);
+    }
+
+    transformControls.addEventListener('change', function () {
+        if (!transformControls.dragging) return;
+
+        selectGroup.children.forEach((child) => {
+            const idx = child.userData.nodeUUID;
+            if (typeof idx === "number" && sceneSchematics[idx]) {
+                let worldPos = new THREE.Vector3();
+                child.getWorldPosition(worldPos);
+
+                sceneSchematics[idx]["x"] = worldPos.x;
+                sceneSchematics[idx]["y"] = worldPos.y;
+                sceneSchematics[idx]["z"] = worldPos.z;
+
+                let worldQuat = new THREE.Quaternion();
+                child.getWorldQuaternion(worldQuat);
+                let worldEuler = new THREE.Euler().setFromQuaternion(worldQuat);
+
+                sceneSchematics[idx]["rotx"] = worldEuler.x;
+                sceneSchematics[idx]["roty"] = worldEuler.y;
+                sceneSchematics[idx]["rotz"] = worldEuler.z;
+
+                if (supportScaling) {
+                    let worldScale = new THREE.Vector3();
+                    child.getWorldScale(worldScale);
+
+                    sceneSchematics[idx]["sizeX"] = worldScale.x;
+                    sceneSchematics[idx]["sizeY"] = worldScale.y;
+                    sceneSchematics[idx]["sizeZ"] = worldScale.z;
+                }
+            }
+        });
+    });
+
+    // attach transformcontrols if not in select mode
+    if (document.getElementById("clicktosel").checked == true) return;
+    transformControls.attach(selectGroup);
+}
+
+// Set up lights and sky
+function allOfTheLights() {
     // create hemisphere light
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
     hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -57,6 +142,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     const sun = new THREE.Vector3();
     sun.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 2), THREE.MathUtils.degToRad(180));
     sky.material.uniforms.sunPosition.value.copy(sun);
+}
+
+// load scene
+function loadScene(sceneSchematics, isForPlayer, select) {
+    // clear scene then re-add sky and lighting
+    scene.remove.apply(scene, scene.children);
+    allOfTheLights();
 
     // editor-specific features
     if (!isForPlayer) {
@@ -157,6 +249,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     cylindermesh.castShadow = true;
     cylindermesh.receiveShadow = true;
 
+    // selector group - editor only
+    let selectGroup = new THREE.Group();
+
     // create all nodes
     sceneSchematics.forEach(async (element, i) => {
         let color = new THREE.Color();
@@ -183,7 +278,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.receiveShadow = true;
 
                 // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
-                if (element.tex || select == i || element.opacity != 1) {
+                if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
                     // apply texture if available
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
@@ -192,45 +287,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
-                    // spawn node
+                    // spawn node and apply transformcontrols
                     scene.add(scenenode);
-
-                    // apply transformcontrols
-                    if (i == select && select !== false) {
-                        selSceneNode = scenenode;
-                        outlinePass.selectedObjects = [scenenode];
-
-                        transformControls.addEventListener('change', function (event) {
-                            if (!transformControls.dragging) return
-
-                            element["x"] = scenenode.position.x;
-                            element["y"] = scenenode.position.y;
-                            element["z"] = scenenode.position.z;
-
-                            element["rotx"] = scenenode.rotation.x;
-                            element["roty"] = scenenode.rotation.y;
-                            element["rotz"] = scenenode.rotation.z;
-
-                            element["sizeX"] = scenenode.scale.x;
-                            element["sizeY"] = scenenode.scale.y;
-                            element["sizeZ"] = scenenode.scale.z;
-
-                            document.getElementById("x").value = scenenode.position.x;
-                            document.getElementById("y").value = scenenode.position.y;
-                            document.getElementById("z").value = scenenode.position.z;
-
-                            document.getElementById("rotx").value = scenenode.rotation.x;
-                            document.getElementById("roty").value = scenenode.rotation.y;
-                            document.getElementById("rotz").value = scenenode.rotation.z;
-
-                            document.getElementById("sizeX").value = scenenode.scale.x;
-                            document.getElementById("sizeY").value = scenenode.scale.y;
-                            document.getElementById("sizeZ").value = scenenode.scale.z;
-                        });
-
-                        // attach transformcontrols if not in select mode
-                        if (document.getElementById("clicktosel").checked == true) return;
-                        transformControls.attach(scenenode);
+                    if (Array.isArray(select) && select.includes(i)) {
+                        if (select.length === 1) {
+                            applyTC(scenenode, element, true);
+                        } else {
+                            applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
+                        }
                     }
 
                     // add node script to object data
@@ -309,7 +373,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.receiveShadow = true;
 
                 // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
-                if (element.tex || select == i || element.opacity != 1) {
+                if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
                     // apply texture if available
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
@@ -318,45 +382,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
-                    // spawn node
+                    // spawn node and apply transformcontrols
                     scene.add(scenenode);
-
-                    // apply transformcontrols
-                    if (i == select && select !== false) {
-                        selSceneNode = scenenode;
-                        outlinePass.selectedObjects = [scenenode];
-
-                        transformControls.addEventListener('change', function () {
-                            if (!transformControls.dragging) return
-
-                            element["x"] = scenenode.position.x;
-                            element["y"] = scenenode.position.y;
-                            element["z"] = scenenode.position.z;
-
-                            element["rotx"] = scenenode.rotation.x;
-                            element["roty"] = scenenode.rotation.y;
-                            element["rotz"] = scenenode.rotation.z;
-
-                            element["sizeX"] = scenenode.scale.x;
-                            element["sizeY"] = scenenode.scale.y;
-                            element["sizeZ"] = scenenode.scale.z;
-
-                            document.getElementById("x").value = scenenode.position.x;
-                            document.getElementById("y").value = scenenode.position.y;
-                            document.getElementById("z").value = scenenode.position.z;
-
-                            document.getElementById("rotx").value = scenenode.rotation.x;
-                            document.getElementById("roty").value = scenenode.rotation.y;
-                            document.getElementById("rotz").value = scenenode.rotation.z;
-
-                            document.getElementById("sizeX").value = scenenode.scale.x;
-                            document.getElementById("sizeY").value = scenenode.scale.y;
-                            document.getElementById("sizeZ").value = scenenode.scale.z;
-                        });
-
-                        // attach transformcontrols if not in select mode
-                        if (document.getElementById("clicktosel").checked == true) return;
-                        transformControls.attach(scenenode);
+                    if (Array.isArray(select) && select.includes(i)) {
+                        if (select.length === 1) {
+                            applyTC(scenenode, element, true);
+                        } else {
+                            applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
+                        }
                     }
 
                     // add node script to object data
@@ -435,7 +468,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.receiveShadow = true;
 
                 // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
-                if (element.tex || select == i || element.opacity != 1) {
+                if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
                     // apply texture if available
                     if (element.tex) {
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
@@ -444,45 +477,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         });
                     }
 
-                    // spawn node
+                    // spawn node and apply transformcontrols
                     scene.add(scenenode);
-
-                    // apply transformcontrols
-                    if (i == select && select !== false) {
-                        selSceneNode = scenenode;
-                        outlinePass.selectedObjects = [scenenode];
-
-                        transformControls.addEventListener('change', function () {
-                            if (!transformControls.dragging) return
-
-                            element["x"] = scenenode.position.x;
-                            element["y"] = scenenode.position.y;
-                            element["z"] = scenenode.position.z;
-
-                            element["rotx"] = scenenode.rotation.x;
-                            element["roty"] = scenenode.rotation.y;
-                            element["rotz"] = scenenode.rotation.z;
-
-                            element["sizeX"] = scenenode.scale.x * 10;
-                            element["sizeY"] = scenenode.scale.y * 10;
-                            element["sizeZ"] = scenenode.scale.z * 10;
-
-                            document.getElementById("x").value = scenenode.position.x;
-                            document.getElementById("y").value = scenenode.position.y;
-                            document.getElementById("z").value = scenenode.position.z;
-
-                            document.getElementById("rotx").value = scenenode.rotation.x;
-                            document.getElementById("roty").value = scenenode.rotation.y;
-                            document.getElementById("rotz").value = scenenode.rotation.z;
-
-                            document.getElementById("sizeX").value = scenenode.scale.x;
-                            document.getElementById("sizeY").value = scenenode.scale.y;
-                            document.getElementById("sizeZ").value = scenenode.scale.z;
-                        });
-
-                        // attach transformcontrols if not in select mode
-                        if (document.getElementById("clicktosel").checked == true) return;
-                        transformControls.attach(scenenode);
+                    if (Array.isArray(select) && select.includes(i)) {
+                        if (select.length === 1) {
+                            applyTC(scenenode, element, true);
+                        } else {
+                            applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
+                        }
                     }
 
                     // add node script to object data
@@ -559,44 +561,15 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.receiveShadow = true;
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+
+                // spawn node and apply transformcontrols
                 scene.add(scenenode);
-
-                // apply transformcontrols
-                if (i == select && select !== false) {
-                    selSceneNode = scenenode;
-                    outlinePass.selectedObjects = [scenenode];
-
-                    transformControls.addEventListener('change', function () {
-                        if (!transformControls.dragging) return
-
-                        element["x"] = scenenode.position.x;
-                        element["y"] = scenenode.position.y;
-                        element["z"] = scenenode.position.z;
-
-                        element["rotx"] = scenenode.rotation.x;
-                        element["roty"] = scenenode.rotation.y;
-                        element["rotz"] = scenenode.rotation.z;
-
-                        element["sizeX"] = scenenode.scale.x;
-                        element["sizeY"] = scenenode.scale.y;
-                        element["sizeZ"] = scenenode.scale.z;
-
-                        document.getElementById("x").value = scenenode.position.x;
-                        document.getElementById("y").value = scenenode.position.y;
-                        document.getElementById("z").value = scenenode.position.z;
-
-                        document.getElementById("rotx").value = scenenode.rotation.x;
-                        document.getElementById("roty").value = scenenode.rotation.y;
-                        document.getElementById("rotz").value = scenenode.rotation.z;
-
-                        document.getElementById("sizeX").value = scenenode.scale.x;
-                        document.getElementById("sizeY").value = scenenode.scale.y;
-                        document.getElementById("sizeZ").value = scenenode.scale.z;
-                    });
-
-                    // attach transformcontrols if not in select mode
-                    if (document.getElementById("clicktosel").checked == true) return;
-                    transformControls.attach(scenenode);
+                if (Array.isArray(select) && select.includes(i)) {
+                    if (select.length === 1) {
+                        applyTC(scenenode, element, true);
+                    } else {
+                        applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
+                    }
                 }
 
                 // create physics body
@@ -641,44 +614,15 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.receiveShadow = true;
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+
+                // spawn node and apply transformcontrols
                 scene.add(scenenode);
-
-                // apply transformcontrols
-                if (i == select && select !== false) {
-                    selSceneNode = scenenode;
-                    outlinePass.selectedObjects = [scenenode];
-
-                    transformControls.addEventListener('change', function () {
-                        if (!transformControls.dragging) return
-
-                        element["x"] = scenenode.position.x;
-                        element["y"] = scenenode.position.y;
-                        element["z"] = scenenode.position.z;
-
-                        element["rotx"] = scenenode.rotation.x;
-                        element["roty"] = scenenode.rotation.y;
-                        element["rotz"] = scenenode.rotation.z;
-
-                        element["sizeX"] = scenenode.scale.x;
-                        element["sizeY"] = scenenode.scale.y;
-                        element["sizeZ"] = scenenode.scale.z;
-
-                        document.getElementById("x").value = scenenode.position.x;
-                        document.getElementById("y").value = scenenode.position.y;
-                        document.getElementById("z").value = scenenode.position.z;
-
-                        document.getElementById("rotx").value = scenenode.rotation.x;
-                        document.getElementById("roty").value = scenenode.rotation.y;
-                        document.getElementById("rotz").value = scenenode.rotation.z;
-
-                        document.getElementById("sizeX").value = scenenode.scale.x;
-                        document.getElementById("sizeY").value = scenenode.scale.y;
-                        document.getElementById("sizeZ").value = scenenode.scale.z;
-                    });
-
-                    // attach transformcontrols if not in select mode
-                    if (document.getElementById("clicktosel").checked == true) return;
-                    transformControls.attach(scenenode);
+                if (Array.isArray(select) && select.includes(i)) {
+                    if (select.length === 1) {
+                        applyTC(scenenode, element, true);
+                    } else {
+                        applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
+                    }
                 }
 
                 // create physics body
@@ -714,30 +658,15 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode = new THREE.PointLight(element.color, element.intensity, element.distance);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.castShadow = true;
+
+                // spawn node and apply transformcontrols
                 scene.add(scenenode);
-
-                // apply transformcontrols
-                if (i == select && select !== false) {
-                    transformControls.attach(scenenode);
-                    transformControls.addEventListener('change', function () {
-                        if (!transformControls.dragging) return
-
-                        element["x"] = scenenode.position.x;
-                        element["y"] = scenenode.position.y;
-                        element["z"] = scenenode.position.z;
-
-                        element["rotx"] = scenenode.rotation.x;
-                        element["roty"] = scenenode.rotation.y;
-                        element["rotz"] = scenenode.rotation.z;
-
-                        document.getElementById("x").value = scenenode.position.x;
-                        document.getElementById("y").value = scenenode.position.y;
-                        document.getElementById("z").value = scenenode.position.z;
-
-                        document.getElementById("rotx").value = scenenode.rotation.x;
-                        document.getElementById("roty").value = scenenode.rotation.y;
-                        document.getElementById("rotz").value = scenenode.rotation.z;
-                    });
+                if (Array.isArray(select) && select.includes(i)) {
+                    if (select.length === 1) {
+                        applyTC(scenenode, element, false);
+                    } else {
+                        applyGroupTC(scenenode, sceneSchematics, selectGroup, i, false);
+                    }
                 }
                 break;
 
@@ -752,48 +681,20 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     }
                 });
 
-                // change 3d model geometry and spawn 3d model
+                // change 3d model geometry
                 scenenode = importedGLTF.scene
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                scene.add(scenenode)
 
-                // apply transformcontrols
-                if (i == select && select !== false) {
-                    selSceneNode = scenenode;
-                    outlinePass.selectedObjects = [scenenode];
-
-                    transformControls.addEventListener('change', function () {
-                        if (!transformControls.dragging) return
-
-                        element["x"] = scenenode.position.x;
-                        element["y"] = scenenode.position.y;
-                        element["z"] = scenenode.position.z;
-
-                        element["rotx"] = scenenode.rotation.x;
-                        element["roty"] = scenenode.rotation.y;
-                        element["rotz"] = scenenode.rotation.z;
-
-                        element["sizeX"] = scenenode.scale.x;
-                        element["sizeY"] = scenenode.scale.y;
-                        element["sizeZ"] = scenenode.scale.z;
-
-                        document.getElementById("x").value = scenenode.position.x;
-                        document.getElementById("y").value = scenenode.position.y;
-                        document.getElementById("z").value = scenenode.position.z;
-
-                        document.getElementById("rotx").value = scenenode.rotation.x;
-                        document.getElementById("roty").value = scenenode.rotation.y;
-                        document.getElementById("rotz").value = scenenode.rotation.z;
-
-                        document.getElementById("sizeX").value = scenenode.scale.x;
-                        document.getElementById("sizeY").value = scenenode.scale.y;
-                        document.getElementById("sizeZ").value = scenenode.scale.z;
-                    });
-
-                    if (document.getElementById("clicktosel").checked == true) return;
-                    transformControls.attach(scenenode);
+                // spawn node and apply transformcontrols
+                scene.add(scenenode);
+                if (Array.isArray(select) && select.includes(i)) {
+                    if (select.length === 1) {
+                        applyTC(scenenode, element, true);
+                    } else {
+                        applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
+                    }
                 }
 
                 // create physics body
@@ -830,15 +731,22 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         }
 
         // spawn player if done loading
-        if (i === sceneSchematics.length - 1 && isForPlayer) {
-            document.getElementById('gameload').style.display = "none";
+        if (i === sceneSchematics.length - 1) {
+            if (isForPlayer) {
+                document.getElementById('gameload').style.display = "none";
 
-            spawnPlayer();
-            debug('Spawning Player...');
+                spawnPlayer();
+                debug('Spawning Player...');
 
-            gamestarteou = true
-            if (isFirebaseEnv == 'true') {
-                otherPlayers();
+                gamestarteou = true
+                if (isFirebaseEnv == 'true') {
+                    otherPlayers();
+                }
+            } else {
+                scene.add(selectGroup)
+                if (select.length > 1) {
+                    outlinePass.selectedObjects = selectGroup.children;
+                }
             }
         }
     });

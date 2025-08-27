@@ -212,7 +212,6 @@ addElem.terrain = function (voxsize, tersize, color) {
 
         if (generated == (terrainSize * terrainSize)) { listSchematic(); addObject() };
     }
-
 }
 
 // backwards compatibility for old api - will remove in the future

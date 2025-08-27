@@ -157,7 +157,7 @@ input[type=checkbox] {
     cursor: pointer;
 }
 
-select {
+#controls select {
     color: white;
     background-color: var(--ui-button-hover-color);
     border: none;
@@ -190,7 +190,6 @@ select {
 }
 
 .sidebarContent {
-    padding: 15px;
     height: 100%;
     overflow: auto;
 }
@@ -249,4 +248,21 @@ select {
 
 .halfbutton:first-of-type {
     float: right;
+}
+
+#explorercontent {
+    height: 100%;
+    width: 100%;
+    background: none;
+    border: none;
+    overflow: auto;
+    color: white;
+}
+
+#explorercontent option {
+    padding: 15px;
+}
+
+#detailscontent {
+    padding: 15px;
 }

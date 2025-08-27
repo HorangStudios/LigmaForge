@@ -57,7 +57,7 @@ var prevWidth = 0
 var prevHeight = 0
 function resizeCanvas() {
     let sideButtonsWidth = document.getElementById('sideButtons').getBoundingClientRect().width
-    let explorerWidth = document.getElementById('explorercontent').getBoundingClientRect().width
+    let explorerWidth = document.getElementById('details').getBoundingClientRect().width
     let controlsHeight = document.getElementById('controls').getBoundingClientRect().height
     let currWidth = window.innerWidth - ((sideButtonsWidth + 2) + (explorerWidth + 2))
     let currHeight = window.innerHeight - (controlsHeight + 1)
@@ -104,14 +104,44 @@ function onDocumentMouseDown(event) {
             else if (selectedObject === spheremesh) data = sphereInstanceData[instanceId];
             else if (selectedObject === cylindermesh) data = cylinderInstanceData[instanceId];
 
-            if ('itemIndex' in data) {
-                listSchematic(data.itemIndex, true)
+            if (data && 'itemIndex' in data) {
+                let idx = data.itemIndex;
+                if (event.shiftKey) {
+                    let selectionArray = [...lastSelectedObj];
+                    if (!selectionArray.includes(idx)) {
+                        selectionArray.push(idx);
+                    } else {
+                        selectionArray.splice(selectionArray.indexOf(idx), 1);
+                    }
+                    listSchematic(selectionArray);
+                } else {
+                    if (!lastSelectedObj.includes(idx)) {
+                        listSchematic([idx]);
+                    } else {
+                        listSchematic([]);
+                    }
+                }
             }
         } else {
-            if ('itemIndex' in selectedObject.userData) {
-                listSchematic(selectedObject.userData.itemIndex, true)
+            let idx = selectedObject.userData && selectedObject.userData.itemIndex;
+            if (idx !== undefined) {
+                if (event.shiftKey) {
+                    let selectionArray = [...lastSelectedObj];
+                    if (!selectionArray.includes(idx)) {
+                        selectionArray.push(idx);
+                    } else {
+                        selectionArray.splice(selectionArray.indexOf(idx), 1);
+                    }
+                    listSchematic(selectionArray);
+                } else {
+                    if (!lastSelectedObj.includes(idx)) {
+                        listSchematic([idx]);
+                    } else {
+                        listSchematic([]);
+                    }
+                }
             } else if (transformControls.object) {
-                listSchematic()
+                listSchematic([]);
             }
         }
     }

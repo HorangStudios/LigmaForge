@@ -17,39 +17,56 @@ const convertBase64 = (event) => {
 };
 
 // list and load game
-let lastSelectedObj
-function listSchematic(toClick = false, clickSelect = false) {
-    // skip this code if selecting an already selected object
-    if (toClick === lastSelectedObj && clickSelect) {
-        return
-    } else {
-        lastSelectedObj = toClick
-    }
+var selectObjCall = {}
+var lastSelectedObj = []
+function listSchematic(toClick = []) {
+    // clear node select code & set last selected object
+    lastSelectedObj = toClick
+    selectObjCall = {}
 
     // node inspector sidebar
     const shapesList = document.getElementById('explorercontent');
     const itemProperties = document.getElementById('detailscontent');
-    itemProperties.innerHTML = '<h3>Inspect</h3><br><span>Select something on the explorer to edit its properties here!</span>';
+    shapesList.innerHTML = '';
 
-    // nodes list sidebar
-    if (sceneSchematics.length != 0) {
-        shapesList.innerHTML = '<h3>Explorer</h3><br>';
-    } else {
-        shapesList.innerHTML = '<h3>Explorer</h3><br><span>Add something to the project to see it here!</span>';
+    // shapes list selection code
+    shapesList.onchange = function () {
+        const selectedValues = Array.from(shapesList.options).filter(option => option.selected).map(option => Number(option.value));
+        if (selectedValues.length == 1) {
+            selectObjCall[selectedValues[0]]();
+        } else if (selectedValues.length > 1) {
+            // process and add schematics to scene with transformcontrols
+            loadScene(sceneSchematics, false, selectedValues)
+
+            // empty out inspector
+            itemProperties.innerHTML = `
+                <h3>Inspect</h3>
+                Selecting multiple nodes
+            `;
+        }
+    }
+
+    // empty out inspector
+    if (toClick.length > 1) {
+        itemProperties.innerHTML = `
+            <h3>Inspect</h3>
+            Selecting multiple nodes
+        `;
     }
 
     // process and add schematics to scene
-    loadScene(sceneSchematics, false, false)
+    loadScene(sceneSchematics, false, toClick)
 
     // create input fields for each properties to the node inspector sidebar
     sceneSchematics.forEach((element, i) => {
-        let button = document.createElement('button');
-        button.className = 'sceneNodeIcon';
+        let button = document.createElement('option');
         button.innerHTML = `<i class="fa fa-cubes"></i> ` + element.name;
+        button.value = i;
 
-        button.onclick = function () {
-            // process and add schematics to scene
-            loadScene(sceneSchematics, false, i)
+        // show node properties when selected as individual
+        selectObjCall[i] = function () {
+            // process and add schematics to scene with transformcontrols
+            loadScene(sceneSchematics, false, [i])
 
             // empty out inspector
             itemProperties.innerHTML = '';
@@ -73,12 +90,17 @@ function listSchematic(toClick = false, clickSelect = false) {
                 sceneSchematics.splice(i, 1);
                 listSchematic()
                 addObject()
+
+                itemProperties.innerHTML = `
+                    <h3>Inspect</h3>
+                    Select something on the explorer to edit its properties here!
+                `;
             }
 
             // when clone button clicked
             cloneButton.onclick = function () {
                 sceneSchematics.push(JSON.parse(JSON.stringify(element)))
-                listSchematic(i)
+                listSchematic([i])
                 addObject()
             }
 
@@ -113,20 +135,20 @@ function listSchematic(toClick = false, clickSelect = false) {
                 input.onchange = async function (event) {
                     if (key == "color") {
                         element[key] = input.value;
-                        listSchematic(i);
+                        listSchematic([i]);
                     } else if (key == "opacity") {
                         element[key] = parseFloat(input.value);
-                        listSchematic(i);
+                        listSchematic([i]);
                     } else if (typeof value == 'number') {
                         element[key] = parseInt(input.value);
-                        listSchematic(i);
+                        listSchematic([i]);
                     } else if (input.type == 'file') {
                         const base64 = await convertBase64(event);
                         element[key] = base64;
-                        listSchematic(i);
+                        listSchematic([i]);
                     } else {
                         element[key] = input.value;
-                        listSchematic(i);
+                        listSchematic([i]);
                     }
                     addObject()
                 };
@@ -155,7 +177,7 @@ function listSchematic(toClick = false, clickSelect = false) {
 
                     clearBtn.onclick = function () {
                         element[key] = false
-                        listSchematic(i);
+                        listSchematic([i]);
                         addObject()
                     }
                 }
@@ -217,13 +239,16 @@ function listSchematic(toClick = false, clickSelect = false) {
             itemProperties.prepend(title);
         };
 
+        // auto select if selected
+        if (toClick.includes(i)) {
+            button.selected = true
+            if (toClick.length == 1) {
+                selectObjCall[i]()
+            }
+        }
+
         // add node to node list
         shapesList.appendChild(button);
-
-        // auto inspect selected item when scene is reloaded
-        if (i === toClick) {
-            button.click();
-        }
     });
 }
 
