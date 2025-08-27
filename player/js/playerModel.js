@@ -353,8 +353,10 @@ async function playerModel(color, avatar) {
       rightLegPivot.rotation.x = lerp(phases[startStep].rightLeg.rot, phases[endStep].rightLeg.rot, t);
 
       // apply step to arms
-      leftArmPivot.rotation.x = lerp(phases[startStep].leftArm.rot, phases[endStep].leftArm.rot, t);
-      rightArmPivot.rotation.x = lerp(phases[startStep].rightArm.rot, phases[endStep].rightArm.rot, t);
+      if (!data.isJumping) {
+        leftArmPivot.rotation.x = lerp(phases[startStep].leftArm.rot, phases[endStep].leftArm.rot, t);
+        rightArmPivot.rotation.x = lerp(phases[startStep].rightArm.rot, phases[endStep].rightArm.rot, t);
+      }
 
       // continue animation or go to next step if completed
       if (t < 1) {
@@ -414,7 +416,7 @@ async function playerModel(color, avatar) {
         animLoopJump(Math.PI);
       }
     } else {
-      if (!data.isWalking) {
+      if (!data.isJumping) {
         if (jumpingAnimation == true) {
           jumpingAnimation = false;
           animLoopJump(0);
