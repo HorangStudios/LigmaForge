@@ -485,6 +485,7 @@ function otherPlayers() {
           scene.add(allPlayersElem[key][0]);
         } else if (allPlayersElem[key] && (timeDifference >= 10000)) {
           // remove inactive player (left, disconnected or minimized)
+          spawnedPlayers -= 1;
           scene.remove(allPlayersElem[key][0]);
           delete allPlayersElem[key];
           firebase.database().ref(`games/${id}/session/${key}`).remove();
