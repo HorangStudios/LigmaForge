@@ -80,7 +80,7 @@ function resizeCanvas() {
 // click to select
 var startTime;
 function onDocumentMouseDown(event, duration) {
-    if (event.target !== renderer.domElement || document.getElementById("clicktosel").checked == false || duration > 250) return;
+    if (event.target !== renderer.domElement || duration > 250) return;
 
     var canvasDimensions = renderer.domElement.getBoundingClientRect();
     var mouse = new THREE.Vector2();

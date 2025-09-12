@@ -34,6 +34,9 @@ function redo() {
 
 // keyboard shortcuts
 document.addEventListener("keydown", function (event) {
+    const focusedElem = document.activeElement.tagName;
+    if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA') return;
+    
     if (event.ctrlKey && event.key == "z") {
         event.preventDefault()
         undo();
@@ -43,16 +46,13 @@ document.addEventListener("keydown", function (event) {
     } else if (event.ctrlKey && event.key == "d" && document.getElementById("cloneNodeBtn")) {
         event.preventDefault()
         document.getElementById("cloneNodeBtn").click()
-    } else if (event.key == "s") {
-        event.preventDefault()
-        document.getElementById("transformSelect").click()
     } else if (event.key == "m") {
         event.preventDefault()
         document.getElementById("transformMove").click()
     } else if (event.key == "r") {
         event.preventDefault()
         document.getElementById("transformRotate").click()
-    } else if (event.key == "c") {
+    } else if (event.key == "s") {
         event.preventDefault()
         document.getElementById("transformScale").click()
     } else if (event.key == "t") {

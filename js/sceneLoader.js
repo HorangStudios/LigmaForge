@@ -45,8 +45,6 @@ function applyTC(scenenode, element, supportScaling) {
         document.getElementById("sizeZ").value = scenenode.scale.z;
     });
 
-    // attach transformcontrols if not in select mode
-    if (document.getElementById("clicktosel").checked == true) return;
     transformControls.attach(scenenode);
 }
 
@@ -92,9 +90,6 @@ function applyGroupTC(scenenode, sceneSchematics, selectGroup, itemIndex, suppor
             }
         });
     });
-
-    // attach transformcontrols if not in select mode
-    if (document.getElementById("clicktosel").checked == true) return;
     transformControls.attach(selectGroup);
 }
 
@@ -144,6 +139,35 @@ function allOfTheLights() {
     sky.material.uniforms.sunPosition.value.copy(sun);
 }
 
+// apply scripts to the mesh
+function applyScript(scenenode, element, i) {
+    var scriptFunction = new Function("mesh", element.updateScript);
+    scenenode.userData.scriptFunction = scriptFunction;
+
+    var clickscriptFunction = new Function("mesh", element.clickScript);
+    scenenode.userData.clickscriptfunction = clickscriptFunction;
+
+    var initscriptFunction = new Function("mesh", element.initScript);
+    scenenode.userData.initscriptFunction = initscriptFunction;
+
+    scenenode.userData.itemIndex = i
+}
+
+// add mesh to physics engine
+function applyPhysics(scenenode, element, isForPlayer) {
+    if (!isForPlayer) return;
+
+    const cubeShape = threeToCannon(scenenode).shape;
+    const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
+
+    cubeBody.addShape(cubeShape);
+    cubeBody.position.set(element.x, element.y, element.z);
+    cubeBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
+    cubeBody.threeMesh = scenenode;
+
+    world.addBody(cubeBody);
+}
+
 // load scene
 function loadScene(sceneSchematics, isForPlayer, select) {
     // clear scene then re-add sky and lighting
@@ -152,12 +176,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
     // editor-specific features
     if (!isForPlayer) {
-        // hide transform controls
-        if (transformControls) {
-            transformControls.detach();
-        }
-
-        // unhighlight if nothing is selected
+        // hide transform controls & unhighlight if nothing is selected
+        if (transformControls) transformControls.detach();
         if (select == false) {
             selSceneNode = false
             outlinePass.selectedObjects = [];
@@ -165,48 +185,28 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
         // create transform controls
         transformControls = new THREE.TransformControls(camera, renderer.domElement);
-        transformControls.setTranslationSnap(0.5)
-        transformControls.setRotationSnap(0.5)
-        transformControls.setScaleSnap(0.5)
-        transformControls.addEventListener('dragging-changed', function (event) {
-            controls.enabled = !event.value;
-        });
+        transformControls.addEventListener('dragging-changed', function (event) { controls.enabled = !event.value; });
+        scene.add(transformControls);
 
         // move tool
         document.getElementById("transformMove").onclick = () => {
-            document.getElementById("clicktosel").checked = false;
             transformControls.setMode('translate')
-
-            if (selSceneNode === false) return;
-            transformControls.attach(selSceneNode);
+            if (selSceneNode !== false) transformControls.attach(selSceneNode);
         };
 
         // rotate tool
         document.getElementById("transformRotate").onclick = () => {
-            document.getElementById("clicktosel").checked = false;
             transformControls.setMode('rotate')
-
-            if (selSceneNode === false) return;
-            transformControls.attach(selSceneNode);
+            if (selSceneNode !== false) transformControls.attach(selSceneNode);
         };
 
         // scale tool
         document.getElementById("transformScale").onclick = () => {
-            document.getElementById("clicktosel").checked = false;
             transformControls.setMode('scale')
-
-            if (selSceneNode === false) return;
-            transformControls.attach(selSceneNode);
+            if (selSceneNode !== false) transformControls.attach(selSceneNode);
         };
 
-        // select tool
-        document.getElementById("transformSelect").onclick = () => {
-            document.getElementById("clicktosel").checked = true;
-            transformControls.detach()
-        };
-
-        // spawn transformcontrols and set snapping
-        scene.add(transformControls);
+        // set snapping
         setSnapping = function (val) {
             if (val == true) {
                 transformControls.setTranslationSnap(0.5)
@@ -218,6 +218,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 transformControls.setScaleSnap(0)
             }
         }
+        setSnapping(document.getElementById("snaptogrid").checked)
     }
 
     // instanced meshes - initial setup
@@ -279,8 +280,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
                 // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
                 if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
-                    // apply texture if available
                     if (element.tex) {
+                        // apply texture if available
                         const texture = new THREE.TextureLoader().load(element.tex, () => {
                             scenenode.material.map = texture;
                             scenenode.material.needsUpdate = true;
@@ -297,25 +298,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         }
                     }
 
-                    // add node script to object data
-                    var scriptFunction = new Function("mesh", element.updateScript);
-                    var clickscriptFunction = new Function("mesh", element.clickScript);
-                    var initscriptFunction = new Function("mesh", element.initScript);
-                    scenenode.userData.scriptFunction = scriptFunction;
-                    scenenode.userData.clickscriptfunction = clickscriptFunction;
-                    scenenode.userData.initscriptFunction = initscriptFunction;
-                    scenenode.userData.itemIndex = i
-
-                    // create physics body
-                    if (isForPlayer) {
-                        const cubeShape = threeToCannon(scenenode).shape;
-                        const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
-                        cubeBody.addShape(cubeShape);
-                        cubeBody.position.set(element.x, element.y, element.z);
-                        cubeBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                        cubeBody.threeMesh = scenenode;
-                        world.addBody(cubeBody);
-                    };
+                    // add node script to object data & add mesh to physics world (if running on player)
+                    applyScript(scenenode, element, i);
+                    applyPhysics(scenenode, element, isForPlayer);
                 } else {
                     // add node to instance
                     dummy.position.set(element.x, element.y, element.z);
@@ -392,25 +377,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         }
                     }
 
-                    // add node script to object data
-                    var scriptFunction = new Function("mesh", element.updateScript);
-                    var clickscriptFunction = new Function("mesh", element.clickScript);
-                    var initscriptFunction = new Function("mesh", element.initScript);
-                    scenenode.userData.scriptFunction = scriptFunction;
-                    scenenode.userData.clickscriptfunction = clickscriptFunction;
-                    scenenode.userData.initscriptFunction = initscriptFunction;
-                    scenenode.userData.itemIndex = i
-
-                    // create physics body
-                    if (isForPlayer) {
-                        const sphereShape = threeToCannon(scenenode).shape;
-                        const sphereBody = new CANNON.Body({ mass: parseFloat(element.mass) });
-                        sphereBody.addShape(sphereShape);
-                        sphereBody.position.set(element.x, element.y, element.z);
-                        sphereBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                        sphereBody.threeMesh = scenenode;
-                        world.addBody(sphereBody);
-                    };
+                    // add node script to object data & add mesh to physics world (if running on player)
+                    applyScript(scenenode, element, i);
+                    applyPhysics(scenenode, element, isForPlayer);
                 } else {
                     // add node to instance
                     dummy.position.set(element.x, element.y, element.z);
@@ -463,7 +432,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode = new THREE.Mesh(geometry, material);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                scenenode.scale.set(element.sizeX / 10, element.sizeY / 10, element.sizeZ / 10);
+                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
                 scenenode.castShadow = true;
                 scenenode.receiveShadow = true;
 
@@ -487,30 +456,14 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         }
                     }
 
-                    // add node script to object data
-                    var scriptFunction = new Function("mesh", element.updateScript);
-                    var clickscriptFunction = new Function("mesh", element.clickScript);
-                    var initscriptFunction = new Function("mesh", element.initScript);
-                    scenenode.userData.scriptFunction = scriptFunction;
-                    scenenode.userData.clickscriptfunction = clickscriptFunction;
-                    scenenode.userData.initscriptFunction = initscriptFunction;
-                    scenenode.userData.itemIndex = i
-
-                    // create physics body
-                    if (isForPlayer) {
-                        const cylinderShape = threeToCannon(scenenode).shape;
-                        const cylinderBody = new CANNON.Body({ mass: parseFloat(element.mass) });
-                        cylinderBody.addShape(cylinderShape);
-                        cylinderBody.position.set(element.x, element.y, element.z);
-                        cylinderBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                        cylinderBody.threeMesh = scenenode;
-                        world.addBody(cylinderBody);
-                    };
+                    // add node script to object data & add mesh to physics world (if running on player)
+                    applyScript(scenenode, element, i);
+                    applyPhysics(scenenode, element, isForPlayer);
                 } else {
                     // add node to instance
                     dummy.position.set(element.x, element.y, element.z);
                     dummy.rotation.set(element.rotx, element.roty, element.rotz);
-                    dummy.scale.set(element.sizeX / 10, element.sizeY / 10, element.sizeZ / 10);
+                    dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
                     dummy.updateMatrix();
                     color.set(element.color);
                     cylindermesh.setMatrixAt(cylinderIndex, dummy.matrix);
@@ -528,8 +481,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         cylinderBodies.push({
                             body: cylinderBody,
                             index: cylinderIndex,
-                            scale: new THREE.Vector3(element.sizeX / 10, element.sizeY / 10, element.sizeZ / 10)
+                            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ)
                         });
+                        
                         cylinderInstanceData.push({
                             scriptFunction: element.updateScript ? new Function("mesh", "index", element.updateScript) : null,
                             clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
@@ -572,25 +526,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     }
                 }
 
-                // create physics body
-                if (isForPlayer) {
-                    var sphereShape = threeToCannon(scenenode).shape;
-                    var sphereBody = new CANNON.Body({ mass: element.mass });
-                    sphereBody.addShape(sphereShape);
-                    sphereBody.position.set(element.x, element.y, element.z);
-                    sphereBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                    world.addBody(sphereBody);
-                    sphereBody.threeMesh = scenenode;
-                }
-
-                // add node script to object data
-                var scriptFunction = new Function("mesh", element.updateScript);
-                var clickscriptFunction = new Function("mesh", element.clickScript);
-                var initscriptFunction = new Function("mesh", element.initScript);
-                scenenode.userData.scriptFunction = scriptFunction;
-                scenenode.userData.clickscriptfunction = clickscriptFunction;
-                scenenode.userData.initscriptFunction = initscriptFunction;
-                scenenode.userData.itemIndex = i
+                // add node script to object data & add mesh to physics world (if running on player)
+                applyScript(scenenode, element, i);
+                applyPhysics(scenenode, element, isForPlayer);
 
                 // apply texture
                 if (element.tex) {
@@ -625,25 +563,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     }
                 }
 
-                // create physics body
-                if (isForPlayer) {
-                    var cylinderShape = threeToCannon(scenenode).shape;
-                    var cylinderBody = new CANNON.Body({ mass: element.mass });
-                    cylinderBody.addShape(cylinderShape);
-                    cylinderBody.position.set(element.x, element.y, element.z);
-                    cylinderBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                    world.addBody(cylinderBody);
-                    cylinderBody.threeMesh = scenenode;
-                }
-
-                // add node script to object data
-                var scriptFunction = new Function("mesh", element.updateScript);
-                var clickscriptFunction = new Function("mesh", element.clickScript);
-                var initscriptFunction = new Function("mesh", element.initScript);
-                scenenode.userData.scriptFunction = scriptFunction;
-                scenenode.userData.clickscriptfunction = clickscriptFunction;
-                scenenode.userData.initscriptFunction = initscriptFunction;
-                scenenode.userData.itemIndex = i
+                // add node script to object data & add mesh to physics world (if running on player)
+                applyScript(scenenode, element, i);
+                applyPhysics(scenenode, element, isForPlayer);
 
                 // apply texture
                 if (element.tex) {
@@ -697,25 +619,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     }
                 }
 
-                // create physics body
-                if (isForPlayer) {
-                    var cylinderShape = threeToCannon(scenenode).shape;
-                    var cylinderBody = new CANNON.Body({ mass: element.mass });
-                    cylinderBody.addShape(cylinderShape);
-                    cylinderBody.position.set(element.x, element.y, element.z);
-                    cylinderBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                    world.addBody(cylinderBody);
-                    cylinderBody.threeMesh = scenenode;
-                }
-
-                // add node script to object data
-                var scriptFunction = new Function("mesh", element.updateScript);
-                var clickscriptFunction = new Function("mesh", element.clickScript);
-                var initscriptFunction = new Function("mesh", element.initScript);
-                scenenode.userData.scriptFunction = scriptFunction;
-                scenenode.userData.clickscriptfunction = clickscriptFunction;
-                scenenode.userData.initscriptFunction = initscriptFunction;
-                scenenode.userData.itemIndex = i
+                // add node script to object data & add mesh to physics world (if running on player)
+                applyScript(scenenode, element, i);
+                applyPhysics(scenenode, element, isForPlayer);
 
                 // apply click script to 3d model
                 scenenode.traverse((child) => {

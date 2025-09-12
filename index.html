@@ -74,7 +74,6 @@
 				<a onclick="redo()"><span>Redo</span></a>
 				<a><span>Snap to Grid</span> <input type="checkbox" onclick="setSnapping(this.checked)" id="snaptogrid"
 						checked></a>
-				<a style="display: none;"><span>Click to Select</span> <input type="checkbox" id="clicktosel"></a>
 			</div>
 		</li>
 
@@ -146,16 +145,13 @@
 	</ul>
 	<div id="sidecontainer">
 		<div id="sideButtons">
-			<button title="Select (S)" id="transformSelect">
-				<i class="fa-solid fa-arrow-pointer"></i>
-			</button>
 			<button title="Move (M)" id="transformMove">
 				<i class="fa-solid fa-up-down-left-right"></i>
 			</button>
 			<button title="Rotate (R)" id="transformRotate">
 				<i class="fa-solid fa-rotate"></i>
 			</button>
-			<button title="Scale (C)" id="transformScale">
+			<button title="Scale (S)" id="transformScale">
 				<i class="fa-solid fa-maximize"></i>
 			</button>
 
@@ -166,7 +162,7 @@
 			<button title="Add Cube" onclick="addElem.cube(0,0,0,1,1,1,'#ff0000')">
 				<i class="fa-solid fa-cube"></i>
 			</button>
-			<button title="Add Cylinder" onclick="addElem.cylinder(0,0,0,1,1,1,'#ff0000')">
+			<button title="Add Cylinder" onclick="addElem.cylinder(0,0,0,0.1,0.1,0.1,'#ff0000')">
 				<i class="fa-solid fa-circle-half-stroke"></i>
 			</button>
 			<button title="Add Sphere" onclick="addElem.sphere(0,0,0,1,1,1,'#ff0000')">
