@@ -99,14 +99,13 @@ function onDocumentMouseDown(event, duration) {
 
         if (selectedObject instanceof THREE.InstancedMesh && intersects[0].instanceId !== undefined) {
             let instanceId = intersects[0].instanceId;
-            let data = null;
+            Object.keys(allMesh).forEach(key => {
+                if (selectedObject !== allMesh[key]) return;
+                let data = instanceData[key][instanceId]
 
-            if (selectedObject === cubemesh) data = cubeInstanceData[instanceId];
-            else if (selectedObject === spheremesh) data = sphereInstanceData[instanceId];
-            else if (selectedObject === cylindermesh) data = cylinderInstanceData[instanceId];
-
-            if (data && 'itemIndex' in data) {
+                if (!data || !('itemIndex' in data)) return;
                 let idx = data.itemIndex;
+
                 if (event.shiftKey) {
                     let selectionArray = [...lastSelectedObj];
                     if (!selectionArray.includes(idx)) {
@@ -122,7 +121,7 @@ function onDocumentMouseDown(event, duration) {
                         listSchematic([]);
                     }
                 }
-            }
+            });
         } else {
             let idx = selectedObject.userData && selectedObject.userData.itemIndex;
             if (idx !== undefined) {

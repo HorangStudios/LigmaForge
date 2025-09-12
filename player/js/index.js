@@ -83,66 +83,29 @@ function updatePhysics() {
         }
     });
 
-    if (typeof cubemesh !== "undefined" && cubemesh.count) {
-        for (let i = 0; i < cubeInstanceData.length; i++) {
-            const data = cubeInstanceData[i];
+    Object.keys(allMesh).forEach(key => {
+        const instance = instanceData[key];
+        const mesh = allMesh[key];
+
+        for (let i = 0; i < instance.length; i++) {
+            const data = instanceData[key][i];
             if (data && data.scriptFunction) {
                 try {
-                    data.scriptFunction(cubemesh, i);
+                    data.scriptFunction(mesh, i);
                 } catch (err) {
                     debug("[ERR] " + err.message);
                 }
             }
             if (data && data.initscriptFunction && !data.initiated) {
                 try {
-                    data.initscriptFunction(cubemesh, i);
+                    data.initscriptFunction(mesh, i);
                     data.initiated = true;
                 } catch (err) {
                     debug("[ERR] " + err.message);
                 }
             }
         }
-    }
-    if (typeof spheremesh !== "undefined" && spheremesh.count) {
-        for (let i = 0; i < sphereInstanceData.length; i++) {
-            const data = sphereInstanceData[i];
-            if (data && data.scriptFunction) {
-                try {
-                    data.scriptFunction(cubemesh, i);
-                } catch (err) {
-                    debug("[ERR] " + err.message);
-                }
-            }
-            if (data && data.initscriptFunction && !data.initiated) {
-                try {
-                    data.initscriptFunction(cubemesh, i);
-                    data.initiated = true;
-                } catch (err) {
-                    debug("[ERR] " + err.message);
-                }
-            }
-        }
-    }
-    if (typeof cylindermesh !== "undefined" && cylindermesh.count) {
-        for (let i = 0; i < cylinderInstanceData.length; i++) {
-            const data = cylinderInstanceData[i];
-            if (data && data.scriptFunction) {
-                try {
-                    data.scriptFunction(cubemesh, i);
-                } catch (err) {
-                    debug("[ERR] " + err.message);
-                }
-            }
-            if (data && data.initscriptFunction && !data.initiated) {
-                try {
-                    data.initscriptFunction(cubemesh, i);
-                    data.initiated = true;
-                } catch (err) {
-                    debug("[ERR] " + err.message);
-                }
-            }
-        }
-    }
+    });
 
     requestAnimationFrame(updatePhysics);
 }
@@ -198,18 +161,17 @@ function onDocumentMouseDown(event) {
 
         if (selectedObject instanceof THREE.InstancedMesh && intersects[0].instanceId !== undefined) {
             let instanceId = intersects[0].instanceId;
-            let data = null;
-            if (selectedObject === cubemesh) data = cubeInstanceData[instanceId];
-            else if (selectedObject === spheremesh) data = sphereInstanceData[instanceId];
-            else if (selectedObject === cylindermesh) data = cylinderInstanceData[instanceId];
+            Object.keys(allMesh).forEach(key => {
+                if (selectedObject !== allMesh[key]) return;
+                let data = instanceData[key][instanceId]
 
-            if (data && data.clickscriptFunction) {
+                if (!data || !data.clickscriptFunction) return;
                 try {
                     data.clickscriptFunction({ mesh: selectedObject, index: instanceId });
                 } catch (err) {
                     debug("[ERR] " + err.message);
                 }
-            }
+            });
         } else if (selectedObject.userData.clickscriptfunction) {
             try {
                 selectedObject.userData.clickscriptfunction(selectedObject);

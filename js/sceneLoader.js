@@ -1,14 +1,10 @@
 // HorangHill LigmaForge Multipurpose Engine - Parse and load scene
-const cubeBodies = [];
-const sphereBodies = [];
-const cylinderBodies = [];
-const cubeInstanceData = [];
-const sphereInstanceData = [];
-const cylinderInstanceData = [];
-const dummy = new THREE.Object3D();
-let cubemesh, spheremesh, cylindermesh, gamestarteou;
-let transformControls
-let selSceneNode
+let gamestarteou, transformControls, selSceneNode;
+let dummy = new THREE.Object3D();
+let instanceBodies = {};
+let instanceData = {};
+let allMesh = {};
+let allIndex = {};
 
 // apply transformcontrols for individual node
 function applyTC(scenenode, element, supportScaling) {
@@ -140,7 +136,7 @@ function allOfTheLights() {
 }
 
 // apply scripts to the mesh
-function applyScript(scenenode, element, i) {
+function applyScript(scenenode, element, i, doApplyToChild = false) {
     var scriptFunction = new Function("mesh", element.updateScript);
     scenenode.userData.scriptFunction = scriptFunction;
 
@@ -151,6 +147,16 @@ function applyScript(scenenode, element, i) {
     scenenode.userData.initscriptFunction = initscriptFunction;
 
     scenenode.userData.itemIndex = i
+
+    if (!doApplyToChild) return;
+
+    // apply click script for 3d model
+    scenenode.traverse((child) => {
+        if (child.isMesh) {
+            child.userData.clickscriptfunction = clickscriptFunction;
+            child.userData.itemIndex = i
+        }
+    });
 }
 
 // add mesh to physics engine
@@ -166,6 +172,74 @@ function applyPhysics(scenenode, element, isForPlayer) {
     cubeBody.threeMesh = scenenode;
 
     world.addBody(cubeBody);
+}
+
+// add node to instance
+function applyInstance(element, index, type, sceneSchematics, geometry, scenenode, isForPlayer, i) {
+    // create mesh type if not yet defined
+    if (typeof allMesh[type] == 'undefined' || i === 0) {
+        allMesh[type] = new THREE.InstancedMesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }), sceneSchematics.filter(obj => obj.type === type).length);
+        allMesh[type].castShadow = true;
+        allMesh[type].receiveShadow = true;
+    }
+
+    // create mesh index if not yet created
+    if (typeof index[type] == 'undefined' || i === 0) {
+        index[type] = 0;
+    }
+
+    // create mesh bodies if not yet created
+    if (typeof instanceBodies[type] == 'undefined' || i === 0) {
+        instanceBodies[type] = [];
+    }
+
+    // create mesh instance data if not yet created
+    if (typeof instanceData[type] == 'undefined' || i === 0) {
+        instanceData[type] = [];
+    }
+
+    // create color and dummy
+    let color = new THREE.Color();
+    let dummy = new THREE.Object3D();
+
+    // add node to instance
+    dummy.position.set(element.x, element.y, element.z);
+    dummy.rotation.set(element.rotx, element.roty, element.rotz);
+    dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+    dummy.updateMatrix();
+    color.set(element.color);
+    allMesh[type].setMatrixAt(index[type], dummy.matrix);
+    allMesh[type].setColorAt(index[type], color);
+
+    // create physics model if run on player
+    if (isForPlayer) {
+        const shape = threeToCannon(scenenode).shape;
+        const body = new CANNON.Body({ mass: parseFloat(element.mass) });
+        body.addShape(shape);
+        body.position.set(element.x, element.y, element.z);
+        body.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
+        world.addBody(body);
+
+        instanceBodies[type].push({
+            body: body,
+            index: index[type],
+            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ)
+        });
+
+        instanceData[type].push({
+            scriptFunction: element.updateScript ? new Function("mesh", "index", element.updateScript) : null,
+            clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
+            initscriptFunction: element.initScript ? new Function("mesh", "index", element.initScript) : null,
+            initiated: false,
+            color: element.color
+        });
+    } else {
+        instanceData[type].push({
+            itemIndex: i
+        })
+    };
+
+    index[element.type]++
 }
 
 // load scene
@@ -222,44 +296,17 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     }
 
     // instanced meshes - initial setup
-    cubeInstanceData.length = 0;
-    sphereInstanceData.length = 0;
-    cylinderInstanceData.length = 0;
-
-    // cube instance - initial setup
-    let cubeIndex = 0;
-    const cubegeometry = new THREE.BoxGeometry(1, 1, 1);
-    const cubematerial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-    cubemesh = new THREE.InstancedMesh(cubegeometry, cubematerial, sceneSchematics.filter(obj => obj.type === "cube").length);
-    cubemesh.castShadow = true;
-    cubemesh.receiveShadow = true;
-
-    // sphere instance - initial setup
-    let sphereIndex = 0;
-    const spheregeometry = new THREE.SphereGeometry(1, 16, 12);
-    const spherematerial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-    spheremesh = new THREE.InstancedMesh(spheregeometry, spherematerial, sceneSchematics.filter(obj => obj.type === "spherev2").length);
-    spheremesh.castShadow = true;
-    spheremesh.receiveShadow = true;
-
-    // cylinder instance - initial setup
-    let cylinderIndex = 0;
-    const cylindergeometry = new THREE.CylinderGeometry(4.5, 4.5, 7.5, 32);
-    const cylindermaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-    cylindermesh = new THREE.InstancedMesh(cylindergeometry, cylindermaterial, sceneSchematics.filter(obj => obj.type === "cylinderv2").length);
-    cylindermesh.castShadow = true;
-    cylindermesh.receiveShadow = true;
+    instanceBodies = {};
+    instanceData = {};
+    allMesh = {};
+    allIndex = {};
 
     // selector group - editor only
     let selectGroup = new THREE.Group();
 
     // create all nodes
     sceneSchematics.forEach(async (element, i) => {
-        let color = new THREE.Color();
-        let dummy = new THREE.Object3D();
-        let geometry
-        let material
-        let scenenode
+        let geometry, material, scenenode;
 
         // check node type
         switch (element.type) {
@@ -303,42 +350,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     applyPhysics(scenenode, element, isForPlayer);
                 } else {
                     // add node to instance
-                    dummy.position.set(element.x, element.y, element.z);
-                    dummy.rotation.set(element.rotx, element.roty, element.rotz);
-                    dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                    dummy.updateMatrix();
-                    color.set(element.color);
-                    cubemesh.setMatrixAt(cubeIndex, dummy.matrix);
-                    cubemesh.setColorAt(cubeIndex, color);
-
-                    // create physics model if run on player
-                    if (isForPlayer) {
-                        const cubeShape = threeToCannon(scenenode).shape;
-                        const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
-                        cubeBody.addShape(cubeShape);
-                        cubeBody.position.set(element.x, element.y, element.z);
-                        cubeBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                        world.addBody(cubeBody);
-
-                        cubeBodies.push({
-                            body: cubeBody,
-                            index: cubeIndex,
-                            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ)
-                        });
-                        cubeInstanceData.push({
-                            scriptFunction: element.updateScript ? new Function("mesh", "index", element.updateScript) : null,
-                            clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
-                            initscriptFunction: element.initScript ? new Function("mesh", "index", element.initScript) : null,
-                            initiated: false,
-                            color: element.color
-                        });
-                    } else {
-                        cubeInstanceData.push({
-                            itemIndex: i
-                        })
-                    };
-
-                    cubeIndex++;
+                    applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
                 }
                 break;
 
@@ -382,42 +394,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     applyPhysics(scenenode, element, isForPlayer);
                 } else {
                     // add node to instance
-                    dummy.position.set(element.x, element.y, element.z);
-                    dummy.rotation.set(element.rotx, element.roty, element.rotz);
-                    dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                    dummy.updateMatrix();
-                    color.set(element.color);
-                    spheremesh.setMatrixAt(sphereIndex, dummy.matrix);
-                    spheremesh.setColorAt(sphereIndex, color);
-
-                    // create physics model if run on player
-                    if (isForPlayer) {
-                        const sphereShape = threeToCannon(scenenode).shape;
-                        const sphereBody = new CANNON.Body({ mass: parseFloat(element.mass) });
-                        sphereBody.addShape(sphereShape);
-                        sphereBody.position.set(element.x, element.y, element.z);
-                        sphereBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                        world.addBody(sphereBody);
-
-                        sphereBodies.push({
-                            body: sphereBody,
-                            index: sphereIndex,
-                            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ)
-                        });
-                        sphereInstanceData.push({
-                            scriptFunction: element.updateScript ? new Function("mesh", "index", element.updateScript) : null,
-                            clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
-                            initscriptFunction: element.initScript ? new Function("mesh", "index", element.initScript) : null,
-                            initiated: false,
-                            color: element.color
-                        });
-                    } else {
-                        sphereInstanceData.push({
-                            itemIndex: i
-                        })
-                    };
-
-                    sphereIndex++;
+                    applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
                 }
                 break;
 
@@ -461,120 +438,10 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     applyPhysics(scenenode, element, isForPlayer);
                 } else {
                     // add node to instance
-                    dummy.position.set(element.x, element.y, element.z);
-                    dummy.rotation.set(element.rotx, element.roty, element.rotz);
-                    dummy.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                    dummy.updateMatrix();
-                    color.set(element.color);
-                    cylindermesh.setMatrixAt(cylinderIndex, dummy.matrix);
-                    cylindermesh.setColorAt(cylinderIndex, color);
-
-                    // create physics model if run on player
-                    if (isForPlayer) {
-                        const cylinderShape = threeToCannon(scenenode).shape;
-                        const cylinderBody = new CANNON.Body({ mass: parseFloat(element.mass) });
-                        cylinderBody.addShape(cylinderShape);
-                        cylinderBody.position.set(element.x, element.y, element.z);
-                        cylinderBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
-                        world.addBody(cylinderBody);
-
-                        cylinderBodies.push({
-                            body: cylinderBody,
-                            index: cylinderIndex,
-                            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ)
-                        });
-                        
-                        cylinderInstanceData.push({
-                            scriptFunction: element.updateScript ? new Function("mesh", "index", element.updateScript) : null,
-                            clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
-                            initscriptFunction: element.initScript ? new Function("mesh", "index", element.initScript) : null,
-                            initiated: false,
-                            color: element.color
-                        });
-                    } else {
-                        cylinderInstanceData.push({
-                            itemIndex: i
-                        })
-                    };
-
-                    cylinderIndex++;
+                    applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
                 }
                 break;
-
-            case "sphere":
-                // legacy sphere object - will be removed in the future
-                // create geometry and material
-                geometry = new THREE.SphereGeometry(element.sphereradius, element.spherewidth, element.sphereheight);
-                material = new THREE.MeshPhongMaterial({ color: element.color });
-                material.opacity = element.opacity || 1
-                material.transparent = true
-
-                // create 3d object
-                scenenode = new THREE.Mesh(geometry, material);
-                scenenode.castShadow = true;
-                scenenode.receiveShadow = true;
-                scenenode.position.set(element.x, element.y, element.z);
-                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-
-                // spawn node and apply transformcontrols
-                scene.add(scenenode);
-                if (Array.isArray(select) && select.includes(i)) {
-                    if (select.length === 1) {
-                        applyTC(scenenode, element, true);
-                    } else {
-                        applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
-                    }
-                }
-
-                // add node script to object data & add mesh to physics world (if running on player)
-                applyScript(scenenode, element, i);
-                applyPhysics(scenenode, element, isForPlayer);
-
-                // apply texture
-                if (element.tex) {
-                    const texture = new THREE.TextureLoader().load(element.tex);
-                    scenenode.material.map = texture;
-                    scenenode.material.needsUpdate = true;
-                }
-                break;
-
-            case "cylinder":
-                // legacy cylinder object - will be removed in the future
-                // create geometry and material
-                geometry = new THREE.CylinderGeometry(element.radius, element.radius, element.height, element.radialSegments);
-                material = new THREE.MeshPhongMaterial({ color: element.color });
-                material.opacity = element.opacity || 1
-                material.transparent = true
-
-                // create 3d object
-                scenenode = new THREE.Mesh(geometry, material);
-                scenenode.castShadow = true;
-                scenenode.receiveShadow = true;
-                scenenode.position.set(element.x, element.y, element.z);
-                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-
-                // spawn node and apply transformcontrols
-                scene.add(scenenode);
-                if (Array.isArray(select) && select.includes(i)) {
-                    if (select.length === 1) {
-                        applyTC(scenenode, element, true);
-                    } else {
-                        applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
-                    }
-                }
-
-                // add node script to object data & add mesh to physics world (if running on player)
-                applyScript(scenenode, element, i);
-                applyPhysics(scenenode, element, isForPlayer);
-
-                // apply texture
-                if (element.tex) {
-                    const texture = new THREE.TextureLoader().load(element.tex);
-                    scenenode.material.map = texture;
-                    scenenode.material.needsUpdate = true;
-                }
-                break;
-
+                
             case "light":
                 // create light
                 scenenode = new THREE.PointLight(element.color, element.intensity, element.distance);
@@ -620,16 +487,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 }
 
                 // add node script to object data & add mesh to physics world (if running on player)
-                applyScript(scenenode, element, i);
+                applyScript(scenenode, element, i, true);
                 applyPhysics(scenenode, element, isForPlayer);
-
-                // apply click script to 3d model
-                scenenode.traverse((child) => {
-                    if (child.isMesh) {
-                        child.userData.clickscriptfunction = clickscriptFunction;
-                        child.userData.itemIndex = i
-                    }
-                });
                 break;
 
             default:
@@ -657,41 +516,22 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         }
     });
 
-    // spawn all instance on scene
-    scene.add(cubemesh);
-    scene.add(spheremesh);
-    scene.add(cylindermesh);
+    // spawn all instances on screen
+    Object.values(allMesh).forEach(element => { scene.add(element) });
 }
 
 // special for instanced meshes - update individual instance to its physics model
 function syncPhysicsToGraphics() {
-    if (!cubemesh || !spheremesh || !cylindermesh) return;
+    Object.keys(instanceBodies).forEach(i => {
+        const data = instanceBodies[i];
+        data.forEach(({ body, index, scale }) => {
+            dummy.position.copy(body.position);
+            dummy.quaternion.copy(body.quaternion);
+            dummy.scale.copy(scale);
+            dummy.updateMatrix();
+            allMesh[i].setMatrixAt(index, dummy.matrix);
+        });
 
-    cubeBodies.forEach(({ body, index, scale }) => {
-        dummy.position.copy(body.position);
-        dummy.quaternion.copy(body.quaternion);
-        dummy.scale.copy(scale);
-        dummy.updateMatrix();
-        cubemesh.setMatrixAt(index, dummy.matrix);
+        allMesh[i].instanceMatrix.needsUpdate = true;
     });
-
-    sphereBodies.forEach(({ body, index, scale }) => {
-        dummy.position.copy(body.position);
-        dummy.quaternion.copy(body.quaternion);
-        dummy.scale.copy(scale);
-        dummy.updateMatrix();
-        spheremesh.setMatrixAt(index, dummy.matrix);
-    });
-
-    cylinderBodies.forEach(({ body, index, scale }) => {
-        dummy.position.copy(body.position);
-        dummy.quaternion.copy(body.quaternion);
-        dummy.scale.copy(scale);
-        dummy.updateMatrix();
-        cylindermesh.setMatrixAt(index, dummy.matrix);
-    });
-
-    cubemesh.instanceMatrix.needsUpdate = true;
-    spheremesh.instanceMatrix.needsUpdate = true;
-    cylindermesh.instanceMatrix.needsUpdate = true;
 }
