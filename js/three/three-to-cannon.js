@@ -1,21 +1,21 @@
-var Quaternion$1 = CANNON.Quaternion
-var Box = CANNON.Box
-var Vec3 = CANNON.Vec3
-var Cylinder = CANNON.Cylinder
-var Sphere = CANNON.Sphere
-var ConvexPolyhedron = CANNON.ConvexPolyhedron
-var Trimesh = CANNON.Trimesh
+var Quaternion$1 = CANNON.Quaternion;
+var Box = CANNON.Box;
+var Vec3 = CANNON.Vec3;
+var Cylinder = CANNON.Cylinder;
+var Sphere = CANNON.Sphere;
+var ConvexPolyhedron = CANNON.ConvexPolyhedron;
+var Trimesh = CANNON.Trimesh;
 
-var Vector3 = THREE.Vector3
-var Line3 = THREE.Line3
-var Plane = THREE.Plane
-var Triangle = THREE.Triangle
-var Quaternion = THREE.Quaternion
-var BufferGeometry$1 = THREE.BufferGeometry
-var BufferAttribute = THREE.BufferAttribute
-var MathUtils = THREE.MathUtils
-var Box3 = THREE.Box3
-var Mesh = THREE.Mesh
+var Vector3 = THREE.Vector3;
+var Line3 = THREE.Line3;
+var Plane = THREE.Plane;
+var Triangle = THREE.Triangle;
+var Quaternion = THREE.Quaternion;
+var BufferGeometry$1 = THREE.BufferGeometry;
+var BufferAttribute = THREE.BufferAttribute;
+var MathUtils = THREE.MathUtils;
+var Box3 = THREE.Box3;
+var Mesh = THREE.Mesh;
 
 /**
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)

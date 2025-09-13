@@ -242,6 +242,16 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
     index[element.type]++
 }
 
+// apply textures
+function applyTex(scenenode, element) {
+    if (element.tex) {
+        const texture = new THREE.TextureLoader().load(element.tex, () => {
+            scenenode.material.map = texture;
+            scenenode.material.needsUpdate = true;
+        });
+    }
+};
+
 // load scene
 function loadScene(sceneSchematics, isForPlayer, select) {
     // clear scene then re-add sky and lighting
@@ -308,148 +318,16 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     sceneSchematics.forEach(async (element, i) => {
         let geometry, material, scenenode;
 
-        // check node type
+        // check node type (default is for static meshes)
         switch (element.type) {
-            case "cube":
-                // create geometry
-                geometry = new THREE.BoxGeometry(1, 1, 1);
-                material = new THREE.MeshPhongMaterial({ color: element.color });
-                material.transparent = true;
-                material.opacity = element.opacity || 1;
-
-                // change geometry
-                scenenode = new THREE.Mesh(geometry, material);
-                scenenode.position.set(element.x, element.y, element.z);
-                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                scenenode.castShadow = true;
-                scenenode.receiveShadow = true;
-
-                // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
-                if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
-                    if (element.tex) {
-                        // apply texture if available
-                        const texture = new THREE.TextureLoader().load(element.tex, () => {
-                            scenenode.material.map = texture;
-                            scenenode.material.needsUpdate = true;
-                        });
-                    }
-
-                    // spawn node and apply transformcontrols
-                    scene.add(scenenode);
-                    if (Array.isArray(select) && select.includes(i)) {
-                        if (select.length === 1) {
-                            applyTC(scenenode, element, true);
-                        } else {
-                            applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
-                        }
-                    }
-
-                    // add node script to object data & add mesh to physics world (if running on player)
-                    applyScript(scenenode, element, i);
-                    applyPhysics(scenenode, element, isForPlayer);
-                } else {
-                    // add node to instance
-                    applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
-                }
-                break;
-
-            case "spherev2":
-                // create geometry
-                geometry = new THREE.SphereGeometry(1, 16, 12);
-                material = new THREE.MeshPhongMaterial({ color: element.color });
-                material.transparent = true;
-                material.opacity = element.opacity || 1;
-
-                // change geometry
-                scenenode = new THREE.Mesh(geometry, material);
-                scenenode.position.set(element.x, element.y, element.z);
-                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                scenenode.castShadow = true;
-                scenenode.receiveShadow = true;
-
-                // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
-                if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
-                    // apply texture if available
-                    if (element.tex) {
-                        const texture = new THREE.TextureLoader().load(element.tex, () => {
-                            scenenode.material.map = texture;
-                            scenenode.material.needsUpdate = true;
-                        });
-                    }
-
-                    // spawn node and apply transformcontrols
-                    scene.add(scenenode);
-                    if (Array.isArray(select) && select.includes(i)) {
-                        if (select.length === 1) {
-                            applyTC(scenenode, element, true);
-                        } else {
-                            applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
-                        }
-                    }
-
-                    // add node script to object data & add mesh to physics world (if running on player)
-                    applyScript(scenenode, element, i);
-                    applyPhysics(scenenode, element, isForPlayer);
-                } else {
-                    // add node to instance
-                    applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
-                }
-                break;
-
-            case "cylinderv2":
-                // create geometry
-                geometry = new THREE.CylinderGeometry(4.5, 4.5, 7.5, 32);
-                material = new THREE.MeshPhongMaterial({ color: element.color });
-                material.transparent = true;
-                material.opacity = element.opacity || 1;
-
-                // change geometry
-                scenenode = new THREE.Mesh(geometry, material);
-                scenenode.position.set(element.x, element.y, element.z);
-                scenenode.rotation.set(element.rotx, element.roty, element.rotz);
-                scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
-                scenenode.castShadow = true;
-                scenenode.receiveShadow = true;
-
-                // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
-                if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
-                    // apply texture if available
-                    if (element.tex) {
-                        const texture = new THREE.TextureLoader().load(element.tex, () => {
-                            scenenode.material.map = texture;
-                            scenenode.material.needsUpdate = true;
-                        });
-                    }
-
-                    // spawn node and apply transformcontrols
-                    scene.add(scenenode);
-                    if (Array.isArray(select) && select.includes(i)) {
-                        if (select.length === 1) {
-                            applyTC(scenenode, element, true);
-                        } else {
-                            applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
-                        }
-                    }
-
-                    // add node script to object data & add mesh to physics world (if running on player)
-                    applyScript(scenenode, element, i);
-                    applyPhysics(scenenode, element, isForPlayer);
-                } else {
-                    // add node to instance
-                    applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
-                }
-                break;
-                
             case "light":
                 // create light
                 scenenode = new THREE.PointLight(element.color, element.intensity, element.distance);
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.castShadow = true;
+                scene.add(scenenode);
 
                 // spawn node and apply transformcontrols
-                scene.add(scenenode);
                 if (Array.isArray(select) && select.includes(i)) {
                     if (select.length === 1) {
                         applyTC(scenenode, element, false);
@@ -475,9 +353,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                 scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+                scene.add(scenenode);
 
                 // spawn node and apply transformcontrols
-                scene.add(scenenode);
                 if (Array.isArray(select) && select.includes(i)) {
                     if (select.length === 1) {
                         applyTC(scenenode, element, true);
@@ -492,7 +370,51 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 break;
 
             default:
-                console.warn('Unknown Scene Node! ' + element.type)
+                if (element.type in elemTypes) {
+                    // create geometry
+                    geometry = new elemTypes[element.type].threeMesh(...elemTypes[element.type].args);
+                    material = new THREE.MeshPhongMaterial({ color: element.color });
+                    material.transparent = true;
+                    material.opacity = element.opacity || 1;
+
+                    // change geometry
+                    scenenode = new THREE.Mesh(geometry, material);
+                    scenenode.position.set(element.x, element.y, element.z);
+                    scenenode.rotation.set(element.rotx, element.roty, element.rotz);
+                    scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+                    scenenode.castShadow = true;
+                    scenenode.receiveShadow = true;
+
+                    // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
+                    if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
+                        // apply transformcontrols
+                        if (Array.isArray(select) && select.includes(i)) {
+                            if (select.length === 1) {
+                                applyTC(scenenode, element, true);
+                            } else {
+                                applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
+                            }
+                        }
+
+                        // spawn node
+                        scene.add(scenenode);
+
+                        // add node script to object data,  add mesh to physics world (if running on player) & apply texture if available
+                        applyTex(scenenode, element)
+                        applyScript(scenenode, element, i);
+                        applyPhysics(scenenode, element, isForPlayer);
+                    } else {
+                        // add node to instance
+                        applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
+                    }
+                } else {
+                    // log unknown/deprecated node (when the element is not in elemTypes)
+                    if (typeof debug !== 'undefined') {
+                        debug('Unknown or Deprecated Node: ' + element.type);
+                    } else {
+                        console.warn('Unknown or Deprecated Node: ' + element.type);
+                    }
+                }
         }
 
         // spawn player if done loading

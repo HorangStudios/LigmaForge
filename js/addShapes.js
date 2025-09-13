@@ -1,7 +1,23 @@
 // HorangHill LigmaForge Multipurpose Engine - Node templates
 var addElem = {}
 
-// create cube
+// static mesh definitions
+var elemTypes = {
+    "cube": {
+        threeMesh: THREE.BoxGeometry,
+        args: [1, 1, 1]
+    },
+    "spherev2": {
+        threeMesh: THREE.SphereGeometry,
+        args: [1, 16, 12]
+    },
+    "cylinderv2": {
+        threeMesh: THREE.CylinderGeometry,
+        args: [4.5, 4.5, 7.5, 32]
+    }
+}
+
+// cube spawn code
 addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "cube",
@@ -35,7 +51,7 @@ addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     addObject()
 }
 
-// create sphere
+// sphere spawn code
 addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "sphere",
@@ -69,7 +85,7 @@ addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     addObject()
 }
 
-// create cylinder
+// cylinder spawn code
 addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "cylinder",
@@ -103,7 +119,7 @@ addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     addObject()
 }
 
-// create light
+// light spawn code
 addElem.light = function (x, y, z, intensity, distance, color) {
     sceneSchematics.push({
         "name": "light",
@@ -213,10 +229,3 @@ addElem.terrain = function (voxsize, tersize, color) {
         if (generated == (terrainSize * terrainSize)) { listSchematic(); addObject() };
     }
 }
-
-// backwards compatibility for old api - will remove in the future
-spawnCube = addElem.cube
-addSphere = addElem.sphere
-addCylinder = addElem.cylinder
-addLight = addElem.light
-generateterrain = addElem.terrain
