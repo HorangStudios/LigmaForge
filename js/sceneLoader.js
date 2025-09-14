@@ -160,9 +160,7 @@ function applyScript(scenenode, element, i, doApplyToChild = false) {
 }
 
 // add mesh to physics engine
-function applyPhysics(scenenode, element, isForPlayer) {
-    if (!isForPlayer) return;
-
+function applyPhysics(scenenode, element) {
     const cubeShape = threeToCannon(scenenode).shape;
     const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
 
@@ -243,13 +241,11 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
 }
 
 // apply textures
-function applyTex(scenenode, element) {
-    if (element.tex) {
-        const texture = new THREE.TextureLoader().load(element.tex, () => {
-            scenenode.material.map = texture;
-            scenenode.material.needsUpdate = true;
-        });
-    }
+function applyTex(scenenode, textureData) {
+    const texture = new THREE.TextureLoader().load(textureData, () => {
+        scenenode.material.map = texture;
+        scenenode.material.needsUpdate = true;
+    });
 };
 
 // load scene
@@ -365,8 +361,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 }
 
                 // add node script to object data & add mesh to physics world (if running on player)
+                if (isForPlayer) applyPhysics(scenenode, element);
                 applyScript(scenenode, element, i, true);
-                applyPhysics(scenenode, element, isForPlayer);
                 break;
 
             default:
@@ -401,9 +397,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         }
 
                         // add node script to object data,  add mesh to physics world (if running on player) & apply texture if available
-                        applyTex(scenenode, element)
+                        if (element.tex) applyTex(scenenode, element.tex);
+                        if (isForPlayer) applyPhysics(scenenode, element);
                         applyScript(scenenode, element, i);
-                        applyPhysics(scenenode, element, isForPlayer);
                     } else {
                         // add node to instance
                         applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
