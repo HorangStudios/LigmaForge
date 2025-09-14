@@ -387,17 +387,18 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
                     // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
                     if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
-                        // apply transformcontrols
+                        // apply transformcontrols and add node to scene
                         if (Array.isArray(select) && select.includes(i)) {
                             if (select.length === 1) {
+                                scene.add(scenenode);
                                 applyTC(scenenode, element, true);
                             } else {
-                                applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true)
+                                scene.add(scenenode);
+                                applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
                             }
+                        } else {
+                            scene.add(scenenode);
                         }
-
-                        // spawn node
-                        scene.add(scenenode);
 
                         // add node script to object data,  add mesh to physics world (if running on player) & apply texture if available
                         applyTex(scenenode, element)
