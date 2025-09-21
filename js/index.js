@@ -59,7 +59,7 @@ function resizeCanvas() {
     let sideButtonsWidth = document.getElementById('sideButtons').getBoundingClientRect().width
     let explorerWidth = document.getElementById('details').getBoundingClientRect().width
     let controlsHeight = document.getElementById('controls').getBoundingClientRect().height
-    let currWidth = window.innerWidth - ((sideButtonsWidth + 2) + (explorerWidth + 2))
+    let currWidth = window.innerWidth - (sideButtonsWidth + explorerWidth)
     let currHeight = window.innerHeight - (controlsHeight + 1)
 
     if ((currHeight != prevHeight) || (currWidth != prevWidth)) {
@@ -67,7 +67,7 @@ function resizeCanvas() {
         prevHeight = currHeight
 
         document.getElementById("canvas").style.marginTop = 0
-        document.getElementById("canvas").style.marginRight = explorerWidth + 1
+        document.getElementById("canvas").style.marginRight = explorerWidth
         document.getElementById("canvas").width = currWidth;
         document.getElementById("canvas").height = currHeight;
 

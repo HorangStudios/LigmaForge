@@ -155,6 +155,9 @@ async function spawnPlayer() {
 
   // keyboard controls - key held down
   document.addEventListener('keydown', async function (event) {
+    const focusedElem = document.activeElement.tagName;
+    if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA') return;
+
     switch (event.code) {
       case 'KeyW':
         keyState.w = true;
@@ -179,6 +182,14 @@ async function spawnPlayer() {
         // show sidebar when escape pressed
         toggleSideBar();
         break;
+      case 'F2':
+        event.preventDefault();
+        getSnapshot();
+        break;
+      case 'Slash':
+        event.preventDefault();
+        document.getElementById("chatInput").focus();
+        break;
       case 'ShiftLeft':
         if (document.pointerLockElement) {
           document.exitPointerLock();
@@ -191,6 +202,9 @@ async function spawnPlayer() {
 
   // keyboard controls - key released
   document.addEventListener('keyup', function (event) {
+    const focusedElem = document.activeElement.tagName;
+    if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA') return;
+
     switch (event.code) {
       case 'KeyW':
         keyState.w = false;

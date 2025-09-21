@@ -12,12 +12,12 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'horangfont';
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     outline: none;
 }
 
 @font-face {
-    font-family: 'horangfont';
+    font-family: 'Righteous';
     src: url("../css/Righteous-Regular.ttf");
 }
 
@@ -28,9 +28,9 @@ body {
     height: 40px;
     width: 100vw;
     border: none;
-    background: none;
     padding: 5px;
     background: #00000050;
+    backdrop-filter: blur(5px);
 }
 
 #health {
@@ -41,49 +41,46 @@ body {
 #navigation img {
     height: 100%;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .sidenav {
     height: calc(100dvh - 40px);
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    background-color: #1d1d1d;
-    overflow: hidden;
-    transition: 0.5s;
+    position: absolute;
     z-index: 10;
     bottom: 0;
+    width: 100vw;
+    place-items: center;
+    justify-content: center;
+    background: #00000025;
+    backdrop-filter: blur(5px);
 }
 
 .sidenav a {
-    padding: 10px 20px;
+    padding: 10px;
     text-decoration: none;
-    font-size: 15px;
-    color: #818181;
-    display: block;
+    color: white;
+    display: inline-block;
     transition: 0.3s;
-    padding-top: 0;
-}
-
-.sidenav hr {
-    margin: 10px 20px 20px;
-    border-color: #818181;
+    border: #ffffff50 solid 1px;
+    border-radius: 10px;
+    margin: 0px 10px 10px 10px;
+    cursor: pointer;
+    width: calc(100% - 20px);
 }
 
 .sidenav a:first-child {
-    padding-top: 10px;
+    margin: 10px 10px 10px 10px;
 }
 
 .sidenav a:hover {
-    color: #f1f1f1;
+    background: #ffffff25;
 }
 
 .sidenav .closebtn {
     position: absolute;
     top: 0;
     right: 25px;
-    font-size: 36px;
     margin-left: 50px;
 }
 
@@ -100,7 +97,9 @@ body {
 }
 
 .topsidebar {
-    height: calc(100% - 70px);
+    height: fit-content;
+    background: #00000050;
+    border-radius: 10px;
 }
 
 .loadingScreen {
@@ -119,25 +118,27 @@ body {
 
 #devtools {
     position: absolute;
-    height: 100dvh;
+    height: calc(100dvh - 40px);
+    width: 100vw;
     box-sizing: border-box;
     overflow: hidden;
-    transition: 0.5s;
     z-index: 10;
-    right: 0;
+    bottom: 0;
+    justify-content: center;
+    place-items: center;
 }
 
 #terminal {
     position: absolute;
-    right: 0;
     backdrop-filter: blur(10px);
     background: #1d1d1dab;
     padding: 20px;
-    height: calc(100dvh - 40px);
-    bottom: 0;
+    height: 40vh;
     color: white;
     overflow: auto;
-    width: 100%;
+    width: 45vw;
+    resize: both;
+    overflow: auto;
 }
 
 #skiploading {
@@ -150,30 +151,30 @@ body {
 }
 
 #chats {
-    overflow: auto;
-    display: flex;
+    overflow: hidden;
     flex-direction: column-reverse;
     position: absolute;
     z-index: 1;
-    padding: 10px;
     height: 20vh;
-    width: 20vw;
-    transition: 0.5s;
-    margin-top: 45px;
-    margin-left: 5px;
-    background: #00000050;
+    bottom: 0;
+    width: 100vw;
+    pointer-events: none;
 }
 
 #chats input {
-    padding: 5px;
-    margin-top: 10px;
-    background: #ffffff50;
-    color: black;
+    padding: 10px;
+    background: #00000025;
+    color: white;
     border: none;
+    pointer-events: all;
+}
+
+#chats input:focus {
+    background: #00000050;
 }
 
 #chats input::placeholder {
-    color: black;
+    color: white;
 }
 
 #chats p {
@@ -181,6 +182,8 @@ body {
     margin: 0;
     color: white;
     width: fit-content;
+    margin: 10px;
+    font-size: 14px;
 }
 
 #signinbox {
@@ -234,4 +237,47 @@ body {
 
 #jumpDiv i {
     pointer-events: all;
+}
+
+#sidenav-content {
+    min-width: 25vw;
+}
+
+@keyframes slideInUp {
+    0% {
+        -webkit-transform: translateY(100%);
+        transform: translateY(100%);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutDown {
+    0% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+
+    100% {
+        visibility: hidden;
+        -webkit-transform: translateY(100%);
+        transform: translateY(100%);
+    }
+}
+
+#gamename {
+    width: 100%;
+    margin: 0;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #00000050;
+    padding: 15px;
+    background-size: cover;
+    background-position: center center;
+    box-shadow: 10vw -1px 100px 8px rgba(0, 0, 0, 1) inset;
 }

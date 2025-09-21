@@ -4,6 +4,7 @@
 <head>
     <title id="pagetitle">HorangHill Player</title>
     <link rel="stylesheet" href="style.css">
+	<link rel="icon" type="image/x-icon" href="../css/HorangHill.png">
 
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
@@ -54,8 +55,8 @@
     </div>
 
     <div id="chats" style="display: none;">
-        <input placeholder="Send a message..." onkeydown="typeChat(this)" autocomplete="one-time-code">
-        <p id="chatcontent">Welcome to HorangHill !</p>
+        <input placeholder="Send a message..." onkeydown="typeChat(this)" autocomplete="one-time-code" id="chatInput">
+        <p id="chatcontent">Welcome to HorangHill!</p>
     </div>
 
     <div id="joyDiv" style="display: none;"></div>
@@ -63,19 +64,21 @@
         <i class="fa-solid fa-circle-arrow-up" id="jumpBtn"></i>
     </div>
 
-    <div id="Sidenav" class="sidenav" style="width: 0px;">
-        <div class="topsidebar" id="topsidebar">
-            <a onclick="window.close();" id="quitbtn"><i class="fa-solid fa-angle-left"></i> Quit</a>
-            <a onclick="firebase.auth().signOut(); window.location.reload()"><i class="fa-solid fa-angle-left"></i> Log
-                out from account</a>
-            <hr>
-            <a onclick="showConsole()"><i class="fa-solid fa-code"></i> Developer log</a>
+    <div id="Sidenav" class="sidenav" style="display: none;">
+        <div id="sidenav-content">
+            <a id="gamename">Game</a>
+            <div class="topsidebar" id="topsidebar">
+                <a onclick="window.close();" id="quitbtn">Leave</a><br>
+                <a onclick="firebase.auth().signOut(); window.location.reload()">Log Out & Leave</a><br>
+                <a onclick="getSnapshot();">Take screenshot</a>
+                <a onclick="document.getElementById('devtools').style.display = 'flex'">Developer log</a>
+            </div>
         </div>
-        <a id="gamename">Game</a>
     </div>
 
-    <div id="devtools" style="width: 0px;">
-        <div id="terminal"></div>
+    <div id="devtools" style="display: none;">
+        <div id="terminal">
+        </div>
     </div>
 
     <div class="loadingScreen" id="loginDialog">

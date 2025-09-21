@@ -14,8 +14,27 @@ function debug(text) {
     let p = document.createElement('p');
     p.innerText = formattedToday + text;
 
-    document.getElementById('terminal').prepend(p)
+    document.getElementById('terminal').appendChild(p)
     console.log(formattedToday + text);
+}
+
+function getSnapshot() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    const formattedToday = dd + '/' + mm + '/' + yyyy;
+    const get = renderer.domElement.toDataURL();
+    const element = document.createElement('a');
+
+    element.setAttribute('href', get);
+    element.setAttribute('download', `${formattedToday}.png`);
+    element.click();
 }
 
 // Create a scene
@@ -36,7 +55,7 @@ world.solver.iterations = 10;
 const clock = new THREE.Clock();
 
 // Create a renderer
-var renderer = new THREE.WebGLRenderer({ antialias: true });
+var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true  });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputEncoding = THREE.sRGBEncoding;
@@ -121,28 +140,17 @@ animate()
 //sidebar
 function toggleSideBar() {
     var x = document.getElementById("Sidenav");
-    var y = document.getElementById("canvas");
-    var b = document.getElementById("chats");
     var z = document.getElementById("devtools");
-    if (x.style.width == "0px") {
-        x.style.width = "250px";
-        y.style.filter = "blur(10px)";
-        b.style.filter = "blur(10px)";
-    } else {
-        x.style.width = "0px";
-        z.style.width = "0px";
-        y.style.filter = "blur(0px)";
-        b.style.filter = "blur(0px)";
-    }
-}
 
-//show devtools
-function showConsole() {
-    var x = document.getElementById("devtools");
-    if (x.style.width == "0px") {
-        x.style.width = "calc(100vw - 250px)";
+    if (x.style.display == "none") {
+        x.style.display = "flex";
+        x.style.animation = "slideInUp 0.25s";
     } else {
-        x.style.width = "0px";
+        x.style.animation = "slideOutDown 0.25s";
+        z.style.display = "none";
+        setTimeout(() => {
+            x.style.display = "none";
+        }, 250);
     }
 }
 
@@ -195,7 +203,7 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 
 //version name
-let ver = "0.5.0";
+let ver = "0.5.5";
 console.log(`
     %cHorangHill V `, `
     font-weight: bold; 

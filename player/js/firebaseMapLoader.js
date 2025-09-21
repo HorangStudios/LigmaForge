@@ -10,11 +10,11 @@ function loadFirebaseGame() {
 
   ref.once('value', snapshot => {
     const item = snapshot.val();
-    document.getElementById('gamename').innerHTML = item.title + "<br>By " + item.createdBy
+    document.getElementById('gamename').innerHTML = `<b>${item.title}</b><br>${item.createdBy}`
     document.getElementById('pagetitle').innerText = item.title
     document.getElementById('gameloader').innerText = item.title
-    document.getElementById('clientversion').innerText = "By " + item.createdBy
-    setTimeout(() => { loadScene(item.hhls, true, false) }, 1500);
+    document.getElementById('gamename').style.backgroundImage = `url(${item.thumbnail})`
+    loadScene(item.hhls, true, false)
   });
 }
 
