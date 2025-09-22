@@ -86,11 +86,11 @@ async function spawnPlayer() {
   });
 
   // check if player is falling or jumping
-  window.checkPositionChange = function(type) {
+  window.checkPositionChange = function (type) {
     const change = Math.abs(cubeBody.velocity.y);
     var smallChangeThreshold;
     if (type == "anim") {
-      smallChangeThreshold = 0.25
+      smallChangeThreshold = 0.20
     } else {
       smallChangeThreshold = 0.01
     }
@@ -208,23 +208,23 @@ async function spawnPlayer() {
     switch (event.code) {
       case 'KeyW':
         keyState.w = false;
-        createPlayer[1].isWalking = false;
         break;
       case 'KeyA':
         keyState.a = false;
-        createPlayer[1].isWalking = false;
         break;
       case 'KeyS':
         keyState.s = false;
-        createPlayer[1].isWalking = false;
         break;
       case 'KeyD':
         keyState.d = false;
-        createPlayer[1].isWalking = false;
         break;
       case 'Space':
         keyState.space = false;
         break;
+    }
+
+    if (!(keyState.w || keyState.a || keyState.s || keyState.d)) {
+      createPlayer[1].isWalking = false;
     }
   });
 
@@ -358,8 +358,10 @@ async function spawnPlayer() {
     // apply animation if player is falling/jumping
     if (checkPositionChange("anim")) {
       createPlayer[1].isJumping = false;
+      console.log("jump false")
     } else {
       createPlayer[1].isJumping = true;
+      console.log("jump true")
     }
 
     // pointer lock indicator

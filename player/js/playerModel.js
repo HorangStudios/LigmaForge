@@ -353,7 +353,7 @@ async function playerModel(color, avatar) {
       rightLegPivot.rotation.x = lerp(phases[startStep].rightLeg.rot, phases[endStep].rightLeg.rot, t);
 
       // apply step to arms. avoid applying animation if jumping/falling
-      if (window.checkPositionChange()) {
+      if (!data.isJumping) {
         leftArmPivot.rotation.x = lerp(phases[startStep].leftArm.rot, phases[endStep].leftArm.rot, t);
         rightArmPivot.rotation.x = lerp(phases[startStep].rightArm.rot, phases[endStep].rightArm.rot, t);
       }
