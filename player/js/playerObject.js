@@ -53,10 +53,12 @@ var firstMessageID = Date.now() + makeid(16)
 // create playable character
 async function spawnPlayer() {
   var playerRotation = 0;
+  var playerRotationY = 0;
   var playerSpeed = 0.1;
   var Health = 100;
   var avatarData = { colors: {} }
   var lastTouchX = 0;
+  var lastTouchY = 0;
 
   // show chat and title bar
   document.getElementById("chats").style.display = 'flex'
@@ -70,6 +72,7 @@ async function spawnPlayer() {
     if (document.pointerLockElement === renderer.domElement) {
       const sensitivity = 0.0025;
       playerRotation -= e.movementX * sensitivity;
+      playerRotationY -= e.movementY * sensitivity;
     }
   });
 
@@ -79,14 +82,17 @@ async function spawnPlayer() {
   renderer.domElement.addEventListener("touchmove", (e) => {
     if (lastTouchX !== 0) {
       const deltaX = e.targetTouches[0].clientX - lastTouchX;
+      const deltaY = e.targetTouches[0].clientY - lastTouchY;
       const sensitivity = 0.0025;
       playerRotation -= deltaX * sensitivity;
+      playerRotationY -= deltaY * sensitivity;
       lastTouchX = e.targetTouches[0].clientX;
+      lastTouchY = e.targetTouches[0].clientY;
     }
   });
 
   // check if player is falling or jumping
-  window.checkPositionChange = function(type) {
+  window.checkPositionChange = function (type) {
     const change = Math.abs(cubeBody.velocity.y);
     var smallChangeThreshold;
     if (type == "anim") {
@@ -156,54 +162,54 @@ async function spawnPlayer() {
   // keyboard controls - key held down
   document.addEventListener('keydown', async function (event) {
     const focusedElem = document.activeElement.tagName;
-    if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA') return;
-
-    switch (event.code) {
-      case 'KeyW':
-        keyState.w = true;
-        createPlayer[1].isWalking = true;
-        break;
-      case 'KeyA':
-        keyState.a = true;
-        createPlayer[1].isWalking = true;
-        break;
-      case 'KeyS':
-        keyState.s = true;
-        createPlayer[1].isWalking = true;
-        break;
-      case 'KeyD':
-        keyState.d = true;
-        createPlayer[1].isWalking = true;
-        break;
-      case 'Space':
-        keyState.space = true;
-        break;
-      case 'Escape':
-        // show sidebar when escape pressed
-        toggleSideBar();
-        break;
-      case 'F2':
-        event.preventDefault();
-        getSnapshot();
-        break;
-      case 'Slash':
-        event.preventDefault();
-        document.getElementById("chatInput").focus();
-        break;
-      case 'ShiftLeft':
-        if (document.pointerLockElement) {
-          document.exitPointerLock();
-        } else {
-          await renderer.domElement.requestPointerLock();
-        }
-        break;
+    const sideNav = document.getElementById("Sidenav");
+    if (event.code == 'Escape' && !(focusedElem == 'INPUT' || focusedElem == 'TEXTAREA')) {
+      toggleSideBar();
+    } else if (!(focusedElem == 'INPUT' || focusedElem == 'TEXTAREA' || sideNav.style.display !== 'none')) {
+      switch (event.code) {
+        case 'KeyW':
+          keyState.w = true;
+          createPlayer[1].isWalking = true;
+          break;
+        case 'KeyA':
+          keyState.a = true;
+          createPlayer[1].isWalking = true;
+          break;
+        case 'KeyS':
+          keyState.s = true;
+          createPlayer[1].isWalking = true;
+          break;
+        case 'KeyD':
+          keyState.d = true;
+          createPlayer[1].isWalking = true;
+          break;
+        case 'Space':
+          keyState.space = true;
+          break;
+        case 'F2':
+          event.preventDefault();
+          getSnapshot();
+          break;
+        case 'Slash':
+          event.preventDefault();
+          document.getElementById("chatInput").focus();
+          break;
+        case 'ShiftLeft':
+          if (document.pointerLockElement) {
+            document.exitPointerLock();
+          } else {
+            await renderer.domElement.requestPointerLock();
+          }
+          break;
+      }
     }
   });
 
   // keyboard controls - key released
   document.addEventListener('keyup', function (event) {
     const focusedElem = document.activeElement.tagName;
-    if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA') return;
+    const sideNav = document.getElementById("Sidenav");
+    if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA' || sideNav.style.display !== 'none') return;
 
     switch (event.code) {
       case 'KeyW':
