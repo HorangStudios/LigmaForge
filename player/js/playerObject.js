@@ -50,6 +50,17 @@ var playerObject
 var playerUniqueID
 var firstMessageID = Date.now() + makeid(16)
 
+function moveToSpawn(body) {
+  if (typeof instanceData.spawnnode !== "undefined") {
+    const values = Object.values(instanceData.spawnnode);
+    const randomValueIndex = Math.floor(Math.random() * values.length);
+    const randomPicked = values[randomValueIndex].elemPos;
+    body.position.set(randomPicked.x, randomPicked.y + 0.5, randomPicked.z);
+  } else {
+    body.position.set(0, 0, 0);
+  }
+}
+
 // create playable character
 async function spawnPlayer() {
   var playerRotation = 0;
@@ -146,9 +157,9 @@ async function spawnPlayer() {
   var cubeBody = new CANNON.Body({ mass: parseInt(1) });
   var shapeOffset = new CANNON.Vec3(0, 0.75, 0);
   cubeBody.addShape(cubeShape, shapeOffset);
-  cubeBody.position.set(0, 0, 0);
   cubeBody.threeMesh = sceneNode;
   world.addBody(cubeBody);
+  moveToSpawn(cubeBody);
 
   // keyboard controls data
   var keyState = {
@@ -364,10 +375,8 @@ async function spawnPlayer() {
     // apply animation if player is falling/jumping
     if (checkPositionChange("anim")) {
       createPlayer[1].isJumping = false;
-      console.log("jump false")
     } else {
       createPlayer[1].isJumping = true;
-      console.log("jump true")
     }
 
     // pointer lock indicator
@@ -394,10 +403,8 @@ async function spawnPlayer() {
 
     // respawn player when dead
     if (Health <= 0) {
-      setTimeout(() => {
-        cubeBody.position.set(0, 0, 0);
+        moveToSpawn(cubeBody)
         Health = 100;
-      }, 1500);
     }
 
     // update health bar

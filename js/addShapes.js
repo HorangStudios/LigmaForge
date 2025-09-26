@@ -14,6 +14,10 @@ var elemTypes = {
     "cylinderv2": {
         threeMesh: THREE.CylinderGeometry,
         args: [4.5, 4.5, 7.5, 32]
+    },
+    "spawnnode": {
+        threeMesh: THREE.BoxGeometry,
+        args: [1, 1, 1]
     }
 }
 
@@ -107,6 +111,41 @@ addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
         "mat": "MeshPhongMaterial",
         "tex": false,
         "opacity": 1,
+
+        "initScript": "",
+        "updateScript": "",
+        "clickScript": "",
+
+        "mass": 0
+    })
+
+    listSchematic()
+    addObject()
+}
+
+// spawn node spawn code
+addElem.spawnnode = function (x, y, z, sizeX, sizeY, sizeZ, color) {
+    sceneSchematics.push({
+        "name": "Spawn Node",
+        "type": "spawnnode",
+
+        "x": x,
+        "y": y,
+        "z": z,
+
+        "rotx": 0,
+        "roty": 0,
+        "rotz": 0,
+
+        "sizeX": sizeX,
+        "sizeY": sizeY,
+        "sizeZ": sizeZ,
+
+        "color": color,
+        "mat": "MeshPhongMaterial",
+        "tex": false,
+        "opacity": 1,
+        "team": "none",
 
         "initScript": "",
         "updateScript": "",

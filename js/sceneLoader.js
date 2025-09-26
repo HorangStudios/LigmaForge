@@ -229,11 +229,12 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
             clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
             initscriptFunction: element.initScript ? new Function("mesh", "index", element.initScript) : null,
             initiated: false,
-            color: element.color
+            color: element.color,
+            elemPos: body.position
         });
     } else {
         instanceData[type].push({
-            itemIndex: i
+            itemIndex: i,
         })
     };
 
