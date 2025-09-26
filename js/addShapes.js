@@ -1,26 +1,6 @@
 // HorangHill LigmaForge Multipurpose Engine - Node templates
 var addElem = {}
 
-// static mesh definitions
-var elemTypes = {
-    "cube": {
-        threeMesh: THREE.BoxGeometry,
-        args: [1, 1, 1]
-    },
-    "spherev2": {
-        threeMesh: THREE.SphereGeometry,
-        args: [1, 16, 12]
-    },
-    "cylinderv2": {
-        threeMesh: THREE.CylinderGeometry,
-        args: [4.5, 4.5, 7.5, 32]
-    },
-    "spawnnode": {
-        threeMesh: THREE.BoxGeometry,
-        args: [1, 1, 1]
-    }
-}
-
 // cube spawn code
 addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
@@ -268,3 +248,56 @@ addElem.terrain = function (voxsize, tersize, color) {
         if (generated == (terrainSize * terrainSize)) { listSchematic(); addObject() };
     }
 }
+
+// static mesh definitions
+var elemTypes = {
+    "cube": {
+        threeMesh: THREE.BoxGeometry,
+        args: [1, 1, 1],
+        name: "Cube",
+        icon: "fa-solid fa-cube",
+        spawnFunction: addElem.cube,
+        spawnArgs: [0, 0, 0, 1, 1, 1, '#ff0000']
+    },
+    "spherev2": {
+        threeMesh: THREE.SphereGeometry,
+        args: [1, 16, 12],
+        name: "Sphere",
+        icon: "fa-solid fa-circle-half-stroke",
+        spawnFunction: addElem.sphere,
+        spawnArgs: [0, 0, 0, 1, 1, 1, '#ff0000']
+    },
+    "cylinderv2": {
+        threeMesh: THREE.CylinderGeometry,
+        args: [4.5, 4.5, 7.5, 32],
+        name: "Cylinder",
+        icon: "fa-solid fa-circle-half-stroke",
+        spawnFunction: addElem.cylinder,
+        spawnArgs: [0, 0, 0, 0.1, 0.1, 0.1, '#ff0000']
+    },
+    "spawnnode": {
+        threeMesh: THREE.BoxGeometry,
+        args: [1, 1, 1],
+        name: "Spawn Node",
+        icon: "fa-solid fa-flag",
+        spawnFunction: addElem.spawnnode,
+        spawnArgs: [0, 0, 0, 1.5, 0.25, 1.5, '#808080']
+    }
+}
+
+// spawn static mesh spawn buttons
+Object.values(elemTypes).forEach(item => {
+    const br = document.createElement("br");
+    const elem = document.createElement("button");
+    elem.title = "Add " + item.name;
+    elem.onclick = function () {
+        item.spawnFunction(...item.spawnArgs);
+    }
+
+    const icon = document.createElement("i");
+    icon.className = item.icon;
+
+    elem.append(icon);
+    document.getElementById("spawnIcon").append(elem);
+    document.getElementById("spawnIcon").append(br);
+});

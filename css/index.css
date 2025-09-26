@@ -266,3 +266,7 @@ input[type=checkbox] {
 #detailscontent {
     padding: 15px;
 }
+
+#spawnIcon button {
+    width: 100%;
+}
