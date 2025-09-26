@@ -176,6 +176,8 @@ async function spawnPlayer() {
     const sideNav = document.getElementById("Sidenav");
     if (event.code == 'Escape' && !(focusedElem == 'INPUT' || focusedElem == 'TEXTAREA')) {
       toggleSideBar();
+    } else if (event.code == 'Escape' && focusedElem == 'INPUT') {
+      document.getElementById("chatInput").blur();
     } else if (!(focusedElem == 'INPUT' || focusedElem == 'TEXTAREA' || sideNav.style.display !== 'none')) {
       switch (event.code) {
         case 'KeyW':
