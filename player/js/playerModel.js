@@ -440,7 +440,7 @@ async function playerModel(color, avatar) {
       rightLegPivot.position.set(0, 0, 0);
       rightLegPivot.rotation.x = 0;
 
-      if (typeof checkPositionChange !== undefined) {
+      if (typeof checkPositionChange !== 'undefined') {
         if (checkPositionChange("anim")) {
           leftArmPivot.rotation.x = 0;
           rightArmPivot.rotation.x = 0;
