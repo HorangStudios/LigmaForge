@@ -55,7 +55,7 @@ world.solver.iterations = 10;
 const clock = new THREE.Clock();
 
 // Create a renderer
-var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true  });
+var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputEncoding = THREE.sRGBEncoding;
@@ -76,25 +76,24 @@ composer.addPass(ssaoPass);
 
 //update physics
 function updatePhysics() {
+    // run initscript and script for normal mesh
     scene.traverse(function (object) {
-        if ((object instanceof THREE.Mesh || object instanceof THREE.Object3D) && object.userData.scriptFunction) {
-            try {
-                object.userData.scriptFunction(object);
-
-                if (object.userData.initiated != true) {
-                    object.userData.initscriptFunction(object);
-                    object.userData.initiated = true;
-                }
+        if ((object instanceof THREE.Mesh || object instanceof THREE.Object3D) && object.userData) {
+            if (object.userData.scriptFunction) {
+                ScriptSandbox(object.userData.scriptFunction, object.userData.body, object, false);
             }
-            catch (err) {
-                debug("[ERR] " + err.message);
+            if (object.userData.initiated != true && object.userData.initscriptFunction) {
+                object.userData.initiated = true;
+                ScriptSandbox(object.userData.initscriptFunction, object.userData.body, object, false);
             }
         }
     });
 
+    // continue physics
     world.step(1 / 60);
     if (gamestarteou) { syncPhysicsToGraphics() };
 
+    // apply to normal bodies
     world.bodies.forEach(function (body, index) {
         if (body.threeMesh) {
             body.threeMesh.position.copy(body.position);
@@ -102,26 +101,16 @@ function updatePhysics() {
         }
     });
 
+    // initscript and loop scripts for instanced meshes
     Object.keys(allMesh).forEach(key => {
-        const instance = instanceData[key];
-        const mesh = allMesh[key];
-
-        for (let i = 0; i < instance.length; i++) {
+        for (let i = 0; i < instanceData[key].length; i++) {
             const data = instanceData[key][i];
             if (data && data.scriptFunction) {
-                try {
-                    data.scriptFunction(mesh, i);
-                } catch (err) {
-                    debug("[ERR] " + err.message);
-                }
+                ScriptSandbox(data.scriptFunction, instanceBodies[key][i].body, allMesh[key], true, i, instanceBodies[key][i]);
             }
             if (data && data.initscriptFunction && !data.initiated) {
-                try {
-                    data.initscriptFunction(mesh, i);
-                    data.initiated = true;
-                } catch (err) {
-                    debug("[ERR] " + err.message);
-                }
+                data.initiated = true;
+                ScriptSandbox(data.initscriptFunction, instanceBodies[key][i].body, allMesh[key], true, i, instanceBodies[key][i]);
             }
         }
     });
@@ -168,28 +157,29 @@ function onDocumentMouseDown(event) {
         var selectedObject = intersects[0].object;
 
         if (selectedObject instanceof THREE.InstancedMesh && intersects[0].instanceId !== undefined) {
-            let instanceId = intersects[0].instanceId;
             Object.keys(allMesh).forEach(key => {
                 if (selectedObject !== allMesh[key]) return;
-                let data = instanceData[key][instanceId]
+                let instanceId = intersects[0].instanceId;
 
+                let data = instanceData[key][instanceId]
                 if (!data || !data.clickscriptFunction) return;
-                try {
-                    data.clickscriptFunction({ mesh: selectedObject, index: instanceId });
-                } catch (err) {
-                    debug("[ERR] " + err.message);
+
+                if (data.clickscriptFunction.type == "script") {
+                    ScriptSandbox(data.clickscriptFunction.code, instanceBodies[key][instanceId].body, selectedObject, true, instanceId, instanceBodies[key][instanceId]);
+                } else if (data.clickscriptFunction.type == "clickListener") {
+                    data.clickscriptFunction.resolve()
                 }
             });
-        } else if (selectedObject.userData.clickscriptfunction) {
-            try {
-                selectedObject.userData.clickscriptfunction(selectedObject);
-            }
-            catch (err) {
-                debug("[ERR] " + err.message);
+        } else if (selectedObject.userData.clickscriptFunction) {
+            if (selectedObject.userData.clickscriptFunction.type == "script") {
+                ScriptSandbox(selectedObject.userData.clickscriptFunction.code, selectedObject.userData.body, selectedObject, false);
+            } else if (selectedObject.userData.clickscriptFunction.type == "clickListener") {
+                selectedObject.userData.clickscriptFunction.resolve()
             }
         }
     }
 }
+
 document.getElementById('canvas').addEventListener('click', onDocumentMouseDown, false);
 
 //resize window
@@ -203,7 +193,7 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 
 //version name
-let ver = "0.5.5";
+let ver = "0.6.7";
 console.log(`
     %cHorangHill V `, `
     font-weight: bold; 

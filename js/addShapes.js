@@ -1,11 +1,37 @@
 // HorangHill LigmaForge Multipurpose Engine - Node templates
 var addElem = {}
+var valueLabel = {
+    "name": "Name",
+    "uuid": "UUID",
+
+    "x": "X",
+    "y": "Y",
+    "z": "Z",
+
+    "rotx": "X Rotation",
+    "roty": "Y Rotation",
+    "rotz": "Z Rotation",
+
+    "sizeX": "Length",
+    "sizeY": "Height",
+    "sizeZ": "Width",
+
+    "color": "Color",
+    "opacity": "Opacity",
+    "tex": "Texture",
+
+    "mass": "Mass",
+
+    "intensity": "Intensity",
+    "distance": "Distance",
+}
 
 // cube spawn code
 addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "cube",
         "type": "cube",
+        "uuid": makeUniqueId(sceneSchematics),
 
         "x": x,
         "y": y,
@@ -40,6 +66,7 @@ addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "sphere",
         "type": "spherev2",
+        "uuid": makeUniqueId(sceneSchematics),
 
         "x": x,
         "y": y,
@@ -74,6 +101,7 @@ addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "cylinder",
         "type": "cylinderv2",
+        "uuid": makeUniqueId(sceneSchematics),
 
         "x": x,
         "y": y,
@@ -108,6 +136,7 @@ addElem.spawnnode = function (x, y, z, sizeX, sizeY, sizeZ, color) {
     sceneSchematics.push({
         "name": "Spawn Node",
         "type": "spawnnode",
+        "uuid": makeUniqueId(sceneSchematics),
 
         "x": x,
         "y": y,
@@ -143,6 +172,7 @@ addElem.light = function (x, y, z, intensity, distance, color) {
     sceneSchematics.push({
         "name": "light",
         "type": "light",
+        "uuid": makeUniqueId(sceneSchematics),
 
         "x": x,
         "y": y,
@@ -178,6 +208,7 @@ addElem.importGLTFModel = function (x, y, z) {
         sceneSchematics.push({
             "name": input.files[0].name,
             "type": "importedGLTFModel",
+            "uuid": makeUniqueId(sceneSchematics),
 
             "x": x,
             "y": y,
@@ -218,6 +249,7 @@ addElem.terrain = function (voxsize, tersize, color) {
             sceneSchematics.push({
                 "name": "cube",
                 "type": "cube",
+                "uuid": makeUniqueId(sceneSchematics),
 
                 "x": (x * voxelSize) - (terrainSize / 2),
                 "y": (noise.noise(x / 10, y / 10, 0) * 10) - 10,
@@ -285,6 +317,40 @@ var elemTypes = {
     }
 }
 
+function makeUniqueId(array) {
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    let maxAttempts = 1000;
+    let attempts = 0;
+    let length = 4;
+    let id;
+
+    function generateId(len) {
+        let result = '';
+        for (let i = 0; i < len; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    function idExists(id) {
+        return array.some(obj => obj["uuid"] === id);
+    }
+
+
+    while (true) {
+        id = generateId(length);
+        if (!idExists(id)) {
+            return id;
+        }
+        attempts++;
+        if (attempts >= maxAttempts) {
+            length++;
+            attempts = 0;
+        }
+    }
+}
+
 // spawn static mesh spawn buttons
 Object.values(elemTypes).forEach(item => {
     const br = document.createElement("br");
@@ -296,6 +362,8 @@ Object.values(elemTypes).forEach(item => {
 
     const icon = document.createElement("i");
     icon.className = item.icon;
+
+    if (!document.getElementById("spawnIcon")) return;
 
     elem.append(icon);
     document.getElementById("spawnIcon").append(elem);

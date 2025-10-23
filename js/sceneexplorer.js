@@ -29,28 +29,111 @@ function listSchematic(toClick = []) {
     const itemProperties = document.getElementById('detailscontent');
     shapesList.innerHTML = '';
 
+    // return to scene tab
+    document.getElementById('scene').click();
+
+    // hide clickscript buttons
+    const clickscriptbtn = document.getElementById('clickscript');
+    const updatescriptbtn = document.getElementById('updatescript');
+    const initscriptbtn = document.getElementById('initscript');
+    clickscriptbtn.style.display = 'none';
+    updatescriptbtn.style.display = 'none';
+    initscriptbtn.style.display = 'none';
+
+    // clear code tabs
+    const tabclickscript = document.getElementById('tab-clickscript');
+    const tabupdatescript = document.getElementById('tab-updatescript');
+    const tabinitscript = document.getElementById('tab-initscript');
+    tabclickscript.innerHTML = '';
+    tabupdatescript.innerHTML = '';
+    tabinitscript.innerHTML = '';
+
+    function cloneGroup(group) {
+        group.forEach(element => {
+            sceneSchematics.push(JSON.parse(JSON.stringify(sceneSchematics[element])))
+            listSchematic(group)
+            addObject()
+        });
+    }
+
+    function delGroup(group) {
+        group.sort((a, b) => b - a);
+        group.forEach(index => {
+            sceneSchematics.splice(index, 1);
+        });
+
+        listSchematic();
+        addObject();
+    }
+
+
+    // create group delete button
+    let delButton = document.createElement('button');
+    delButton.innerHTML = `<i class="fa-solid fa-trash"></i>`
+    delButton.className = "sceneNodeIcon halfbutton";
+    delButton.id = 'deleteNodeBtn';
+    delButton.title = 'Delete (Del)';
+
+    // create group clone button
+    let cloneButton = document.createElement('button');
+    cloneButton.innerHTML = `<i class="fa-regular fa-clone"></i>`
+    cloneButton.className = "sceneNodeIcon halfbutton";
+    cloneButton.id = 'cloneNodeBtn';
+    cloneButton.title = 'Clone (Ctrl + D)';
+
     // shapes list selection code
     shapesList.onchange = function () {
+        // return to scene tab
+        document.getElementById('scene').click();
+
+        // hide clickscript buttons & clear code tabs
+        clickscriptbtn.style.display = 'none';
+        updatescriptbtn.style.display = 'none';
+        initscriptbtn.style.display = 'none';
+        tabclickscript.innerHTML = '';
+        tabupdatescript.innerHTML = '';
+        tabinitscript.innerHTML = '';
+
+        // get selected nodes
         const selectedValues = Array.from(shapesList.options).filter(option => option.selected).map(option => Number(option.value));
+
+        // select the node on the scene
         if (selectedValues.length == 1) {
             selectObjCall[selectedValues[0]]();
         } else if (selectedValues.length > 1) {
             // process and add schematics to scene with transformcontrols
             loadScene(sceneSchematics, false, selectedValues)
+            itemProperties.innerHTML = '';
 
-            // empty out inspector
-            itemProperties.innerHTML = `
-                <h3>Inspect</h3>
-                Selecting multiple nodes
-            `;
+            itemProperties.prepend(delButton);
+            delButton.onclick = () => { delGroup(selectedValues) };
+
+            itemProperties.prepend(cloneButton);
+            cloneButton.onclick = () => { cloneGroup(selectedValues) };
+
+            itemProperties.append(document.createElement('hr'));
+            itemProperties.append(document.createElement('br'));
+            itemProperties.append(document.createElement('span').innerText = 'Selecting multiple items');
         }
     }
 
     // empty out inspector
     if (toClick.length > 1) {
+        itemProperties.innerHTML = '';
+
+        itemProperties.prepend(delButton);
+        delButton.onclick = () => { delGroup(toClick) };
+
+        itemProperties.prepend(cloneButton);
+        cloneButton.onclick = () => { cloneGroup(toClick) };
+
+        itemProperties.append(document.createElement('hr'));
+        itemProperties.append(document.createElement('br'));
+        itemProperties.append(document.createElement('span').innerText = 'Selecting multiple items');
+    } else if (toClick.length == 0) {
         itemProperties.innerHTML = `
             <h3>Inspect</h3>
-            Selecting multiple nodes
+            Select something on the explorer to edit its properties here
         `;
     }
 
@@ -71,30 +154,11 @@ function listSchematic(toClick = []) {
             // empty out inspector
             itemProperties.innerHTML = '';
 
-            // create delete button
-            let delButton = document.createElement('button');
-            delButton.innerHTML = `<i class="fa-solid fa-trash"></i>`
-            delButton.className = "sceneNodeIcon halfbutton";
-            delButton.id = 'deleteNodeBtn';
-            delButton.title = 'Delete (Del)';
-
-            // create clone button
-            let cloneButton = document.createElement('button');
-            cloneButton.innerHTML = `<i class="fa-regular fa-clone"></i>`
-            cloneButton.className = "sceneNodeIcon halfbutton";
-            cloneButton.id = 'cloneNodeBtn';
-            cloneButton.title = 'Clone (Ctrl + D)';
-
             // when delete button clicked
             delButton.onclick = function () {
                 sceneSchematics.splice(i, 1);
                 listSchematic()
                 addObject()
-
-                itemProperties.innerHTML = `
-                    <h3>Inspect</h3>
-                    Select something on the explorer to edit its properties here!
-                `;
             }
 
             // when clone button clicked
@@ -107,13 +171,14 @@ function listSchematic(toClick = []) {
             // add line spacer
             itemProperties.prepend(document.createElement('hr'));
 
-            Object.entries(element).forEach(([key, value]) => {
+            Object.entries(element).forEach(async ([key, value]) => {
                 // create input and label
                 let input = document.createElement('input');
                 let label = document.createElement('label');
+                let labelname = valueLabel[key] ? valueLabel[key] : key;
 
                 // label text, class, id and input value, id
-                label.innerText = key + ":";
+                label.innerText = await translateOrLoadFromCache(labelname, prefLang) + ":";
                 label.className = "nodeSceneLabel";
                 label.setAttribute('for', key);
                 input.value = value;
@@ -136,6 +201,9 @@ function listSchematic(toClick = []) {
                     if (key == "color") {
                         element[key] = input.value;
                         listSchematic([i]);
+                    }if (key == "uuid") {
+                        input.value = element[key];
+                        listSchematic([i]);
                     } else if (key == "opacity") {
                         element[key] = parseFloat(input.value);
                         listSchematic([i]);
@@ -157,6 +225,7 @@ function listSchematic(toClick = []) {
                 if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript" && key !== "gltfData") {
                     itemProperties.appendChild(label);
                     itemProperties.appendChild(input);
+                    itemProperties.appendChild(document.createElement('br'));
                 }
 
                 // color picker
@@ -166,77 +235,88 @@ function listSchematic(toClick = []) {
 
                 // texture file uploader
                 if (key == "tex") {
-                    input.type = "file"
-                    input.accept = 'image/png, image/jpeg'
-
-                    let clearBtn = document.createElement('a')
-                    clearBtn.innerHTML = '&nbsp;(Clear)'
-                    clearBtn.style.cursor = 'pointer'
-                    clearBtn.style.textDecoration = 'underline'
-                    label.appendChild(clearBtn)
-
-                    clearBtn.onclick = function () {
-                        element[key] = false
-                        listSchematic([i]);
-                        addObject()
+                    if (element[key] == false) {
+                        input.type = "file";
+                        input.accept = 'image/png, image/jpeg';
+                    } else {
+                        input.type = "button";
+                        input.value = "Clear";
+                        input.onclick = function () {
+                            element[key] = false
+                            listSchematic([i]);
+                            addObject()
+                        }
                     }
+
                 }
 
                 // initscript edit
                 if (key == "initScript") {
-                    let button = document.createElement('button');
-                    button.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> InitScript`
-                    button.className = "sceneNodeIcon";
+                    initscriptbtn.style.display = 'inline-block';
+                    initscriptbtn.onclick = function () {
+                        let textarea = document.createElement("textarea");
+                        textarea.innerHTML = element.initScript;
+                        tabinitscript.appendChild(textarea);
 
-                    button.onclick = async function () {
-                        let code = await spawnCodeEditor(element.initScript, element.name + ' InitScript')
-                        element['initScript'] = code;
-                        addObject()
+                        let editor = CodeMirror.fromTextArea(textarea, {
+                            mode: "javascript",
+                            lineNumbers: true,
+                            lineWrapping: true
+                        });
+
+                        editor.on('change', (args) => {
+                            element['initScript'] = editor.getValue();
+                            addObject()
+                        });
                     }
-
-                    itemProperties.prepend(button);
                 }
 
                 // updatescript edit
                 if (key == "updateScript") {
-                    let button = document.createElement('button');
-                    button.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> UpdateScript`
-                    button.className = "sceneNodeIcon";
+                    updatescriptbtn.style.display = 'inline-block';
+                    updatescriptbtn.onclick = function () {
+                        let textarea = document.createElement("textarea");
+                        textarea.innerHTML = element.updateScript;
+                        tabupdatescript.appendChild(textarea);
 
-                    button.onclick = async function () {
-                        let code = await spawnCodeEditor(element.updateScript, element.name + ' updateScript')
-                        element['updateScript'] = code;
-                        addObject()
+                        let editor = CodeMirror.fromTextArea(textarea, {
+                            mode: "javascript",
+                            lineNumbers: true,
+                            lineWrapping: true
+                        });
+
+                        editor.on('change', (args) => {
+                            element['updateScript'] = editor.getValue();
+                            addObject()
+                        });
                     }
-
-                    itemProperties.prepend(button);
                 }
 
                 // clickscript edit
                 if (key == "clickScript") {
-                    let button = document.createElement('button');
-                    button.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> ClickScript`
-                    button.className = "sceneNodeIcon";
+                    clickscriptbtn.style.display = 'inline-block';
+                    clickscriptbtn.onclick = function () {
+                        let textarea = document.createElement("textarea");
+                        textarea.innerHTML = element.clickScript;
+                        tabclickscript.appendChild(textarea);
 
-                    button.onclick = async function () {
-                        let code = await spawnCodeEditor(element.clickScript, element.name + ' clickScript')
-                        element['clickScript'] = code;
-                        addObject()
+                        let editor = CodeMirror.fromTextArea(textarea, {
+                            mode: "javascript",
+                            lineNumbers: true,
+                            lineWrapping: true
+                        });
+
+                        editor.on('change', (args) => {
+                            element['clickScript'] = editor.getValue();
+                            addObject()
+                        });
                     }
-
-                    itemProperties.prepend(button);
                 }
             });
 
             // delete and clone button (+separator)
             itemProperties.prepend(delButton);
             itemProperties.prepend(cloneButton);
-            itemProperties.prepend(document.createElement("br"));
-
-            // inspector title
-            let title = document.createElement("h3");
-            title.innerText = 'Inspect';
-            itemProperties.prepend(title);
         };
 
         // auto select if selected

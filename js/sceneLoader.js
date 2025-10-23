@@ -5,6 +5,7 @@ let instanceBodies = {};
 let instanceData = {};
 let allMesh = {};
 let allIndex = {};
+let uuidIndex = {};
 
 // apply transformcontrols for individual node
 function applyTC(scenenode, element, supportScaling) {
@@ -137,30 +138,24 @@ function allOfTheLights() {
 
 // apply scripts to the mesh
 function applyScript(scenenode, element, i, doApplyToChild = false) {
-    var scriptFunction = new Function("mesh", element.updateScript);
-    scenenode.userData.scriptFunction = scriptFunction;
-
-    var clickscriptFunction = new Function("mesh", element.clickScript);
-    scenenode.userData.clickscriptfunction = clickscriptFunction;
-
-    var initscriptFunction = new Function("mesh", element.initScript);
-    scenenode.userData.initscriptFunction = initscriptFunction;
-
-    scenenode.userData.itemIndex = i
+    scenenode.userData.scriptFunction = element.updateScript;
+    scenenode.userData.clickscriptFunction = { type: "script", code: element.clickScript };
+    scenenode.userData.initscriptFunction = element.initScript;
+    scenenode.userData.itemIndex = i;
 
     if (!doApplyToChild) return;
 
     // apply click script for 3d model
     scenenode.traverse((child) => {
         if (child.isMesh) {
-            child.userData.clickscriptfunction = clickscriptFunction;
+            child.userData.clickscriptFunction = { type: "script", code: element.clickScript };;
             child.userData.itemIndex = i
         }
     });
 }
 
 // add mesh to physics engine
-function applyPhysics(scenenode, element) {
+function applyPhysics(scenenode, element, mesh, type) {
     const cubeShape = threeToCannon(scenenode).shape;
     const cubeBody = new CANNON.Body({ mass: parseFloat(element.mass) });
 
@@ -168,6 +163,14 @@ function applyPhysics(scenenode, element) {
     cubeBody.position.set(element.x, element.y, element.z);
     cubeBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
     cubeBody.threeMesh = scenenode;
+    scenenode.userData.body = cubeBody;
+
+    // set lookup
+    uuidIndex[element.uuid] = {
+        "type": type,
+        "mesh": mesh,
+        "body": cubeBody
+    }
 
     world.addBody(cubeBody);
 }
@@ -179,6 +182,7 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
         allMesh[type] = new THREE.InstancedMesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }), sceneSchematics.filter(obj => obj.type === type).length);
         allMesh[type].castShadow = true;
         allMesh[type].receiveShadow = true;
+        allMesh[type].userData.type = type;
     }
 
     // create mesh index if not yet created
@@ -218,16 +222,26 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
         body.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
         world.addBody(body);
 
+        // add to lookup
+        uuidIndex[element.uuid] = {
+            "type": "instanced",
+            "index": i,
+            "mesh": allMesh[type],
+            "body": body,
+            "meshType": type
+        };
+
         instanceBodies[type].push({
             body: body,
             index: index[type],
-            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ)
+            scale: new THREE.Vector3(element.sizeX, element.sizeY, element.sizeZ),
+            uuid: element.uuid
         });
 
         instanceData[type].push({
-            scriptFunction: element.updateScript ? new Function("mesh", "index", element.updateScript) : null,
-            clickscriptFunction: element.clickScript ? new Function("mesh", "index", element.clickScript) : null,
-            initscriptFunction: element.initScript ? new Function("mesh", "index", element.initScript) : null,
+            scriptFunction: element.updateScript ? element.updateScript : null,
+            clickscriptFunction: element.clickScript ? { type: "script", code: element.clickScript } : null,
+            initscriptFunction: element.initScript ? element.initScript : null,
             initiated: false,
             color: element.color,
             elemPos: body.position
@@ -254,6 +268,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     // clear scene then re-add sky and lighting
     scene.remove.apply(scene, scene.children);
     allOfTheLights();
+    uuidIndex = {};
+
+    // add scene schematics back if gone
+    if (typeof window.sceneSchematics == "undefined") {
+        window.sceneSchematics = sceneSchematics;
+    }
 
     // editor-specific features
     if (!isForPlayer) {
@@ -315,6 +335,11 @@ function loadScene(sceneSchematics, isForPlayer, select) {
     sceneSchematics.forEach(async (element, i) => {
         let geometry, material, scenenode;
 
+        // make sure it has a uuid
+        if (typeof element.uuid == 'undefined') {
+            element.uuid = makeUniqueId(sceneSchematics);
+        }
+
         // check node type (default is for static meshes)
         switch (element.type) {
             case "light":
@@ -323,6 +348,12 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 scenenode.position.set(element.x, element.y, element.z);
                 scenenode.castShadow = true;
                 scene.add(scenenode);
+
+                // set lookup
+                uuidIndex[element.uuid] = {
+                    "type": "light",
+                    "mesh": scenenode
+                }
 
                 // spawn node and apply transformcontrols
                 if (Array.isArray(select) && select.includes(i)) {
@@ -362,7 +393,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 }
 
                 // add node script to object data & add mesh to physics world (if running on player)
-                if (isForPlayer) applyPhysics(scenenode, element);
+                if (isForPlayer) applyPhysics(scenenode, element, scenenode, element.type);
                 applyScript(scenenode, element, i, true);
                 break;
 
@@ -379,27 +410,28 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     scenenode.position.set(element.x, element.y, element.z);
                     scenenode.rotation.set(element.rotx, element.roty, element.rotz);
                     scenenode.scale.set(element.sizeX, element.sizeY, element.sizeZ);
+                    scenenode.userData.originalNode = scenenode.clone();
+                    scenenode.userData.uuid = element.uuid;
                     scenenode.castShadow = true;
                     scenenode.receiveShadow = true;
 
                     // skip instancing and generate independent model if selected in editor or has custom texture/opacity properties
                     if (element.tex || (Array.isArray(select) && select.includes(i)) || element.opacity != 1) {
-                        // apply transformcontrols and add node to scene
+                        // add node to scene
+                        scene.add(scenenode);
+
+                        // apply transformcontrols if selected
                         if (Array.isArray(select) && select.includes(i)) {
                             if (select.length === 1) {
-                                scene.add(scenenode);
                                 applyTC(scenenode, element, true);
                             } else {
-                                scene.add(scenenode);
                                 applyGroupTC(scenenode, sceneSchematics, selectGroup, i, true);
                             }
-                        } else {
-                            scene.add(scenenode);
                         }
 
                         // add node script to object data,  add mesh to physics world (if running on player) & apply texture if available
                         if (element.tex) applyTex(scenenode, element.tex);
-                        if (isForPlayer) applyPhysics(scenenode, element);
+                        if (isForPlayer) applyPhysics(scenenode, element, scenenode, 'normalMesh');
                         applyScript(scenenode, element, i);
                     } else {
                         // add node to instance

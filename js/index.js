@@ -66,10 +66,13 @@ function resizeCanvas() {
         prevWidth = currWidth
         prevHeight = currHeight
 
-        document.getElementById("canvas").style.marginTop = 0
         document.getElementById("canvas").style.marginRight = explorerWidth
         document.getElementById("canvas").width = currWidth;
         document.getElementById("canvas").height = currHeight;
+
+        document.getElementById("tabs").style.marginRight = explorerWidth
+        document.getElementById("tabs").style.width = `${currWidth}px`;
+        document.getElementById("tabs").style.height = `${currHeight}px`;
 
         camera.aspect = currWidth / currHeight
         camera.updateProjectionMatrix();

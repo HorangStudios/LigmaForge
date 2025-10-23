@@ -4,22 +4,23 @@
 	<link rel="icon" type="image/x-icon" href="css/HorangHill.png">
 	<link rel="stylesheet" href="css/index.css">
 	<link rel="stylesheet" href="css/scroll.css">
-	<link rel="stylesheet" href="css/windows.css">
+	<link rel="stylesheet" href="css/codemirror.css">
 
 	<title>HorangHill Editor</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<script type="text/javascript" src="js/undo.js" defer></script>
+	<script type="text/javascript" src="js/editorUI.js" defer></script>
 	<script type="text/javascript" src="js/index.js" defer></script>
 	<script type="text/javascript" src="js/addShapes.js" defer></script>
 	<script type="text/javascript" src="js/sceneLoader.js" defer></script>
 	<script type="text/javascript" src="js/sceneexplorer.js" defer></script>
 
 	<script type="text/javascript" src="js/deps/fontawesome.js" defer></script>
-	<script type="text/javascript" src="js/deps/winmgmt.js" defer></script>
 	<script type="text/javascript" src="js/deps/jquery.min.js"></script>
 	<script type="text/javascript" src="js/deps/jquery-ui.js"></script>
 	<script type="text/javascript" src="js/deps/translation.js"></script>
+	<script type="text/javascript" src="js/deps/codemirror.js"></script>
+	<script type="text/javascript" src="js/deps/cm-js.js"></script>
 
 	<script type="text/javascript" src="js/three/ImprovedNoise.js" defer></script>
 	<script type="text/javascript" src="js/three/three.min.js"></script>
@@ -35,8 +36,8 @@
 	<script type="text/javascript" src="js/three/TransformControls.js"></script>
 	<script type="text/javascript" src="js/three/sky.js"></script>
 	<script type="text/javascript" src="js/three/gltfExporter.js"></script>
-    <script type="text/javascript" src="js/three/gltfLoader.js"></script>
-    <script type="text/javascript" src="js/three/OutlinePass.js"></script>
+	<script type="text/javascript" src="js/three/gltfLoader.js"></script>
+	<script type="text/javascript" src="js/three/OutlinePass.js"></script>
 </head>
 
 <body>
@@ -80,7 +81,7 @@
 		<li class="dropdown li">
 			<a class="dropbtn"><span>Help</span></a>
 			<div class="dropdown-content">
-				<a><span>HorangHill Editor v2.0.5</span></a>
+				<a><span>HorangHill Editor v2.1.0</span></a>
 				<a><span>Translations are automated and may be inaccurate.</span></a>
 				<a><select name="languages" id="languages" onchange="changeLang(this.value)">
 						<option value="am">Amharic</option>
@@ -167,17 +168,12 @@
 				onclick="addElem.terrain(2, prompt('Enter terrain size...'), prompt('Enter terrain color... (in hex)'))">
 				<i class="fa-solid fa-mountain"></i>
 			</button>
-			<button title="Import Object File"
-				onclick="addElem.importGLTFModel(0,0,0)">
+			<button title="Import Object File" onclick="addElem.importGLTFModel(0,0,0)">
 				<i class="fa-solid fa-object-group"></i>
 			</button>
 
 			<button class="separator">
 				<hr>
-			</button>
-
-			<button title="Run Code" onclick="CreateEditorCodeWindow()">
-				<i class="fa-solid fa-terminal"></i>
 			</button>
 			<button title="Test Game (R)" onclick="playScene()">
 				<i class="fa-solid fa-circle-play"></i>
@@ -192,8 +188,29 @@
 	<div id="details">
 		<div id="detailscontent" class="sidebarContent">
 			<h3>Inspect</h3>
-			<span>Select something on the explorer to edit its properties here!</span>
+			<span>Select something on the explorer to edit its properties here</span>
 		</div>
+	</div>
+	<div id="tabs">
+		<div class="tabbuttons">
+			<div class="tabbutton selectedTab" id="scene">
+				<span>Scene</span>
+			</div>
+			<div class="tabbutton" id="clickscript">
+				<span>ClickScript</span>
+			</div>
+			<div class="tabbutton" id="updatescript">
+				<span>UpdateScript</span>
+			</div>
+			<div class="tabbutton" id="initscript">
+				<span>InitScript</span>
+			</div>
+		</div>
+		<div class="tab" id="tab-scene" style="display: block;"></div>
+		<div class="tab" id="tab-clickscript"></div>
+		<div class="tab" id="tab-updatescript"></div>
+		<div class="tab" id="tab-initscript"></div>
+		<div class="tab" id="tab-console"></div>
 	</div>
 </body>
 

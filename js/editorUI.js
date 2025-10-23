@@ -1,4 +1,4 @@
-// HorangHill LigmaForge Editor Engine - Undo, Redo and keyboard shortcuts
+// HorangHill LigmaForge Editor Engine - Undo, Redo, Keyboard Shortcuts and tab system
 let sceneHistory = [];
 let currentIndex = -1;
 let shiftKeyHeld
@@ -36,13 +36,15 @@ function redo() {
 document.addEventListener("keydown", function (event) {
     const focusedElem = document.activeElement.tagName;
     if (focusedElem == 'INPUT' || focusedElem == 'TEXTAREA') return;
-    
+
     if (event.ctrlKey && event.key == "z") {
         event.preventDefault()
         undo();
     } else if (event.ctrlKey && event.key == "y") {
         event.preventDefault()
         redo();
+    } else if (event.ctrlKey && event.key == "s") {
+        event.preventDefault()
     } else if (event.ctrlKey && event.key == "d" && document.getElementById("cloneNodeBtn")) {
         event.preventDefault()
         document.getElementById("cloneNodeBtn").click()
@@ -73,3 +75,28 @@ document.addEventListener("keyup", function (event) {
         shiftKeyHeld = false
     }
 })
+
+function openTab(id) {
+    const tabbuttons = document.getElementsByClassName('tabbutton');
+    const tabs = document.getElementsByClassName('tab');
+
+    Object.values(tabbuttons).forEach((button) => {
+        if (button.id == id) {
+            button.classList.add('selectedTab');
+        } else {
+            button.classList.remove('selectedTab');
+        }
+    });
+
+    Object.values(tabs).forEach((tab) => {
+        if (tab.id == `tab-${id}`) {
+            tab.style.display = 'block';
+        } else {
+            tab.style.display = 'none';
+        }
+    });
+}
+
+Object.values(document.getElementsByClassName('tabbutton')).forEach((button) => {
+    button.addEventListener('click', () => { openTab(button.id) });
+});

@@ -1,11 +1,7 @@
 * {
     margin: 0px;
     padding: 0px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow: hidden;
     outline: none;
-    box-sizing: border-box;
-    user-select: none;
 }
 
 .sceneNodeIcon {
@@ -26,6 +22,8 @@
 
 :root {
     --ui-base-color: #2d2d2d;
+    --ui-base-color-transparent: #2d2d2dab;
+    --ui-base-color-transparent-more: #2d2d2d73;
     --ui-button-color: #1d1d1d;
     --ui-button-hover-color: #3d3d3d;
     --ui-button-active-color: #424242;
@@ -66,6 +64,18 @@ button {
     min-width: 25px;
 }
 
+hr,
+h3,
+li a,
+.tabbutton,
+button,
+.sidebarContent,
+input,
+select {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+}
+
 #sideButtons {
     float: left;
     width: fit-content;
@@ -74,7 +84,7 @@ button {
 }
 
 #sideButtons button {
-    padding: 12px;
+    padding: 11px;
     background: none;
     font-size: 17px;
 }
@@ -99,7 +109,7 @@ canvas {
     color: white;
     display: inline-block;
     text-align: center;
-    padding: 12px;
+    padding: 11px;
     text-decoration: none;
 }
 
@@ -123,7 +133,7 @@ button:hover {
     cursor: pointer;
 }
 
-.dropdown-content{
+.dropdown-content {
     display: none;
     position: absolute;
     background-color: var(--ui-button-hover-color);
@@ -196,8 +206,11 @@ input[type=checkbox] {
 
 .sidebarContent label {
     display: inline-block;
-    margin: 5px;
     margin-left: 0;
+    width: calc(50% - 8px);
+    text-align: left;
+    margin-top: 10px;
+    padding-left: 8px;
 }
 
 .sidebarContent input[type=checkbox] {
@@ -210,14 +223,21 @@ input[type=checkbox] {
 .sidebarContent input[type=text],
 .sidebarContent input[type=file],
 .sidebarContent input[type=color],
+.sidebarContent input[type=button],
 .sidebarContent button {
-    width: 100%;
     padding: 8px;
     background-color: #202020;
     color: white;
     border: none;
-    border-radius: 5px;
     text-align: left;
+    width: 50%;
+    display: inline-block;
+    border-radius: 5px;
+}
+
+.sidebarContent input[type=button] {
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 #sidecontainer {
@@ -232,13 +252,19 @@ input[type=checkbox] {
     justify-content: center;
     place-items: center;
     padding-top: 10px !important;
+    width: fit-content;
 }
 
 #resourceMonitor {
     float: right !important;
     position: absolute !important;
     right: 0;
-    height: 40px;
+    height: 44px;
+    overflow: hidden;
+}
+
+#resourceMonitor canvas {
+    height: 43px !important;
 }
 
 .halfbutton {
@@ -265,8 +291,61 @@ input[type=checkbox] {
 
 #detailscontent {
     padding: 15px;
+    height: calc(100% - 30px);
 }
 
 #spawnIcon button {
     width: 100%;
+}
+
+#tabs {
+    position: absolute;
+    right: 0;
+    pointer-events: none;
+}
+
+.tabbuttons {
+    background: var(--ui-base-color-transparent);
+    pointer-events: all;
+    text-align: center;
+    padding: 5px;
+    height: 30px;
+    backdrop-filter: blur(10px);
+}
+
+.tabbutton {
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px;
+    padding-top: 3px;
+    padding-inline: 10px;
+}
+
+.selectedTab {
+    background-color: var(--ui-base-color-transparent-more);
+    border-radius: 5px;
+}
+
+.tab {
+    display: none;
+    pointer-events: all;
+    height: calc(100% - 40px);
+}
+
+.CodeMirror {
+    height: 100% !important;
+}
+
+#tab-scene {
+    pointer-events: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }
