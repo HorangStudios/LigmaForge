@@ -151,6 +151,9 @@ function deleteMesh(uuid) {
 
 // script sandbox
 function ScriptSandbox(code, body, mesh, isInstance, id = 0, bodyData = {}) {
+    let functionStore = new Map();
+    let fnCounter = 0;
+    let apistring = "";
     let iframe = document.createElement('iframe');
     iframe.style = 'position: absolute; left: -9999px;';
 
@@ -190,7 +193,6 @@ function ScriptSandbox(code, body, mesh, isInstance, id = 0, bodyData = {}) {
     }
 
     // parse apis object to be injected to iframe
-    let apistring = "";
     Object.keys(apis).forEach((element, i) => {
         const selected = apis[element];
         let functions = "";
@@ -205,8 +207,6 @@ function ScriptSandbox(code, body, mesh, isInstance, id = 0, bodyData = {}) {
     });
 
     // process messages between sandbox and engine
-    let functionStore = new Map();
-    let fnCounter = 0;
     window.addEventListener('message', async (event) => {
         if (event.source !== iframe.contentWindow) return;
         if (typeof event.data == 'undefined') return;

@@ -264,7 +264,6 @@ addElem.terrain = function (voxsize, tersize, color) {
                 "sizeZ": voxelSize,
 
                 "color": color,
-                "mat": "MeshPhongMaterial",
                 "tex": false,
                 "opacity": 1,
 

@@ -87,6 +87,7 @@ function applyGroupTC(scenenode, sceneSchematics, selectGroup, itemIndex, suppor
             }
         });
     });
+
     transformControls.attach(selectGroup);
 }
 
@@ -393,8 +394,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                 }
 
                 // add node script to object data & add mesh to physics world (if running on player)
-                if (isForPlayer) applyPhysics(scenenode, element, scenenode, element.type);
                 applyScript(scenenode, element, i, true);
+                if (isForPlayer) applyPhysics(scenenode, element, scenenode, element.type);
                 break;
 
             default:
@@ -430,20 +431,17 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                         }
 
                         // add node script to object data,  add mesh to physics world (if running on player) & apply texture if available
+                        applyScript(scenenode, element, i);
                         if (element.tex) applyTex(scenenode, element.tex);
                         if (isForPlayer) applyPhysics(scenenode, element, scenenode, 'normalMesh');
-                        applyScript(scenenode, element, i);
                     } else {
                         // add node to instance
                         applyInstance(element, allIndex, element.type, sceneSchematics, geometry, scenenode, isForPlayer, i);
                     }
                 } else {
                     // log unknown/deprecated node (when the element is not in elemTypes)
-                    if (typeof debug !== 'undefined') {
-                        debug('Unknown or Deprecated Node: ' + element.type);
-                    } else {
-                        console.warn('Unknown or Deprecated Node: ' + element.type);
-                    }
+                    const log = (typeof debug != "undefined") ? debug : console.warn;
+                    log('Unknown or Deprecated Node: ' + element.type);
                 }
         }
 

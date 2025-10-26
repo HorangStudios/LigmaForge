@@ -222,7 +222,7 @@ function listSchematic(toClick = []) {
                 };
 
                 // add input if the data is allowed to be edited
-                if (key !== "type" && key !== "mat" && key !== "initScript" && key !== "updateScript" && key !== "clickScript" && key !== "gltfData") {
+                if (key !== "type" && key !== "initScript" && key !== "updateScript" && key !== "clickScript" && key !== "gltfData") {
                     itemProperties.appendChild(label);
                     itemProperties.appendChild(input);
                     itemProperties.appendChild(document.createElement('br'));
