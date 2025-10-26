@@ -46,7 +46,6 @@ addElem.cube = function (x, y, z, sizeX, sizeY, sizeZ, color) {
         "sizeZ": sizeZ,
 
         "color": color,
-        "mat": "MeshPhongMaterial",
         "tex": false,
         "opacity": 1,
 
@@ -81,7 +80,6 @@ addElem.sphere = function (x, y, z, sizeX, sizeY, sizeZ, color) {
         "sizeZ": sizeZ,
 
         "color": color,
-        "mat": "MeshPhongMaterial",
         "tex": false,
         "opacity": 1,
 
@@ -116,7 +114,6 @@ addElem.cylinder = function (x, y, z, sizeX, sizeY, sizeZ, color) {
         "sizeZ": sizeZ,
 
         "color": color,
-        "mat": "MeshPhongMaterial",
         "tex": false,
         "opacity": 1,
 
@@ -151,7 +148,6 @@ addElem.spawnnode = function (x, y, z, sizeX, sizeY, sizeZ, color) {
         "sizeZ": sizeZ,
 
         "color": color,
-        "mat": "MeshPhongMaterial",
         "tex": false,
         "opacity": 1,
         "team": "none",
