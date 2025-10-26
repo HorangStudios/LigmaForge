@@ -10,7 +10,7 @@ function loadFirebaseGame() {
 
   ref.once('value', snapshot => {
     const item = snapshot.val();
-    document.getElementById('gamename').innerHTML = `<b>${item.title}</b><br>${item.createdBy}`
+    document.getElementById('gamename').innerHTML = `<b>${sanitizeHtml(item.title)}</b><br>${sanitizeHtml(item.createdBy)}`
     document.getElementById('pagetitle').innerText = item.title
     document.getElementById('gameloader').innerText = item.title
     document.getElementById('gamename').style.backgroundImage = `url(${item.thumbnail})`
