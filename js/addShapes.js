@@ -288,7 +288,7 @@ var elemTypes = {
     },
     "spherev2": {
         threeMesh: THREE.SphereGeometry,
-        args: [1, 16, 12],
+        args: [0.5, 16, 12],
         name: "Sphere",
         icon: "fa-solid fa-circle-half-stroke",
         spawnFunction: addElem.sphere,
@@ -296,11 +296,11 @@ var elemTypes = {
     },
     "cylinderv2": {
         threeMesh: THREE.CylinderGeometry,
-        args: [4.5, 4.5, 7.5, 32],
+        args: [0.5, 0.5, 1, 32],
         name: "Cylinder",
         icon: "fa-solid fa-circle-half-stroke",
         spawnFunction: addElem.cylinder,
-        spawnArgs: [0, 0, 0, 0.1, 0.1, 0.1, '#ff0000']
+        spawnArgs: [0, 0, 0, 1, 1, 1, '#ff0000']
     },
     "spawnnode": {
         threeMesh: THREE.BoxGeometry,
