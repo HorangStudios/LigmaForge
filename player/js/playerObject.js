@@ -36,7 +36,7 @@ function typeChat(e) {
     const theMessage = e.value
 
     document.getElementById("chatcontent").innerText = document.getElementById("chatcontent").innerText + '\nYou: ' + theMessage
-    firebase.database().ref(`games/${id}/session/${playerUniqueID}/messages/${generatedMessageID}`).set({
+    firebase.database().ref(`session/${id}/${playerUniqueID}/messages/${generatedMessageID}`).set({
       content: (firebase.auth().currentUser.displayName || "Player") + ": " + theMessage,
       age: Date.now(),
       id: generatedMessageID
@@ -414,7 +414,7 @@ async function spawnPlayer() {
 
     // send position to server if on multiplayer game
     if (isFirebaseEnv == 'true') {
-      const playerRef = firebase.database().ref(`games/${id}/session/${playerUniqueID}`);
+      const playerRef = firebase.database().ref(`session/${id}/${playerUniqueID}`);
       playerRef.update({
         rot: playerRotation,
         pos: cubeBody.position,
@@ -448,7 +448,7 @@ async function spawnPlayer() {
     }
 
     //firebase.database().ref(`games/${id}/server/${playerUniqueID}`).set(player)
-    firebase.database().ref(`games/${id}/session/${playerUniqueID}`).set(player)
+    firebase.database().ref(`session/${id}/${playerUniqueID}`).set(player)
   }
 }
 
@@ -461,7 +461,7 @@ function otherPlayers() {
   var spawnedPlayers = 0
 
   // fetch game server (automatically update on new data)
-  firebase.database().ref(`games/${id}/session/`).on('value', async function (snapshot) {
+  firebase.database().ref(`session/${id}/`).on('value', async function (snapshot) {
     // get server data
     var listofplayers = snapshot.val();
     var playeramount = Object.keys(listofplayers).length - 1;
@@ -524,7 +524,7 @@ function otherPlayers() {
           spawnedPlayers -= 1;
           scene.remove(allPlayersElem[key][0]);
           delete allPlayersElem[key];
-          firebase.database().ref(`games/${id}/session/${key}`).remove();
+          firebase.database().ref(`session/${id}/${key}`).remove();
         } else {
           // update position, rotation and animations if model created and not inactive
           if (!allPlayersElem[key]) return;

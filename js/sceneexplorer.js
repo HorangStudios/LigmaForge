@@ -333,4 +333,4 @@ function listSchematic(toClick = []) {
 }
 
 // create baseplate
-addElem.cube(0, -1, 0, 32, 1, 32, '#008000')
+addElem.cube(0, -1, 0, 32, 1, 32, '#228b22')

@@ -10,11 +10,15 @@ function loadFirebaseGame() {
 
   ref.once('value', snapshot => {
     const item = snapshot.val();
-    document.getElementById('gamename').innerHTML = `<b>${sanitizeHtml(item.title)}</b><br>${sanitizeHtml(item.createdBy)}`
-    document.getElementById('pagetitle').innerText = item.title
-    document.getElementById('gameloader').innerText = item.title
-    document.getElementById('gamename').style.backgroundImage = `url(${item.thumbnail})`
-    loadScene(item.hhls, true, false)
+    document.getElementById('gamename').innerHTML = `<b>${sanitizeHtml(item.title)}</b><br>${sanitizeHtml(item.createdBy)}`;
+    document.getElementById('pagetitle').innerText = item.title;
+    document.getElementById('gameloader').innerText = item.title;
+    document.getElementById('gamename').style.backgroundImage = `url(${item.thumbnail})`;
+
+    firebase.database().ref(`storage/${item.hhls}`).once('value', snapshot => {
+      const hhls = snapshot.val();
+      loadScene(hhls.file, true, false)
+    })
   });
 }
 
