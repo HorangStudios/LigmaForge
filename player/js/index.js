@@ -144,10 +144,11 @@ function toggleSideBar() {
 }
 
 //click script
-function onDocumentMouseDown(event) {
+function onDocumentMouseDown(event, isClick) {
     var mouse = new THREE.Vector2();
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = - (event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+    renderer.domElement.style.cursor = "unset";
 
     var raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
@@ -164,23 +165,26 @@ function onDocumentMouseDown(event) {
                 let data = instanceData[key][instanceId]
                 if (!data || !data.clickscriptFunction) return;
 
-                if (data.clickscriptFunction.type == "script") {
-                    ScriptSandbox(data.clickscriptFunction.code, instanceBodies[key][instanceId].body, selectedObject, true, instanceId, instanceBodies[key][instanceId]);
-                } else if (data.clickscriptFunction.type == "clickListener") {
-                    data.clickscriptFunction.resolve()
+                if (isClick) {
+                    if (data.clickscriptFunction.type == "script") { ScriptSandbox(data.clickscriptFunction.code, instanceBodies[key][instanceId].body, selectedObject, true, instanceId, instanceBodies[key][instanceId]); }
+                    else if (data.clickscriptFunction.type == "clickListener") { data.clickscriptFunction.resolve() }
+                } else {
+                    renderer.domElement.style.cursor = "pointer";
                 }
             });
         } else if (selectedObject.userData.clickscriptFunction) {
-            if (selectedObject.userData.clickscriptFunction.type == "script") {
-                ScriptSandbox(selectedObject.userData.clickscriptFunction.code, selectedObject.userData.body, selectedObject, false);
-            } else if (selectedObject.userData.clickscriptFunction.type == "clickListener") {
-                selectedObject.userData.clickscriptFunction.resolve()
+            if (isClick) {
+                if (selectedObject.userData.clickscriptFunction.type == "script") { ScriptSandbox(selectedObject.userData.clickscriptFunction.code, selectedObject.userData.body, selectedObject, false); }
+                else if (selectedObject.userData.clickscriptFunction.type == "clickListener") { selectedObject.userData.clickscriptFunction.resolve() }
+            } else {
+                renderer.domElement.style.cursor = "pointer";
             }
         }
     }
 }
 
-document.getElementById('canvas').addEventListener('click', onDocumentMouseDown, false);
+document.getElementById('canvas').addEventListener('click', (e) => { onDocumentMouseDown(e, true) }, false);
+document.getElementById('canvas').addEventListener('mousemove', (e) => { onDocumentMouseDown(e, false) }, false);
 
 //resize window
 function onWindowResize() {
