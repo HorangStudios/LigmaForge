@@ -9,6 +9,13 @@
 	<title>HorangHill Editor</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sanitize-html/1.27.1/sanitize-html.min.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+	<script type="text/javascript" src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+	<script type="text/javascript" src="js/integration.js" defer></script>
 	<script type="text/javascript" src="js/editorUI.js" defer></script>
 	<script type="text/javascript" src="js/index.js" defer></script>
 	<script type="text/javascript" src="js/addShapes.js" defer></script>
@@ -41,6 +48,8 @@
 </head>
 
 <body>
+	<div class="g-recaptcha" data-sitekey="6LejRf8rAAAAAHgkRlKWd_M6P9IUDp5JJCc0ttCB" data-size="invisible"></div>
+
 	<ul class="ul" id="controls">
 		<li id="logobutton" class="dropdown li">
 			<a class="dropbtn cornerlogo">
@@ -52,11 +61,13 @@
 			<a class="dropbtn"><span>File</span></a>
 			<div class="dropdown-content">
 				<input type="file" accept=".hhls" id="file-input" onchange="importScene()" style="display: none;">
-				<a onclick="window.location.reload()"><span>New</span></a>
+				<a onclick="newProject()"><span>New</span></a>
 				<a onclick="exportScene()"><span>Save</span></a>
-				<a onclick="document.getElementById('file-input').click();"><span>Open</span></a>
-				<a href="https://horanghill.web.app/" target="_blank"><span>Publish Game</span></a>
-				<a onclick="exportGLTF()"><span>Export Scene</span></a>
+				<a onclick="openFileMenu()"><span>Open</span></a>
+				<hr>
+				<a onclick="publish()"><span>Publish Game</span></a>
+				<!-- <a onclick="exportGLTF()"><span>Export Scene</span></a> -->
+				<a onclick="returnToMenu()"><span>Close Project</span></a>
 			</div>
 		</li>
 
@@ -73,6 +84,7 @@
 			<div class="dropdown-content">
 				<a onclick="undo()"><span>Undo</span></a>
 				<a onclick="redo()"><span>Redo</span></a>
+				<hr>
 				<a><span>Snap to Grid</span> <input type="checkbox" onclick="setSnapping(this.checked)" id="snaptogrid"
 						checked></a>
 			</div>
@@ -82,7 +94,6 @@
 			<a class="dropbtn"><span>Help</span></a>
 			<div class="dropdown-content">
 				<a><span>HorangHill Editor v2.1.0</span></a>
-				<a href="https://github.com/HorangStudios/LigmaForge/blob/master/docs/scriptapi.md" target="_blank"><span>Scripting Documentation</span></a>
 				<a><select name="languages" id="languages" onchange="changeLang(this.value)">
 						<option disabled>Translations are automated and may be inaccurate.</option>
 						<option value="am">Amharic</option>
@@ -142,9 +153,13 @@
 						<option value="cy">Welsh</option>
 					</select>
 				</a>
+				<hr>
+				<a href="https://github.com/HorangStudios/LigmaForge/blob/master/docs/scriptapi.md"
+					target="_blank"><span>Scripting Documentation</span></a>
 			</div>
 		</li>
 	</ul>
+
 	<div id="sidecontainer">
 		<div id="sideButtons">
 			<button title="Move (M)" id="transformMove">
@@ -181,17 +196,20 @@
 			</button>
 		</div>
 	</div>
+
 	<div id="explorer">
 		<div class="sidebarContent">
 			<select multiple id="explorercontent"></select>
 		</div>
 	</div>
+
 	<div id="details">
 		<div id="detailscontent" class="sidebarContent">
 			<h3>Inspect</h3>
 			<span>Select something on the explorer to edit its properties here</span>
 		</div>
 	</div>
+
 	<div id="tabs">
 		<div class="tabbuttons">
 			<div class="tabbutton selectedTab" id="scene">
@@ -212,6 +230,66 @@
 		<div class="tab" id="tab-updatescript"></div>
 		<div class="tab" id="tab-initscript"></div>
 		<div class="tab" id="tab-console"></div>
+	</div>
+
+	<div id="homepage">
+		<div class="homeNavbar">
+			<img src="../css/HorangHill.png">
+			<h2>Editor</h2>
+		</div>
+
+		<div class="login" id="loginBox" style="display: none;">
+			<div>
+				<h2>Authenticate with HorangHill</h2>
+				<p>To continue, Create an account or sign in to an existing one <a href="https://horanghill.web.app">here</a></p>
+				<br>
+				<input type="email" id="emailLogin" placeholder="Email" required>
+				<br>
+				<input type="password" id="passwordLogin" placeholder="Password" required>
+				<br>
+				<button onclick="loginacc(); this.disabled = true; this.innerText = 'Please Wait...'">Sign
+					In</button>
+				<br>
+				<p id="error1" style="color: red; text-align: center;"></p>
+			</div>
+		</div>
+
+		<div class="login" id="loginCheck">
+			<div>
+				<i class="fa-solid fa-spinner fa-spin"></i>
+				&nbsp;
+				<span id="progress">Checking for authentication</span>
+			</div>
+		</div>
+
+		<div id="dashboard" style="display: none;">
+			<h2 id="greetings"></h2>
+
+			<div class="gamecard" onclick="newProject()">
+				<i class="fa-regular fa-square-plus"></i> New Project
+			</div>
+			<div class="gamecard" onclick="document.getElementById('file-input').click();">
+				<i class="fa-regular fa-folder-open"></i> Open Local Project
+			</div>
+			<div class="gamecard" onclick="firebase.auth().signOut(); window.location.replace('../index.html')">
+				<i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out
+			</div>
+
+			<h2 id="devgreeting"><i class="fa-solid fa-hammer"></i> Continue where you left off</h2>
+			<div id="mygames"></div>
+		</div>
+
+		<div id="publish" style="display: none;">
+			<button onclick="document.getElementById('homepage').style.display = 'none';"><i class="fa-solid fa-arrow-left"></i> Return</button>
+
+			<h2>Publish to HorangHill</h2>
+			<input placeholder="Title" id="gameTitle"><br>
+			<input placeholder="Description" id="gameDesc">
+			<button onclick="publishNew()">Publish</button>
+
+			<h2>Update existing game</h2>
+			<div id="selectPublish"></div>
+		</div>
 	</div>
 </body>
 

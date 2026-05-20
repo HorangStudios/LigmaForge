@@ -71,7 +71,8 @@ li a,
 button,
 .sidebarContent,
 input,
-select {
+select,
+#homepage {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     user-select: none;
 }
@@ -342,10 +343,95 @@ input[type=checkbox] {
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 input[type=number] {
-  -moz-appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+#homepage {
+    background-color: var(--ui-button-color);
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    z-index: 10001;
+    top: 0;
+}
+
+.homeNavbar img {
+    width: 30px;
+    float: left;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.homeNavbar h2 {
+    padding: 9px;
+    padding-left: 50px;
+    font-weight: normal;
+}
+
+.homeNavbar {
+    background: var(--ui-base-color);
+    border-bottom: var(--ui-button-hover-color) solid 1px;
+}
+
+.login {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    place-items: center;
+}
+
+.login div {
+    text-align: center;
+}
+
+.gamecard {
+    padding: 15px;
+    background: var(--ui-base-color);
+    border: var(--ui-button-hover-color) solid 1px;
+    color: white;
+    box-shadow: 200px -1px 136px 8px rgba(0, 0, 0, 0.5) inset;
+    border-radius: 5px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    cursor: pointer;
+    margin: 15px;
+    width: calc(100% - 60px);
+    margin-bottom: 0;
+}
+
+#loginBox input,
+#loginBox button,
+#publish input,
+#publish button {
+    width: calc(100% - 30px);
+    padding: 10px;
+    border: var(--ui-button-hover-color) solid 1px;
+    background: var(--ui-base-color);
+    margin: 15px;
+    margin-bottom: 0;
+    color: white;
+}
+
+#dashboard,
+#publish {
+    width: 800px;
+    box-sizing: border-box;
+    padding: 15px;
+    height: calc(100% - 50px);
+    overflow: auto;
+    margin: auto;
+}
+
+#dashboard h2,
+#publish h2 {
+    margin: 15px;
+    margin-bottom: 8px;
+    margin-top: 50px;
 }

@@ -20,13 +20,13 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 // Create a renderer
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
-renderer.setSize(1920, 1080);
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.domElement.id = 'canvas';
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.VSMShadowMap;
 document.body.appendChild(renderer.domElement);
 
 //Outline Effect
@@ -45,7 +45,7 @@ composer.addPass(outlinePass);
 function animate() {
     stats.begin();
     controls.update()
-    composer.render(scene, camera);
+    if (document.getElementById("homepage").style.display == "none") composer.render(scene, camera);
     resizeCanvas()
     stats.end();
     requestAnimationFrame(animate);
@@ -185,7 +185,8 @@ function importScene() {
         const contents = event.target.result;
         const json = JSON.parse(contents);
         sceneSchematics = json;
-        listSchematic()
+        listSchematic();
+        document.getElementById("homepage").style.display = "none";
     };
 
     reader.readAsText(file);
@@ -222,6 +223,12 @@ function exportGLTF() {
         }
     );
 }
+
+//close tab confirmation
+// window.addEventListener('beforeunload', (event) => {
+//   event.preventDefault();
+//   event.returnValue = ''; 
+// });
 
 //start translation
 startAutomaticTranslation()

@@ -101,18 +101,18 @@ function allOfTheLights() {
     scene.add(hemiLight);
 
     // create directional light
+    const dir = 40;
     const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(0, 1.75, -1.75);
-    dirLight.position.multiplyScalar(30);
-    dirLight.shadow.mapSize.set(8192, 8192);
-    dirLight.shadow.camera.left = - 50;
-    dirLight.shadow.camera.right = 50;
-    dirLight.shadow.camera.top = 50;
-    dirLight.shadow.camera.bottom = - 50;
-    dirLight.shadow.camera.near = 1;
-    dirLight.shadow.camera.far = 3500;
-    dirLight.shadow.radius = 0;
+    dirLight.position.set(-1.5, 1.5, -1.5);
+    dirLight.position.multiplyScalar(10);
+    dirLight.shadow.mapSize.set(1024, 1024);
     dirLight.castShadow = true;
+    dirLight.shadow.camera.left = -dir;
+    dirLight.shadow.camera.right = dir;
+    dirLight.shadow.camera.top = dir;
+    dirLight.shadow.camera.bottom = -dir;
+    dirLight.shadow.camera.near = 0.01;
+    dirLight.shadow.camera.far = 500;
     scene.add(dirLight);
 
     // create ambient light

@@ -100,3 +100,42 @@ function openTab(id) {
 Object.values(document.getElementsByClassName('tabbutton')).forEach((button) => {
     button.addEventListener('click', () => { openTab(button.id) });
 });
+
+//open file with confirmation
+function openFileMenu() {
+    const response = confirm("Do you want to proceed?");
+    if (!response) return;
+    document.getElementById('file-input').click();
+}
+
+//close project and return to menu
+function returnToMenu() {
+    const response = confirm("Do you want to proceed?");
+    if (!response) return;
+
+    document.getElementById('homepage').style.display = 'block';
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("publish").style.display = "none";
+    loadGames();
+}
+
+//show publish screen
+function publish() {
+    document.getElementById('homepage').style.display = 'block';
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("publish").style.display = "block";
+    loadGames();
+}
+
+//create blank project
+function newProject() {
+    const response = confirm("Do you want to proceed?");
+    if (!response) return;
+
+    document.getElementById("homepage").style.display = "none";
+    sceneSchematics = [];
+    loadScene([], true, false);
+
+    // create baseplate
+    addElem.cube(0, -1, 0, 32, 1, 32, '#228b22');
+}
