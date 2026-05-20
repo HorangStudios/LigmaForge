@@ -13,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         document.getElementById("progress").innerText = "Signing in";
-        loadGames();
+        loadGames(true);
 
         let hour = (new Date()).getHours();
         if (hour >= 5 && hour < 12) {
@@ -82,18 +82,20 @@ function formatDate(today) {
 }
 
 //load games made by user
-async function loadGames() {
+async function loadGames(showDashboard = false) {
     let fetchGames = await firebaseFetch('games');
     let myGames = Object.keys(fetchGames).filter(item => fetchGames[item].uid == firebase.auth().currentUser.uid);
     let list = document.getElementById("mygames");
     let publishList = document.getElementById("selectPublish");
 
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("loginCheck").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
+    if (showDashboard) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("loginCheck").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+    }
+
     list.innerHTML = '';
     publishList.innerHTML = '';
-
     if (myGames.length == 0) {
         document.getElementById("spacing").style.display = "none";
         document.getElementById("devgreeting").style.display = "none";
@@ -106,13 +108,14 @@ async function loadGames() {
         let button = document.createElement("div");
         button.className = "gamecard";
         button.style.backgroundImage = `url(${element.thumbnail})`;
-        button.innerHTML = `<b>${element.title}</b><br>${element.desc}`;
+        button.innerHTML = `<b>${element.title}</b><a target="_blank" href="https://horanghill.web.app/pages/details.html?id=${key}">Edit Metadata</a><br>${element.desc}`;
         list.appendChild(button);
 
         let publish = button.cloneNode(true);
         publishList.appendChild(publish);
 
-        publish.onclick = async () => {
+        publish.onclick = async (e) => {
+            if (e.target.tagName === 'A') return;
             const response = confirm("Do you want to proceed?");
             if (!response) return;
 
@@ -129,7 +132,8 @@ async function loadGames() {
             })
         };
 
-        button.onclick = async () => {
+        button.onclick = async (e) => {
+            if (e.target.tagName === 'A') return;
             sceneSchematics = (await firebaseFetch(`storage/${element.hhls}`)).file;
             document.getElementById("homepage").style.display = "none";
             listSchematic();

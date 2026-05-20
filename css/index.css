@@ -229,7 +229,7 @@ input[type=checkbox] {
     padding: 8px;
     background-color: #202020;
     color: white;
-    border: none;
+    border: var(--ui-button-hover-color) solid 1px;
     text-align: left;
     width: 50%;
     display: inline-block;
@@ -323,7 +323,7 @@ input[type=checkbox] {
 }
 
 .selectedTab {
-    background-color: var(--ui-base-color-transparent-more);
+    background-color: #202020;
     border-radius: 5px;
 }
 
@@ -345,10 +345,6 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
-}
-
-input[type=number] {
-    -moz-appearance: textfield;
 }
 
 #homepage {
@@ -406,10 +402,20 @@ input[type=number] {
     margin-bottom: 0;
 }
 
+.gamecard a {
+    float: right;
+    color: white;
+}
+
+a {
+    color: white;
+}
+
 #loginBox input,
 #loginBox button,
 #publish input,
-#publish button {
+#publish button,
+#dashboard button {
     width: calc(100% - 30px);
     padding: 10px;
     border: var(--ui-button-hover-color) solid 1px;

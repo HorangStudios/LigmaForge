@@ -264,16 +264,15 @@
 
 		<div id="dashboard" style="display: none;">
 			<h2 id="greetings"></h2>
-
-			<div class="gamecard" onclick="newProject()">
+			<button onclick="newProject()">
 				<i class="fa-regular fa-square-plus"></i> New Project
-			</div>
-			<div class="gamecard" onclick="document.getElementById('file-input').click();">
+			</button>
+			<button onclick="document.getElementById('file-input').click();">
 				<i class="fa-regular fa-folder-open"></i> Open Local Project
-			</div>
-			<div class="gamecard" onclick="firebase.auth().signOut(); window.location.replace('../index.html')">
+			</button>
+			<button onclick="firebase.auth().signOut(); window.location.replace('../index.html')">
 				<i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out
-			</div>
+			</button>
 
 			<h2 id="devgreeting"><i class="fa-solid fa-hammer"></i> Continue where you left off</h2>
 			<div id="mygames"></div>
