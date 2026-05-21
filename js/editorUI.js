@@ -128,9 +128,11 @@ function publish() {
 }
 
 //create blank project
-function newProject() {
-    const response = confirm("Do you want to proceed?");
-    if (!response) return;
+function newProject(confirmation) {
+    if (confirmation) {
+        const response = confirm("Do you want to proceed?");
+        if (!response) return;
+    }
 
     document.getElementById("homepage").style.display = "none";
     sceneSchematics = [];

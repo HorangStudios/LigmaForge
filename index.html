@@ -61,7 +61,7 @@
 			<a class="dropbtn"><span>File</span></a>
 			<div class="dropdown-content">
 				<input type="file" accept=".hhls" id="file-input" onchange="importScene()" style="display: none;">
-				<a onclick="newProject()"><span>New</span></a>
+				<a onclick="newProject(true)"><span>New</span></a>
 				<a onclick="exportScene()"><span>Save</span></a>
 				<a onclick="openFileMenu()"><span>Open</span></a>
 				<hr>
@@ -264,7 +264,7 @@
 
 		<div id="dashboard" style="display: none;">
 			<h2 id="greetings"></h2>
-			<button onclick="newProject()">
+			<button onclick="newProject(false)">
 				<i class="fa-regular fa-square-plus"></i> New Project
 			</button>
 			<button onclick="document.getElementById('file-input').click();">
