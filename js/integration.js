@@ -10,19 +10,15 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-firebase.auth().onAuthStateChanged(function (user) {
+firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
-        document.getElementById("progress").innerText = "Signing in";
+        document.getElementById("progress").innerText = await translateOrLoadFromCache("Signing in", prefLang);
         loadGames(true);
 
         let hour = (new Date()).getHours();
-        if (hour >= 5 && hour < 12) {
-            document.getElementById('greetings').innerHTML = `<i class='fa-solid fa-sun'></i> Good morning, ${sanitizeHtml(firebase.auth().currentUser.displayName)}!`;
-        } else if (hour >= 12 && hour < 18) {
-            document.getElementById('greetings').innerHTML = `<i class='fa-regular fa-sun'></i> Good afternoon, ${sanitizeHtml(firebase.auth().currentUser.displayName)}!`;
-        } else {
-            document.getElementById('greetings').innerHTML = `<i class='fa-solid fa-sun'></i> Good evening, ${sanitizeHtml(firebase.auth().currentUser.displayName)}!`;
-        }
+        if (hour >= 5 && hour < 12) document.getElementById('greetings').innerHTML = `<i class='fa-solid fa-sun'></i> ${await translateOrLoadFromCache("Good morning", prefLang)}, ${sanitizeHtml(firebase.auth().currentUser.displayName)}!`;
+        else if (hour >= 12 && hour < 18) document.getElementById('greetings').innerHTML = `<i class='fa-regular fa-sun'></i> ${await translateOrLoadFromCache("Good afternoon", prefLang)}, ${sanitizeHtml(firebase.auth().currentUser.displayName)}!`;
+        else document.getElementById('greetings').innerHTML = `<i class='fa-solid fa-sun'></i> ${await translateOrLoadFromCache("Good evening", prefLang)}, ${sanitizeHtml(firebase.auth().currentUser.displayName)}!`;
     } else {
         document.getElementById("homepage").style.display = "block";
 

@@ -265,16 +265,22 @@
 		<div id="dashboard" style="display: none;">
 			<h2 id="greetings"></h2>
 			<button onclick="newProject(false)">
-				<i class="fa-regular fa-square-plus"></i> New Project
+				<i class="fa-regular fa-square-plus"></i> 
+				<span>New Project</span>
 			</button>
 			<button onclick="document.getElementById('file-input').click();">
-				<i class="fa-regular fa-folder-open"></i> Open Local Project
+				<i class="fa-regular fa-folder-open"></i> 
+				<span>Open Local Project</span>
 			</button>
 			<button onclick="firebase.auth().signOut(); window.location.reload()">
-				<i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out
+				<i class="fa-solid fa-arrow-right-from-bracket"></i> 
+				<span>Sign out</span>
 			</button>
 
-			<h2 id="devgreeting"><i class="fa-solid fa-hammer"></i> Continue where you left off</h2>
+			<h2 id="devgreeting">
+				<i class="fa-solid fa-hammer"></i>
+				<span>Continue where you left off</span>
+			</h2>
 			<div id="mygames"></div>
 		</div>
 
