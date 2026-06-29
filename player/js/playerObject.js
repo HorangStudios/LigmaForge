@@ -203,6 +203,10 @@ async function spawnPlayer() {
           event.preventDefault();
           getSnapshot();
           break;
+        case 'F5':
+          event.preventDefault();
+          toggleDisplay('terminal');
+          break;
         case 'Slash':
           event.preventDefault();
           document.getElementById("chatInput").focus();

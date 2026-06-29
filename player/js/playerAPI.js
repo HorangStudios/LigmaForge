@@ -76,7 +76,8 @@ function setMenu(id, text) {
         var stat = document.createElement('a');
         stat.innerText = text;
         stat.id = `leaderboardMenu-${id}`;
-        document.getElementById('topsidebar').appendChild(stat);
+        document.getElementById('stats').appendChild(stat);
+        document.getElementById('stats').appendChild(document.createElement('br'));
     }
 };
 

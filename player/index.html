@@ -67,21 +67,40 @@
     </div>
 
     <div id="Sidenav" class="sidenav" style="display: none;">
-        <div id="sidenav-content">
+        <div class="sidenav-content">
             <a id="gamename">Game</a>
             <div class="topsidebar" id="topsidebar">
+                <a onclick="getSnapshot();">Take screenshot</a>
+                <a onclick="toggleDisplay('settings', 'flex')">Settings</a>
+                <a onclick="toggleDisplay('terminal')">Developer log</a>
+            </div>
+            <br>
+            <div class="topsidebar">
+                <a onclick="toggleSideBar();">Resume</a><br>
                 <a onclick="window.close();" id="quitbtn">Leave</a><br>
                 <a onclick="firebase.auth().signOut(); window.location.reload()">Log Out & Leave</a><br>
-                <a onclick="getSnapshot();">Take screenshot</a>
-                <a onclick="document.getElementById('devtools').style.display = 'flex'">Developer log</a>
             </div>
         </div>
     </div>
 
-    <div id="devtools" style="display: none;">
-        <div id="terminal">
+    <div id="settings" class="sidenav" style="display: none;">
+        <div class="sidenav-content">
+            <div class="topsidebar">
+                <a>
+                    <input type="checkbox" id="enableShadows" onchange="localStorage.setItem('shadowmap', this.checked); toggleshadow(this.checked)">
+                    <label for="enableShadows">Shadows</label>
+                </a><br>
+                <a>
+                    <input type="number" step="0.1" min="0.1" max="1" id="setRes" onchange="localStorage.setItem('resolutionscale', this.value); renderer.setPixelRatio(this.value)">
+                    <label for="setRes">Resolution scale</label>
+                </a><br>
+                <a onclick="toggleDisplay('settings')">Close</a><br>
+            </div>
         </div>
     </div>
+
+    <div id="terminal" style="display: none;"></div>
+    <div id="stats"></div>
 
     <div class="loadingScreen" id="loginDialog">
         <div id="loginCheck">

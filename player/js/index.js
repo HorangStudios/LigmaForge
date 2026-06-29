@@ -1,19 +1,11 @@
 // HorangHill LigmaForge Player Engine - 3d scene, physics setup and render, physics update loops
 // editor debug
 function debug(text) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    let mm = today.getMonth() + 1;
-    let dd = today.getDate();
-
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-
-    const formattedToday = '[' + dd + '/' + mm + '/' + yyyy + '] ';
+    let today = new Date();
+    let formattedToday = `[ ${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()} ] `;
 
     let p = document.createElement('p');
     p.innerText = formattedToday + text;
-
     document.getElementById('terminal').appendChild(p)
     console.log(formattedToday + text);
 }
@@ -62,8 +54,9 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.5;
 renderer.domElement.id = 'canvas';
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = localStorage.getItem('shadowmap') !== 'false';
 renderer.shadowMap.type = THREE.VSMShadowMap;
+renderer.setPixelRatio(localStorage.getItem('resolutionscale') || 1);
 document.body.appendChild(renderer.domElement);
 
 //AAA game graphics
@@ -129,17 +122,26 @@ animate()
 //sidebar
 function toggleSideBar() {
     var x = document.getElementById("Sidenav");
-    var z = document.getElementById("devtools");
 
     if (x.style.display == "none") {
         x.style.display = "flex";
         x.style.animation = "slideInUp 0.25s";
     } else {
+        document.getElementById("settings").style.display = "none";
         x.style.animation = "slideOutDown 0.25s";
-        z.style.display = "none";
         setTimeout(() => {
             x.style.display = "none";
         }, 250);
+    }
+}
+
+function toggleDisplay(id, type = "block") {
+    var x = document.getElementById(id);
+
+    if (x.style.display == "none") {
+        x.style.display = type;
+    } else {
+        x.style.display = "none";
     }
 }
 
@@ -196,8 +198,18 @@ function onWindowResize() {
 }
 window.addEventListener('resize', onWindowResize, false);
 
+function toggleshadow(val) {
+    renderer.shadowMap.enabled = val;
+    scene.traverse((obj) => {
+        if (obj.isMesh) {
+            obj.castShadow = val;
+            obj.receiveShadow = val;
+        }
+    });
+}
+
 //version name
-let ver = "0.6.7";
+let ver = "0.6.7.1";
 console.log(`
     %cHorangHill V `, `
     font-weight: bold; 
@@ -206,6 +218,8 @@ console.log(`
     margin-bottom: 15px;
     text-shadow: 3px 3px 0 rgb(217,31,38) , 6px 6px 0 rgb(226,91,14) , 9px 9px 0 rgb(245,221,8) , 12px 12px 0 rgb(5,148,68) , 15px 15px 0 rgb(2,135,206) , 18px 18px 0 rgb(4,77,145) , 21px 21px 0 rgb(42,21,113)
 `);
-console.log(`HorangHill Client Version ${ver} (LigmaForge)`)
-document.getElementById('clientversion').innerText = `HorangHill Client Version ${ver}`
-document.getElementById('clientversion1').innerText = `HorangHill Client Version ${ver}`
+console.log(`HorangHill Client Version ${ver} (LigmaForge)`);
+document.getElementById('clientversion').innerText = `HorangHill Client Version ${ver}`;
+document.getElementById('clientversion1').innerText = `HorangHill Client Version ${ver}`;
+document.getElementById("setRes").value = localStorage.getItem('resolutionscale') || 1;
+document.getElementById("enableShadows").checked = localStorage.getItem('shadowmap') !== 'false';

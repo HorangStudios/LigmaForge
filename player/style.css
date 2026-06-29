@@ -31,6 +31,7 @@ body {
     padding: 5px;
     background: #00000050;
     backdrop-filter: blur(5px);
+    border-bottom: #ffffff24 solid 1px;
 }
 
 #health {
@@ -62,11 +63,29 @@ body {
     color: white;
     display: inline-block;
     transition: 0.3s;
-    border: #ffffff50 solid 1px;
+    border: #ffffff24 solid 1px;
+    background: #ffffff05;
     border-radius: 10px;
     margin: 0px 10px 10px 10px;
     cursor: pointer;
     width: calc(100% - 20px);
+}
+
+.sidenav a input {
+    float: right;
+}
+
+input[type=checkbox] {
+    min-width: 20px;
+    margin: 0;
+    accent-color: white;
+    cursor: pointer;
+    aspect-ratio: 1/1;
+    margin-top: 1px;
+}
+
+input[type=number] {
+    width: 35px;
 }
 
 .sidenav a:first-child {
@@ -74,7 +93,7 @@ body {
 }
 
 .sidenav a:hover {
-    background: #ffffff25;
+    background: #ffffff15;
 }
 
 .sidenav .closebtn {
@@ -99,7 +118,8 @@ body {
 .topsidebar {
     height: fit-content;
     background: #00000050;
-    border-radius: 10px;
+    border-radius: 15px;
+    border: #ffffff24 solid 1px;
 }
 
 .loadingScreen {
@@ -128,17 +148,34 @@ body {
     place-items: center;
 }
 
-#terminal {
+#terminal,
+#stats {
     position: absolute;
-    backdrop-filter: blur(10px);
-    background: #1d1d1dab;
-    padding: 20px;
-    height: 40vh;
+    height: calc(100dvh - 40px);
     color: white;
+    width: 100vw;
     overflow: auto;
-    width: 45vw;
-    resize: both;
-    overflow: auto;
+    pointer-events: none;
+    margin-top: 40px;
+}
+
+#stats {
+    text-align: right;
+}
+
+#stats a {
+    pointer-events: all;
+    background: #00000050;
+    padding: 10px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 10px;
+    border-radius: 15px;
+}
+
+#terminal p {
+    background: #00000025;
+    width: fit-content;
 }
 
 #skiploading {
@@ -239,7 +276,7 @@ body {
     pointer-events: all;
 }
 
-#sidenav-content {
+.sidenav-content {
     min-width: 25vw;
 }
 
@@ -248,11 +285,13 @@ body {
         -webkit-transform: translateY(100%);
         transform: translateY(100%);
         visibility: visible;
+        opacity: 0;
     }
 
     100% {
         -webkit-transform: translateY(0);
         transform: translateY(0);
+        opacity: 1;
     }
 }
 
@@ -260,12 +299,14 @@ body {
     0% {
         -webkit-transform: translateY(0);
         transform: translateY(0);
+        opacity: 1;
     }
 
     100% {
         visibility: hidden;
         -webkit-transform: translateY(100%);
         transform: translateY(100%);
+        opacity: 0;
     }
 }
 
@@ -274,7 +315,7 @@ body {
     margin: 0;
     margin-bottom: 10px;
     border: none;
-    border-radius: 10px;
+    border-radius: 15px;
     background: #00000050;
     padding: 15px;
     background-size: cover;
