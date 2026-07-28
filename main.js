@@ -15,7 +15,7 @@ function createWindow(args) {
 
   if (args[0]) {
     const filePath = path.join(__dirname, './player/index.html');
-    const gameId = new URLSearchParams(new URL('horanghill:///?id=-OgyZ3g6aJUivonWsvti').search).get('id');
+    const gameId = new URLSearchParams(new URL(args[0]).search).get('id');
     win.loadURL(`file://${filePath}?id=${gameId}&online=true`);
   } else {
     const filePath = path.join(__dirname, 'index.html');
