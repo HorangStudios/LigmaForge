@@ -28,22 +28,23 @@
     <script type="text/javascript" src="../js/addShapes.js" defer></script>
     <script type="text/javascript" src="../js/sceneLoader.js" defer></script>
 
+    <script type="text/javascript" src="../js/deps/fontawesome.js" defer></script>
+    <script type="text/javascript" src="../js/deps/sanitize-html.js"></script>
+    <script type="text/javascript" src="../js/deps/joy.js"></script>
+    <script type="text/javascript" src="../js/electronHelper.js"></script>
     <script type="text/javascript" src="js/playerAPI.js"></script>
     <script type="text/javascript" src="js/playerModel.js"></script>
     <script type="text/javascript" src="js/playerObject.js" defer></script>
     <script type="text/javascript" src="js/index.js" defer></script>
     <script type="text/javascript" src="js/firebaseMapLoader.js" defer></script>
-    <script type="text/javascript" src="../js/deps/fontawesome.js" defer></script>
-    <script type="text/javascript" src="../js/deps/sanitize-html.js"></script>
-    <script type="text/javascript" src="../js/deps/joy.js"></script>
 </head>
 
 <body id="section">
     <div class="loadingScreen" id="gameload" style="display: none;">
         <div id="loadingMessageScreenForLigmaForge">
             <h1 id="gameloader">Loading Game...</h1>
-            <span id="clientversion"></span><br><br>
-            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span id="clientversion"></span>
+            <div id="spinner"></div>
         </div>
     </div>
 
@@ -78,7 +79,7 @@
             <div class="topsidebar">
                 <a onclick="toggleSideBar();">Resume</a><br>
                 <a onclick="window.close();" id="quitbtn">Leave</a><br>
-                <a onclick="firebase.auth().signOut(); window.location.reload()">Log Out & Leave</a><br>
+                <a onclick="logOut();">Log Out & Leave</a><br>
             </div>
         </div>
     </div>
@@ -105,16 +106,18 @@
     <div class="loadingScreen" id="loginDialog">
         <div id="loginCheck">
             <h1>Checking for authentication...</h1>
-            <span id="clientversion1"></span><br><br>
-            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span id="clientversion1"></span>
+            <div id="spinner"></div>
         </div>
         <div id="signinbox" style="display: none;">
             <h2>Authenticate with HorangHill</h2>
-            <p>To continue, Create an account or sign in to an existing one <a
-                    href="https://horanghill.web.app">here</a></p>
+            <p>To continue, Create a HorangHill account or sign in to an existing one <a
+                    onclick="redirect('https://horanghill.web.app')" href="#"">here</a></p>
+            <br>
+            <hr style="border: #2d2d2d solid 1px;">
             <br>
             <input type="email" id="emailLogin" placeholder="HorangHill Account Email" required>
-            <br>
+            <br><br>
             <input type="password" id="passwordLogin" placeholder="HorangHill Account Password" required>
             <br><br>
             <button onclick="loginacc(); this.disabled = true; this.innerText = 'Please Wait...'">Sign In</button>

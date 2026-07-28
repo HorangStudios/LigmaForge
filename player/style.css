@@ -3,7 +3,7 @@ body {
     user-select: none;
     touch-action: manipulation;
     transition: all 0.5s ease !important;
-    background: #000000;
+    background: #1d1d1d;
     height: 100dvh;
     width: 100vw;
 }
@@ -130,10 +130,9 @@ input[type=number] {
     backdrop-filter: blur(10px);
     background: #1d1d1dab;
     color: white;
-    text-align: center;
-    justify-content: center;
-    place-items: center;
     display: flex;
+    align-items: flex-end;
+    padding: 25px;
 }
 
 #devtools {
@@ -223,11 +222,13 @@ input[type=number] {
     font-size: 14px;
 }
 
-#signinbox {
+#signinbox, #signinbox input, #signinbox button {
     backdrop-filter: blur(10px);
     background: #1d1d1dab;
     padding: 25px;
     border-radius: 5px;
+    border: #2d2d2d solid 1px;
+    color: white;
 }
 
 #signinbox input,
@@ -321,4 +322,46 @@ input[type=number] {
     background-size: cover;
     background-position: center center;
     box-shadow: 10vw -1px 100px 8px rgba(0, 0, 0, 1) inset;
+}
+
+#spinner {
+    border-width: 5px;
+    border-style: solid;
+    border-color: #ffffffbd #ffffff32 #ffffff32;
+    border-image: initial;
+    border-radius: 50%;
+    animation: 2s linear 0s infinite normal none running spin;
+    width: 55px;
+    aspect-ratio: 1/1;
+    right: 25px;
+    bottom: 25px;
+    position: absolute;
+}
+
+a {
+    color: white;
+}
+
+button {
+    cursor: pointer;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fo {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }

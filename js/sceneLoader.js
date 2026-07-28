@@ -459,8 +459,9 @@ function loadScene(sceneSchematics, isForPlayer, select) {
                     spawnPlayer();
                     gamestarteou = true;
                     if (isFirebaseEnv == 'true') otherPlayers();
-                    document.getElementById('gameload').style.display = "none";
-                }, 5000);
+                    document.getElementById('gameload').style.animation = 'fo 1s';
+                    setTimeout(() => document.getElementById('gameload').style.display = "none", 800);
+                }, 2500);
             } else {
                 scene.add(selectGroup)
                 if (select.length > 1) {

@@ -1,8 +1,8 @@
-var { autoUpdater, AppUpdater } = require("electron-updater");
-var { app, BrowserWindow, electron, shell } = require("electron");
+var { autoUpdater } = require("electron-updater");
+var { app, BrowserWindow, ipcMain, shell } = require("electron");
 var path = require('node:path');
-var win;
 
+var win;
 function createWindow(args) {
   win = new BrowserWindow({
     width: 1000,
@@ -10,7 +10,7 @@ function createWindow(args) {
     backgroundColor: '#1d1d1d',
     autoHideMenuBar: true,
     icon: './assets/icon.png',
-    webPreferences: { contextIsolation: false }
+    webPreferences: { preload: path.join(__dirname, 'js/preload.js') }
   });
 
   if (args[0]) {
@@ -23,6 +23,7 @@ function createWindow(args) {
   }
 }
 
+ipcMain.handle('redirect', async (event, url) => shell.openExternal(url));
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 

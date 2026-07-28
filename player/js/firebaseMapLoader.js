@@ -8,8 +8,9 @@ function loadFirebaseGame() {
   document.getElementById("gameload").style.display = "flex";
   var ref = firebase.database().ref(`games/${id}`);
 
-  ref.once('value', snapshot => {
+  ref.once('value', async snapshot => {
     const item = snapshot.val();
+    document.getElementById('clientversion').innerText = (await firebaseFetch('/players/' + item.uid)).displayName;
     document.getElementById('gamename').innerHTML = `<b>${sanitizeHtml(item.title)}</b>`;
     document.getElementById('pagetitle').innerText = item.title;
     document.getElementById('gameloader').innerText = item.title;
@@ -31,6 +32,15 @@ function loginacc() {
 
   firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) { document.getElementById('error1').innerText = error.message; });
 };
+
+function logOut() {
+  firebase.auth().signOut();
+  document.getElementById("navigation").style.display = "none";
+  document.getElementById("Sidenav").style.display = "none";
+  document.getElementById("chats").style.display = "none";
+  document.getElementById("canvas").style.display = "none";
+  setTimeout(() => window.location.reload(), 1000);
+}
 
 // easy way of fetching firebase data
 async function firebaseFetch(dir) {

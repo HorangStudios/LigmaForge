@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 firebase.auth().onAuthStateChanged(async function (user) {
+    document.getElementById("appVersion").innerText = `HorangHill v${await getVersion('package.json')}`;
     if (user) {
         document.getElementById("progress").innerText = await translateOrLoadFromCache("Signing in", prefLang);
         loadGames(true);
@@ -104,7 +105,7 @@ async function loadGames(showDashboard = false) {
         let button = document.createElement("div");
         button.className = "gamecard";
         button.style.backgroundImage = `url(${element.thumbnail})`;
-        button.innerHTML = `<b>${element.title}</b><a target="_blank" href="https://horanghill.web.app/pages/details.html?id=${key}">Edit Metadata</a><br>${element.desc}`;
+        button.innerHTML = `<b>${element.title}</b><a onclick="redirect('https://horanghill.web.app/pages/details.html?id=${key}')" href="#">Edit Metadata</a><br>${element.desc}`;
         list.appendChild(button);
 
         let publish = button.cloneNode(true);
