@@ -41,9 +41,10 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 // Create the physics world
 var world = new CANNON.World();
 var worldmass = 0
-world.gravity.set(0, -9.85, 0);
-world.broadphase = new CANNON.NaiveBroadphase();
-world.solver.iterations = 10;
+world.gravity.set(0, -9.81, 0);
+world.broadphase = new CANNON.SAPBroadphase(world);
+world.solver.iterations = 5;
+world.allowSleep = true;
 const clock = new THREE.Clock();
 
 // Create a renderer
@@ -62,9 +63,9 @@ document.body.appendChild(renderer.domElement);
 //AAA game graphics
 composer = new THREE.EffectComposer(renderer);
 ssaoPass = new THREE.SSAOPass(scene, camera);
-ssaoPass.kernelRadius = 1
-ssaoPass.minDistance = 0.0001
-ssaoPass.maxDistance = 0.3
+ssaoPass.kernelRadius = 1;
+ssaoPass.minDistance = 0.0001;
+ssaoPass.maxDistance = 0.3;
 composer.addPass(ssaoPass);
 
 //update physics
@@ -84,7 +85,7 @@ function updatePhysics() {
 
     // continue physics
     world.step(1 / 60);
-    if (gamestarteou) { syncPhysicsToGraphics() };
+    if (gamestarteou) syncPhysicsToGraphics();
 
     // apply to normal bodies
     world.bodies.forEach(function (body, index) {
@@ -107,17 +108,13 @@ function updatePhysics() {
             }
         }
     });
-
-    requestAnimationFrame(updatePhysics);
 }
-updatePhysics()
 
-//render
 function animate() {
+    updatePhysics();
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
-}
-animate()
+}; animate();
 
 //sidebar
 function toggleSideBar() {
@@ -206,6 +203,12 @@ function toggleshadow(val) {
             obj.receiveShadow = val;
         }
     });
+}
+
+function isElectron() {
+  const isNode = typeof process !== 'undefined' && !!process.versions.electron;
+  const isUA = typeof navigator === 'object' && navigator.userAgent.indexOf('Electron') >= 0;
+  return isNode || isUA;
 }
 
 //version name

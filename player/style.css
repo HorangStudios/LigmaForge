@@ -18,7 +18,7 @@ body {
 
 @font-face {
     font-family: 'Righteous';
-    src: url("../css/Righteous-Regular.ttf");
+    src: url("../resources/css/Righteous-Regular.ttf");
 }
 
 #navigation {

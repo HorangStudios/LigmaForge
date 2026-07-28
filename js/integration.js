@@ -47,7 +47,7 @@ function publishNew() {
             const game = {
                 title: title.value,
                 desc: desc.value,
-                thumbnail: 'https://horanghill.web.app/css/horanghillstartingplace.png',
+                thumbnail: 'https://horanghill.web.app/resources/css/horanghillstartingplace.png',
                 createdAt: formatDate(new Date()),
                 hhls: storageRef.key,
                 uid: userid

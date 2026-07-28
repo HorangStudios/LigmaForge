@@ -5,7 +5,7 @@ const id = new URLSearchParams(window.location.search).get('id');
 
 // load game if multiplayer
 function loadFirebaseGame() {
-  document.getElementById("gameload").style.display = "flex"
+  document.getElementById("gameload").style.display = "flex";
   var ref = firebase.database().ref(`games/${id}`);
 
   ref.once('value', snapshot => {
@@ -54,7 +54,11 @@ if (isFirebaseEnv == 'true') {
   firebase.initializeApp(firebaseConfig);
 
   document.getElementById('quitbtn').onclick = function () {
-    window.location.href = 'https://horanghill.web.app/'
+    if (isElectron()) {
+      window.close();
+    } else {
+      window.location.href = 'https://horanghill.web.app/';
+    }
   }
 
   firebase.auth().onAuthStateChanged(function (user) {

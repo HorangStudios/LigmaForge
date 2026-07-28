@@ -163,6 +163,8 @@ function applyPhysics(scenenode, element, mesh, type) {
     cubeBody.position.set(element.x, element.y, element.z);
     cubeBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
     cubeBody.threeMesh = scenenode;
+    cubeBody.sleepSpeedLimit = 0.5;
+    cubeBody.sleepTimeLimit = 1.0;
     scenenode.userData.body = cubeBody;
 
     // set lookup
@@ -173,6 +175,7 @@ function applyPhysics(scenenode, element, mesh, type) {
     }
 
     world.addBody(cubeBody);
+    if (element.mass == 0) cubeBody.sleep();
 }
 
 // add node to instance
@@ -219,8 +222,12 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
         const body = new CANNON.Body({ mass: parseFloat(element.mass) });
         body.addShape(shape);
         body.position.set(element.x, element.y, element.z);
-        body.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
+        body.quaternion.setFromEuler(element.rotx, element.roty, element.rotz);
+        body.sleepSpeedLimit = 0.5;
+        body.sleepTimeLimit = 1.0;
+
         world.addBody(body);
+        if (element.mass == 0) body.sleep();
 
         // add to lookup
         uuidIndex[element.uuid] = {
@@ -447,15 +454,13 @@ function loadScene(sceneSchematics, isForPlayer, select) {
         // spawn player if done loading
         if (i === sceneSchematics.length - 1) {
             if (isForPlayer) {
-                document.getElementById('gameload').style.display = "none";
-
-                spawnPlayer();
                 debug('Spawning Player...');
-
-                gamestarteou = true
-                if (isFirebaseEnv == 'true') {
-                    otherPlayers();
-                }
+                setTimeout(() => {
+                    spawnPlayer();
+                    gamestarteou = true;
+                    if (isFirebaseEnv == 'true') otherPlayers();
+                    document.getElementById('gameload').style.display = "none";
+                }, 5000);
             } else {
                 scene.add(selectGroup)
                 if (select.length > 1) {
