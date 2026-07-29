@@ -105,7 +105,7 @@ async function loadGames(showDashboard = false) {
         let button = document.createElement("div");
         button.className = "gamecard";
         button.style.backgroundImage = `url(${element.thumbnail})`;
-        button.innerHTML = `<b>${element.title}</b><a onclick="redirect('https://horanghill.web.app/pages/details.html?id=${key}')" href="#">Edit Metadata</a><br>${element.desc}`;
+        button.innerHTML = `<b>${sanitizeHtml(element.title)}</b><a onclick="redirect('https://horanghill.web.app/pages/details.html?id=${key}')" href="#">Edit Metadata</a><br>${element.desc}`;
         list.appendChild(button);
 
         let publish = button.cloneNode(true);
