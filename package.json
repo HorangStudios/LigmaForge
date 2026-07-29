@@ -1,6 +1,6 @@
 {
   "name": "horanghill",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "Desktop app for the sandbox platform.",
   "homepage": "https://github.com/HorangStudios/LigmaForge",
   "main": "main.js",

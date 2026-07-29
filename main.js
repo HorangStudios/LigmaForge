@@ -10,7 +10,7 @@ function createWindow(args) {
     backgroundColor: '#1d1d1d',
     autoHideMenuBar: true,
     icon: './assets/icon.png',
-    webPreferences: { preload: path.join(__dirname, 'js/preload.js') }
+    webPreferences: { preload: path.join(__dirname, 'js/preload.js'), contextIsolation: false }
   });
 
   if (args[0]) {

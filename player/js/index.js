@@ -42,9 +42,8 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 var world = new CANNON.World();
 var worldmass = 0
 world.gravity.set(0, -9.81, 0);
-world.broadphase = new CANNON.SAPBroadphase(world);
-world.solver.iterations = 5;
-world.allowSleep = true;
+world.broadphase = new CANNON.NaiveBroadphase();
+world.solver.iterations = 10;
 const clock = new THREE.Clock();
 
 // Create a renderer
@@ -207,6 +206,7 @@ function toggleshadow(val) {
 
 //version name
 async function uiInit() {
+    loadScene([], true, false);
     let ver = await getVersion('../package.json');
     console.log(`
         %cHorangHill V `, `
@@ -221,5 +221,4 @@ async function uiInit() {
     document.getElementById('clientversion1').innerText = `HorangHill Version v${ver}`;
     document.getElementById("setRes").value = localStorage.getItem('resolutionscale') || 1;
     document.getElementById("enableShadows").checked = localStorage.getItem('shadowmap') !== 'false';
-    loadScene([], true, false);
 }; uiInit();

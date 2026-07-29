@@ -163,8 +163,6 @@ function applyPhysics(scenenode, element, mesh, type) {
     cubeBody.position.set(element.x, element.y, element.z);
     cubeBody.quaternion.setFromEuler(element.rotx, element.roty, element.rotz)
     cubeBody.threeMesh = scenenode;
-    cubeBody.sleepSpeedLimit = 0.5;
-    cubeBody.sleepTimeLimit = 1.0;
     scenenode.userData.body = cubeBody;
 
     // set lookup
@@ -175,7 +173,6 @@ function applyPhysics(scenenode, element, mesh, type) {
     }
 
     world.addBody(cubeBody);
-    if (element.mass == 0) cubeBody.sleep();
 }
 
 // add node to instance
@@ -223,11 +220,7 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
         body.addShape(shape);
         body.position.set(element.x, element.y, element.z);
         body.quaternion.setFromEuler(element.rotx, element.roty, element.rotz);
-        body.sleepSpeedLimit = 0.5;
-        body.sleepTimeLimit = 1.0;
-
         world.addBody(body);
-        if (element.mass == 0) body.sleep();
 
         // add to lookup
         uuidIndex[element.uuid] = {
