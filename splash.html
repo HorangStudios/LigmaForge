@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <link rel="icon" type="image/x-icon" href="resources/css/HorangHill.png">
+    <link rel="stylesheet" href="resources/css/index.css">
+    <link rel="stylesheet" href="resources/css/scroll.css">
+
+    <title>HorangHill</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<script type="text/javascript" src="js/electronHelper.js" defer></script>
+    <script type="text/javascript" src="js/splash.js" defer></script>
+	<script type="text/javascript" src="js/deps/fontawesome.js" defer></script>
+</head>
+
+<body>
+    <div id="splash" style="display: none;">
+        <div class="splashright">      
+            <button onclick="openHorangHill()"><i class="fa-solid fa-gamepad"></i> Play HorangHill</button>
+            <button onclick="openEditor()"><i class="fa-solid fa-hammer"></i> Open Editor</button>
+        </div>
+        <div class="splashleft">
+
+        </div>
+    </div>
+    <div id="updater">
+        <img src="resources/css/HorangHill.png" class="splashLogo">
+        <span id="updateText">Checking for updates...</span>
+        <div class="progress">
+            <div class="progressContent"></div>
+        </div>
+    </div>
+</body>
+
+</html>

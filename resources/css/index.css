@@ -72,7 +72,8 @@ button,
 .sidebarContent,
 input,
 select,
-#homepage {
+#homepage,
+span {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     user-select: none;
 }
@@ -440,4 +441,97 @@ a {
     margin: 15px;
     margin-bottom: 8px;
     margin-top: 50px;
+}
+
+.progress {
+    background: var(--ui-button-color);
+    margin: 50px;
+    bottom: 0;
+    position: absolute;
+    width: calc(100vw - 100px);
+    border-radius: 10px;
+    overflow: hidden;
+    border: var(--ui-button-hover-color) solid 1px;
+}
+
+.progressContent {
+    background: dodgerblue;
+    animation: infinite 1s cubic-bezier(0.9, 0.7, 0.5, 0.9) progressbar;
+    transition: none;
+    height: 10px;
+}
+
+#updateText {
+    text-align: center;
+    width: 100vw;
+    display: block;
+    position: absolute;
+    bottom: 75px;
+}
+
+.splashLogo {
+    width: 25vw;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+
+#updater {
+    text-align: center;
+}
+
+.splashright {
+    float: right;
+    width: calc(65vw - 1px);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--ui-button-color);
+    border-left: var(--ui-button-hover-color) solid 1px;
+}
+
+.splashright button {
+    margin: 25px;
+    margin-bottom: 0;
+    height: calc(50% - 38px);
+    background: var(--ui-base-color);
+    border: var(--ui-button-hover-color) solid 1px;
+}
+
+.splashleft {
+    float: left;
+    width: 35vw;
+    background-image: url('../splash.png');
+    background-color: rgba(0, 0, 0, 0.5);
+    background-blend-mode: darken; 
+    background-size: cover;
+    background-position: center center;
+    height: 100vh;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    place-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+@keyframes progressbar {
+    0% {
+        float: left;
+        width: 0%;
+    }
+
+    50% {
+        float: left;
+        width: 100%;
+    }
+
+    51% {
+        float: right;
+        width: 100%;
+    }
+
+    100% {
+        float: right;
+        width: 0%;
+    }
 }
