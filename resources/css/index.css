@@ -489,6 +489,20 @@ a {
     border-left: var(--ui-button-hover-color) solid 1px;
 }
 
+.splashright span {
+    z-index: 10;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+}
+
+.splashright i {
+    font-size: 100;
+    opacity: 0.05;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
 .splashright button {
     margin: 25px;
     margin-bottom: 0;
