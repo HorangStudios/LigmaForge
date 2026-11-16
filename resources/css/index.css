@@ -206,6 +206,10 @@ input[type=checkbox] {
     overflow: auto;
 }
 
+.sidebarContent details {
+    padding: 5px;
+}
+
 .sidebarContent label {
     display: inline-block;
     margin-left: 0;
@@ -279,16 +283,16 @@ input[type=checkbox] {
 }
 
 #explorercontent {
-    height: 100%;
     width: 100%;
     background: none;
     border: none;
     overflow: auto;
     color: white;
+    field-sizing: content;
 }
 
 #explorercontent option {
-    padding: 15px;
+    padding: 10px;
 }
 
 #detailscontent {

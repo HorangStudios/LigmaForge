@@ -50,15 +50,20 @@ function listSchematic(toClick = []) {
 
     function cloneGroup(group) {
         group.forEach(element => {
-            sceneSchematics.push(JSON.parse(JSON.stringify(sceneSchematics[element])))
-            listSchematic(group)
-            addObject()
+            let cloneelem = JSON.parse(JSON.stringify(sceneSchematics[element]));
+            cloneelem.uuid = makeUniqueId(sceneSchematics);
+            sceneSchematics.push(cloneelem);
+            listSchematic(group);
+            addObject();
         });
     }
 
     function delGroup(group) {
         group.sort((a, b) => b - a);
         group.forEach(index => {
+            let element = sceneSchematics[index]
+            if (gltfcache[element.uuid]) delete gltfcache[element.uuid];
+            if (texcache[element.uuid]) delete texcache[element.uuid];
             sceneSchematics.splice(index, 1);
         });
 
@@ -156,6 +161,8 @@ function listSchematic(toClick = []) {
 
             // when delete button clicked
             delButton.onclick = function () {
+                if (gltfcache[element.uuid]) delete gltfcache[element.uuid];
+                if (texcache[element.uuid]) delete texcache[element.uuid];
                 sceneSchematics.splice(i, 1);
                 listSchematic()
                 addObject()
@@ -163,7 +170,9 @@ function listSchematic(toClick = []) {
 
             // when clone button clicked
             cloneButton.onclick = function () {
-                sceneSchematics.push(JSON.parse(JSON.stringify(element)))
+                let cloneElem = JSON.parse(JSON.stringify(element));
+                cloneElem.uuid = makeUniqueId(sceneSchematics);
+                sceneSchematics.push(cloneElem)
                 listSchematic([i])
                 addObject()
             }

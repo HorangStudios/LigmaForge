@@ -18,6 +18,8 @@ function loadFirebaseGame() {
 
     firebase.database().ref(`storage/${item.hhls}`).once('value', snapshot => {
       const hhls = snapshot.val();
+      gltfcache = {};
+      texcache = {};
       loadScene(hhls.file, true, false)
     })
   });

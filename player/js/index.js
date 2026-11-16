@@ -59,14 +59,6 @@ renderer.shadowMap.type = THREE.VSMShadowMap;
 renderer.setPixelRatio(localStorage.getItem('resolutionscale') || 1);
 document.body.appendChild(renderer.domElement);
 
-//AAA game graphics
-composer = new THREE.EffectComposer(renderer);
-ssaoPass = new THREE.SSAOPass(scene, camera);
-ssaoPass.kernelRadius = 1;
-ssaoPass.minDistance = 0.0001;
-ssaoPass.maxDistance = 0.3;
-composer.addPass(ssaoPass);
-
 //update physics
 function updatePhysics() {
     // run initscript and script for normal mesh
@@ -190,7 +182,6 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
 }
 window.addEventListener('resize', onWindowResize, false);
 

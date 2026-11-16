@@ -19,7 +19,6 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 // Create a renderer
 var renderer = new THREE.WebGLRenderer({ antialias: true });
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputEncoding = THREE.sRGBEncoding;
@@ -29,25 +28,31 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.VSMShadowMap;
 document.body.appendChild(renderer.domElement);
 
+//controls
+var clock = new THREE.Clock();
+var controls = new THREE.FlyControls(camera, renderer.domElement);
+controls.movementSpeed = 50;
+controls.rollSpeed = 0;
+controls.autoForward = false;
+controls.dragToLook = true;
+
 //Outline Effect
 const composer = new THREE.EffectComposer(renderer);
 const renderPass = new THREE.RenderPass(scene, camera);
 const outlinePass = new THREE.OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-const ssaoPass = new THREE.SSAOPass(scene, camera);
-ssaoPass.kernelRadius = 1
-ssaoPass.minDistance = 0.001
-ssaoPass.maxDistance = 0.3
 composer.addPass(renderPass);
 composer.addPass(outlinePass);
-//composer.addPass(ssaoPass);
 
 //render
 function animate() {
     stats.begin();
-    controls.update()
     if (document.getElementById("homepage").style.display == "none") composer.render(scene, camera);
-    resizeCanvas()
     stats.end();
+
+    const delta = clock.getDelta();
+    controls.update(delta);
+    resizeCanvas()
+
     requestAnimationFrame(animate);
 }
 animate()
@@ -83,7 +88,7 @@ function resizeCanvas() {
 // click to select
 var startTime;
 function onDocumentMouseDown(event, duration) {
-    if (event.target !== renderer.domElement || duration > 250) return;
+    if (event.target !== renderer.domElement || duration > 250 || event.button != 0) return;
 
     var canvasDimensions = renderer.domElement.getBoundingClientRect();
     var mouse = new THREE.Vector2();
@@ -163,6 +168,24 @@ document.getElementById('canvas').addEventListener('mouseup', (event) => {
     }
 });
 
+//editor controls
+renderer.domElement.addEventListener('wheel', e => { e.preventDefault(); camera.translateZ(e.deltaY * 0.01); }, { passive: false });
+renderer.domElement.addEventListener("mousedown", async (e) => { if (e.button === 2) { try { await renderer.domElement.requestPointerLock(); } catch (err) { } } });
+renderer.domElement.addEventListener("mouseup", (e) => { if (e.button === 2 && document.pointerLockElement === renderer.domElement) { document.exitPointerLock(); } });
+renderer.domElement.addEventListener("contextmenu", (e) => e.preventDefault());
+document.addEventListener("mousemove", (e) => {
+    const sensitivity = 0.0025;
+    const PI_2 = Math.PI / 2;
+    const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+
+    if (document.pointerLockElement !== renderer.domElement) return;
+    euler.setFromQuaternion(camera.quaternion);
+    euler.y -= e.movementX * sensitivity;
+    euler.x -= e.movementY * sensitivity;
+    euler.x = Math.max(-PI_2, Math.min(PI_2, euler.x));
+    camera.quaternion.setFromEuler(euler);
+});
+
 // save
 function exportScene() {
     const json = JSON.stringify(sceneSchematics, null, 2);
@@ -185,6 +208,8 @@ function importScene() {
         const contents = event.target.result;
         const json = JSON.parse(contents);
         sceneSchematics = json;
+        gltfcache = {};
+        texcache = {};
         listSchematic();
         document.getElementById("homepage").style.display = "none";
     };

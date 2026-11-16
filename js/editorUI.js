@@ -136,8 +136,10 @@ function newProject(confirmation) {
 
     document.getElementById("homepage").style.display = "none";
     sceneSchematics = [];
-    loadScene([], true, false);
+    gltfcache = {};
+    texcache = {};
 
     // create baseplate
+    loadScene([], true, false);
     addElem.cube(0, -1, 0, 32, 1, 32, '#228b22');
 }

@@ -133,6 +133,8 @@ async function loadGames(showDashboard = false) {
             if (e.target.tagName === 'A') return;
             sceneSchematics = (await firebaseFetch(`storage/${element.hhls}`)).file;
             document.getElementById("homepage").style.display = "none";
+            gltfcache = {};
+            texcache = {};
             listSchematic();
         };
     });

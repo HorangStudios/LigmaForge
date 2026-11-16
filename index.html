@@ -22,28 +22,26 @@
 	<script type="text/javascript" src="js/sceneLoader.js" defer></script>
 	<script type="text/javascript" src="js/sceneexplorer.js" defer></script>
 
-	<script type="text/javascript" src="js/deps/fontawesome.js" defer></script>
+	<script type="text/javascript" src="js/deps/fontawesome.js"></script>
 	<script type="text/javascript" src="js/deps/translation.js"></script>
 	<script type="text/javascript" src="js/deps/codemirror.js"></script>
 	<script type="text/javascript" src="js/deps/cm-js.js"></script>
 	<script type="text/javascript" src="js/deps/sanitize-html.js"></script>
 
-	<script type="text/javascript" src="js/three/ImprovedNoise.js" defer></script>
 	<script type="text/javascript" src="js/three/three.min.js"></script>
-	<script type="text/javascript" src="js/three/OrbitControls.js"></script>
+	<script type="text/javascript" src="js/three/flyControls.js"></script>
 	<script type="text/javascript" src="js/three/stats.min.js"></script>
 	<script type="text/javascript" src="js/three/EffectComposer.js"></script>
 	<script type="text/javascript" src="js/three/RenderPass.js"></script>
 	<script type="text/javascript" src="js/three/SimplexNoise.js"></script>
 	<script type="text/javascript" src="js/three/ShaderPass.js"></script>
 	<script type="text/javascript" src="js/three/CopyShader.js"></script>
-	<script type="text/javascript" src="js/three/SSAOPass.js"></script>
-	<script type="text/javascript" src="js/three/SSAOShader.js"></script>
 	<script type="text/javascript" src="js/three/TransformControls.js"></script>
 	<script type="text/javascript" src="js/three/sky.js"></script>
 	<script type="text/javascript" src="js/three/gltfExporter.js"></script>
 	<script type="text/javascript" src="js/three/gltfLoader.js"></script>
 	<script type="text/javascript" src="js/three/OutlinePass.js"></script>
+	<script type="text/javascript" src="js/three/ImprovedNoise.js"></script>
 </head>
 
 <body>
@@ -198,7 +196,10 @@
 
 	<div id="explorer">
 		<div class="sidebarContent">
-			<select multiple id="explorercontent"></select>
+			<details open>
+				<summary>Workspace</summary>
+				<select multiple id="explorercontent"></select>
+			</details>
 		</div>
 	</div>
 

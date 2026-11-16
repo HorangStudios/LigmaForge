@@ -6,6 +6,8 @@ let instanceData = {};
 let allMesh = {};
 let allIndex = {};
 let uuidIndex = {};
+let gltfcache = {};
+let texcache = {};
 
 // apply transformcontrols for individual node
 function applyTC(scenenode, element, supportScaling) {
@@ -256,11 +258,17 @@ function applyInstance(element, index, type, sceneSchematics, geometry, scenenod
 }
 
 // apply textures
-function applyTex(scenenode, textureData) {
-    const texture = new THREE.TextureLoader().load(textureData, () => {
-        scenenode.material.map = texture;
-        scenenode.material.needsUpdate = true;
-    });
+function applyTex(scenenode, textureData, elem) {
+    if (typeof texcache[elem.uuid] != 'undefined') {
+            scenenode.material.map = texcache[elem.uuid];
+            scenenode.material.needsUpdate = true;
+    } else {
+        const texture = new THREE.TextureLoader().load(textureData, () => {
+            scenenode.material.map = texture;
+            scenenode.material.needsUpdate = true;
+            texcache[elem.uuid] = texture;
+        });
+    }
 };
 
 // load scene
@@ -367,7 +375,8 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
             case "importedGLTFModel":
                 // load 3d model dataurl
-                const importedGLTF = await new THREE.GLTFLoader().loadAsync(element.gltfData);
+                if (typeof gltfcache[element.uuid] != 'undefined') var importedGLTF = gltfcache[element.uuid];
+                else var importedGLTF = await new THREE.GLTFLoader().loadAsync(element.gltfData); gltfcache[element.uuid] = importedGLTF;
                 importedGLTF.scene.traverse((child) => {
                     // enable shadows in 3d model
                     if (child.isMesh) {
@@ -431,7 +440,7 @@ function loadScene(sceneSchematics, isForPlayer, select) {
 
                         // add node script to object data,  add mesh to physics world (if running on player) & apply texture if available
                         applyScript(scenenode, element, i);
-                        if (element.tex) applyTex(scenenode, element.tex);
+                        if (element.tex) applyTex(scenenode, element.tex, element);
                         if (isForPlayer) applyPhysics(scenenode, element, scenenode, 'normalMesh');
                     } else {
                         // add node to instance
