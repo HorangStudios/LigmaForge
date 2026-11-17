@@ -251,6 +251,7 @@ function listSchematic(toClick = []) {
                         input.type = "button";
                         input.value = "Clear";
                         input.onclick = function () {
+                            if (texcache[element.uuid]) delete texcache[element.uuid];
                             element[key] = false
                             listSchematic([i]);
                             addObject()
